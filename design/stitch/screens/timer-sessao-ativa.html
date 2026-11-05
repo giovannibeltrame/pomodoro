@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-fixed-variant": "#653e00", "surface-container-highest": "#33343c", "secondary": "#ffb2b7", "surface-container-lowest": "#0d0e15", "surface": "#12131a", "outline-variant": "#464554", "inverse-on-surface": "#2f3038", "inverse-primary": "#494bd6", "tertiary": "#ffb95f", "surface-container-low": "#1a1b22", "on-secondary": "#67001b", "on-surface-variant": "#c7c4d7", "surface-container-high": "#292931", "on-primary": "#1000a9", "outline": "#908fa0", "primary-container": "#8083ff", "primary": "#c0c1ff", "on-error": "#690005", "secondary-fixed": "#ffdadb", "secondary-container": "#b50036", "on-tertiary-fixed": "#2a1700", "tertiary-fixed": "#ffddb8", "surface-bright": "#383941", "primary-fixed-dim": "#c0c1ff", "error": "#ffb4ab", "on-background": "#e3e1ec", "tertiary-container": "#ca8100", "surface-container": "#1e1f26", "on-tertiary": "#472a00", "background": "#12131a", "on-secondary-container": "#ffc2c4", "on-secondary-fixed": "#40000d", "on-secondary-fixed-variant": "#92002a", "tertiary-fixed-dim": "#ffb95f", "error-container": "#93000a", "secondary-fixed-dim": "#ffb2b7", "on-primary-container": "#0d0096", "inverse-surface": "#e3e1ec", "on-primary-fixed": "#07006c", "surface-dim": "#12131a", "on-surface": "#e3e1ec", "on-tertiary-container": "#3e2400", "surface-tint": "#c0c1ff", "surface-variant": "#33343c", "primary-fixed": "#e1e0ff", "on-primary-fixed-variant": "#2f2ebe", "on-error-container": "#ffdad6" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "margin-tablet": "1.5rem", "space-xs": "0.25rem", "gutter-desktop": "1.5rem", "gutter": "1rem", "space-md": "0.75rem", "margin": "1rem", "space-lg": "1rem", "margin-desktop": "2rem", "space-sm": "0.5rem", "space-xl": "1.5rem" }, "fontFamily": { "label-md": ["JetBrains Mono"], "headline-lg": ["Geist"], "display-timer": ["JetBrains Mono"], "title-sm": ["Geist"], "body-lg": ["Geist"], "body-md": ["Geist"], "body-sm": ["Geist"], "headline-sm": ["Geist"], "title-md": ["Geist"], "headline-md": ["Geist"], "label-sm": ["JetBrains Mono"], "display-timer-mobile": ["JetBrains Mono"], "code-inline": ["JetBrains Mono"] }, "fontSize": { "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.03em", "fontWeight": "600" }], "display-timer": ["72px", { "lineHeight": "72px", "letterSpacing": "-0.04em", "fontWeight": "500" }], "title-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "body-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "title-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.015em", "fontWeight": "500" }], "headline-md": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.025em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }], "display-timer-mobile": ["48px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "500" }], "code-inline": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.25)]"><div class="h-16 max-w-7xl mx-auto px-margin-desktop flex items-center justify-between gap-space-lg"><div class="flex items-center gap-space-lg shrink-0"><div class="flex items-center gap-space-sm"><img alt="FocusMatrix Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7LDz5fjtMGH9xrtZlm621GBbMk368m-xqrotK25fQ1Ta0tZ68NtYIZOJwQjskjYtL9SVCCv6pssMbvAyfjWSxbpkCqQJ5RqgFo9LhUW1GwNMaEzEKNU0yaVQSDe-YLlK4r98zV7y1HA3KcL3-Pe5E4usRboe_LGr6cD6fMp4w6gSAoNwpcKZoL_3IkMukRykhMncqa6ni3EuFcEsendLK7x1cBtxaU8sPxHf5Fa4"/><span class="font-title-md text-title-md text-on-surface font-semibold tracking-tight">FocusMatrix</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase px-space-xs py-0.5 rounded bg-surface-container-high">Atelier</span></div><div class="h-4 w-px bg-outline-variant/30 hidden lg:block"></div><div class="hidden lg:flex items-center gap-space-sm px-space-sm py-1 rounded bg-surface-container-low"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-md text-label-md text-secondary">Ciclo 3 de 4</span><span class="text-outline-variant">•</span><span class="font-label-md text-label-md text-on-surface">Foco (Q1)</span></div></div><nav class="hidden xl:flex items-center gap-space-xs p-1 rounded-lg bg-surface-container-lowest" data-active-classes="bg-surface-container-high text-primary font-medium shadow-sm"><a class="px-space-md py-1.5 rounded font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" data-path="timer-and-sessao-ativa" href="#">Timer &amp; Sessão Ativa</a><a class="px-space-md py-1.5 rounded font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" data-path="planejador-and-matriz-q1-q3" href="#">Planejador &amp; Matriz Q1-Q3</a><a class="px-space-md py-1.5 rounded font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" data-path="painel-semanal" href="#">Painel Semanal (Metas vs Realizado)</a><a class="px-space-md py-1.5 rounded font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" data-path="historico-de-blocos" href="#">Histórico de Blocos</a></nav><div class="flex items-center gap-space-md shrink-0"><button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors" title="Som Ambiente / Modo Silencioso" type="button"><span class="material-symbols-outlined text-[18px]">headphones</span><span class="font-label-sm text-label-sm hidden sm:inline">Binaural 40Hz</span></button><div class="flex items-center gap-space-xs px-space-sm py-1.5 rounded bg-surface-container-low"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Meta:</span><span class="font-label-md text-label-md text-primary font-medium">7/12</span><span class="font-label-sm text-label-sm text-outline">blocos</span></div><div class="flex items-center pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxh_19ODMvH0oIL9uYVoTlTOPuSZ-4INhZ3EHq6Vw4V-VfIYHgAIGjeGOXGIezVEn2uYvP-6IG2PFQ3kVNy9eQhNmEhm1tUuoo0Dx1vu5K4eYyONDfwY8VIDXwyxn80JUtc9rn-p0zT1NLsfzuvdyGtBAvu-zYz_bk2_ZsJwIi3ZMpTD22I_j2hNn8gmcfaRZ2OTpX2bCItVqV3d3chwO4GPNRDuPlCBj-vVMBqV8"/></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-64px)]"><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto w-full px-margin-desktop py-space-xl flex flex-col gap-space-xl">
+<!-- Top Status Banner / Atmospheric Sub-header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md p-space-lg rounded-xl bg-surface-container-low shadow-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">all_inclusive</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="font-title-md text-title-md text-on-surface font-semibold">Protocolo de Foco Contínuo</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-primary">Sessão #4</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Classifique intencionalmente antes de iniciar a contagem regressiva.</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto">
+<div class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-ping"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Auto-sync Ativo</span>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">database</span>
+<span>IndexedDB Local</span>
+</div>
+</div>
+</div>
+<!-- Main Workspace Grid (2 Columns: Core Focus Console & Daily Ledger Sidebar) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Left Column: Core Focus & Active Session Console (7 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg">
+<!-- Timer Main Module -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-xl shadow-md flex flex-col items-center">
+<!-- Mode Tabs (Focus / Short Break / Long Break) -->
+<div class="flex items-center gap-space-xs p-1 rounded-lg bg-surface-container-lowest mb-space-xl">
+<button class="mode-btn px-space-lg py-1.5 rounded font-title-sm text-title-sm font-medium transition-all bg-surface-container-high text-primary shadow-sm" id="mode-focus" onclick="setTimerMode('focus', 25)">
+              Foco (25m)
+            </button>
+<button class="mode-btn px-space-lg py-1.5 rounded font-title-sm text-title-sm font-medium transition-all text-on-surface-variant hover:text-on-surface" id="mode-short" onclick="setTimerMode('short', 5)">
+              Pausa Curta (5m)
+            </button>
+<button class="mode-btn px-space-lg py-1.5 rounded font-title-sm text-title-sm font-medium transition-all text-on-surface-variant hover:text-on-surface" id="mode-long" onclick="setTimerMode('long', 15)">
+              Pausa Longa (15m)
+            </button>
+</div>
+<!-- Circular Progress Ring & Monospaced Digits Display -->
+<div class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center my-space-sm">
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 320 320">
+<!-- Background Track -->
+<circle class="text-surface-container-highest" cx="160" cy="160" fill="transparent" r="140" stroke="currentColor" stroke-width="6"></circle>
+<!-- Dynamic Elapsed Track -->
+<circle class="text-primary transition-all duration-1000 ease-linear" cx="160" cy="160" fill="transparent" id="timer-progress-ring" r="140" stroke="currentColor" stroke-dasharray="879.64" stroke-dashoffset="0" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<!-- Center Digital Time Readout -->
+<div class="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none">
+<span class="font-display-timer text-display-timer text-on-surface font-semibold tracking-tighter" id="timer-display">
+                25:00
+              </span>
+<div class="flex items-center gap-space-xs mt-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary" id="active-quadrant-indicator"></span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider" id="active-quadrant-text">Q2 • Estratégico</span>
+</div>
+</div>
+</div>
+<!-- Timer Interaction Controls -->
+<div class="flex items-center gap-space-md mt-space-lg">
+<button class="w-12 h-12 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all" id="btn-reset" onclick="resetTimer()" title="Reiniciar Ciclo">
+<span class="material-symbols-outlined text-[22px]">restart_alt</span>
+</button>
+<button class="h-14 px-space-xl rounded-lg bg-primary hover:bg-primary-fixed-dim text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center gap-space-sm shadow-md transition-all active:scale-95" id="btn-toggle" onclick="toggleTimer()">
+<span class="material-symbols-outlined text-[28px]" id="play-pause-icon" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+<span id="play-pause-text">Iniciar Bloco</span>
+</button>
+<button class="w-12 h-12 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all" id="btn-skip" onclick="skipTimer()" title="Completar &amp; Avançar Bloco">
+<span class="material-symbols-outlined text-[22px]">skip_next</span>
+</button>
+</div>
+<!-- Shortcuts Legend Inline -->
+<div class="flex items-center gap-space-md mt-space-lg text-outline font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">Espaço</kbd> Toggle</span>
+<span class="text-surface-container-highest">•</span>
+<span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">R</kbd> Reset</span>
+<span class="text-surface-container-highest">•</span>
+<span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">S</kbd> Pular</span>
+</div>
+</div>
+<!-- Session Metadata Card: Quadrants & Intent -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm flex flex-col gap-space-lg">
+<!-- Section 1: Eisenhower Quadrant Selector -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<label class="font-title-sm text-title-sm text-on-surface font-semibold flex items-center gap-space-xs">
+<span>Classificação do Bloco (Matriz)</span>
+<span class="font-label-sm text-label-sm text-secondary">*Obrigatório</span>
+</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Taxonomia Eisenhower</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
+<!-- Q1 Option -->
+<div class="cursor-pointer p-space-md rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col gap-1 relative overflow-hidden group" id="quadrant-card-q1" onclick="selectQuadrant('q1')">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Q1
+                  </span>
+<span class="font-label-sm text-label-sm text-outline">Urgente + Importante</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-medium mt-1">Crises &amp; Urgências</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Incêndios, bloqueios imediatos, bugs de produção.</p>
+</div>
+<!-- Q2 Option (Active by default) -->
+<div class="cursor-pointer p-space-md rounded-lg bg-surface-container-highest transition-all flex flex-col gap-1 relative overflow-hidden group shadow-sm" id="quadrant-card-q2" onclick="selectQuadrant('q2')">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-primary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Q2
+                  </span>
+<span class="font-label-sm text-label-sm text-primary">Não Urgente + Importante</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-medium mt-1">Trabalho Profundo</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Arquitetura, estratégia, escrita técnica, criação.</p>
+</div>
+<!-- Q3 Option -->
+<div class="cursor-pointer p-space-md rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col gap-1 relative overflow-hidden group" id="quadrant-card-q3" onclick="selectQuadrant('q3')">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-tertiary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> Q3
+                  </span>
+<span class="font-label-sm text-label-sm text-outline">Urgente + Não Importante</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-medium mt-1">Demandas &amp; Interrupções</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Mensagens, triagem de emails reativa, reuniões ad-hoc.</p>
+</div>
+</div>
+</div>
+<!-- Section 2: Role and Intention Inputs -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
+<!-- Role / Persona Select -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-title-sm text-title-sm text-on-surface font-medium flex items-center gap-space-xs" for="block-role">
+<span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+                Papel / Função no Bloco
+              </label>
+<div class="relative">
+<select class="w-full bg-surface-container text-on-surface rounded-lg px-space-md py-2.5 font-body-md text-body-md appearance-none focus:outline-none focus:bg-surface-container-high transition-colors" id="block-role">
+<option value="software-architect">Arquiteto de Software</option>
+<option value="tech-lead">Líder Técnico</option>
+<option value="content-creator">Criador de Conteúdo</option>
+<option value="product-manager">Gestor de Produtos</option>
+<option value="deep-researcher">Pesquisador / Estudioso</option>
+<option value="system-operator">Operador de Infraestrutura</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-2.5 text-[20px] text-outline">expand_more</span>
+</div>
+</div>
+<!-- Focus Objective -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-title-sm text-title-sm text-on-surface font-medium flex items-center gap-space-xs" for="session-goal">
+<span class="material-symbols-outlined text-[16px] text-tertiary">flag</span>
+                Objetivo Singular da Sessão
+              </label>
+<input class="w-full bg-surface-container text-on-surface rounded-lg px-space-md py-2.5 font-body-md text-body-md focus:outline-none focus:bg-surface-container-high transition-colors placeholder:text-outline/50" id="session-goal" placeholder="Ex: Escrever especificação técnica do microsserviço..." type="text" value="Refatorar camada de mensageria assíncrona do worker de faturamento"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Real-time Daily Ledger & Upcoming Blocks (4 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-space-lg">
+<!-- Daily Executive Summary Card -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">analytics</span>
+<h2 class="font-title-md text-title-md text-on-surface font-semibold">Balanço do Dia</h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">9 Blocos (3h45m)</span>
+</div>
+<!-- Quadrant Progress Counters -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<!-- Q1 Row -->
+<div class="flex flex-col gap-1 p-space-sm rounded-lg bg-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-sm bg-secondary"></span>
+<span class="font-title-sm text-title-sm text-on-surface font-medium">Q1: Crises &amp; Urgências</span>
+</div>
+<span class="font-label-md text-label-md text-secondary font-semibold">3 blocos</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 33%;"></div>
+</div>
+</div>
+<!-- Q2 Row (Heroic state) -->
+<div class="flex flex-col gap-1 p-space-sm rounded-lg bg-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-sm bg-primary"></span>
+<span class="font-title-sm text-title-sm text-on-surface font-medium">Q2: Deep Work Estratégico</span>
+</div>
+<span class="font-label-md text-label-md text-primary font-semibold">5 blocos</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 55%;"></div>
+</div>
+</div>
+<!-- Q3 Row -->
+<div class="flex flex-col gap-1 p-space-sm rounded-lg bg-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-sm bg-tertiary"></span>
+<span class="font-title-sm text-title-sm text-on-surface font-medium">Q3: Demandas Reativas</span>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-semibold">1 bloco</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 12%;"></div>
+</div>
+</div>
+</div>
+<!-- Ratio Quality KPI -->
+<div class="mt-space-xs p-space-sm rounded-lg bg-surface-container-high flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Índice de Soberania (Q2 vs Geral)</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">55.6%</span>
+</div>
+<span class="px-2 py-1 rounded font-label-sm text-label-sm bg-primary-container/20 text-primary font-medium">Dentro da Meta (&gt;50%)</span>
+</div>
+</div>
+<!-- Upcoming Blocks in Weekly Schedule -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-tertiary">schedule</span>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Próximos na Agenda</h3>
+</div>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">Ver Matriz</a>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Block 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-start justify-between gap-space-sm group">
+<div class="flex items-start gap-space-xs">
+<span class="w-1.5 h-6 rounded-full bg-primary mt-0.5 shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface font-medium leading-snug">Design Doc do Repositório de Eventos</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Papel: Arquiteto • 2 blocos estimados</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface font-medium shrink-0">15:30</span>
+</div>
+<!-- Block 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-start justify-between gap-space-sm group">
+<div class="flex items-start gap-space-xs">
+<span class="w-1.5 h-6 rounded-full bg-secondary mt-0.5 shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface font-medium leading-snug">Alinhamento de Incidente de Latência</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Papel: Líder Técnico • 1 bloco</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface font-medium shrink-0">16:45</span>
+</div>
+<!-- Block 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-start justify-between gap-space-sm group">
+<div class="flex items-start gap-space-xs">
+<span class="w-1.5 h-6 rounded-full bg-tertiary mt-0.5 shrink-0"></span>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface font-medium leading-snug">Triagem e Despacho de Pull Requests</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Papel: Gestor de Projetos • 1 bloco</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface font-medium shrink-0">17:30</span>
+</div>
+</div>
+</div>
+<!-- Local Storage Persistence & Security Widget -->
+<div class="p-space-md rounded-xl bg-surface-container-lowest flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[20px] text-primary">security_update_good</span>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface font-medium">Persistência Offline Local</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Nenhum dado é perdido ao atualizar.</span>
+</div>
+</div>
+<button class="px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm transition-colors" onclick="simulateSaveFeedback(this)">
+            Forçar Salvar
+          </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Timer State Controller
+  let timerDuration = 25 * 60;
+  let remainingSeconds = timerDuration;
+  let timerInterval = null;
+  let isRunning = false;
+  let currentMode = 'focus';
+  let selectedQuadrant = 'q2';
+
+  const circumference = 2 * Math.PI * 140; // 879.645
+
+  function updateDisplay() {
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = remainingSeconds % 60;
+    const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    const displayEl = document.getElementById('timer-display');
+    if (displayEl) {
+      displayEl.textContent = formatted;
+    }
+
+    // Update Progress Ring
+    const progressRing = document.getElementById('timer-progress-ring');
+    if (progressRing) {
+      const progressRatio = remainingSeconds / timerDuration;
+      const offset = circumference * (1 - progressRatio);
+      progressRing.style.strokeDashoffset = offset;
+    }
+  }
+
+  function toggleTimer() {
+    const playIcon = document.getElementById('play-pause-icon');
+    const playText = document.getElementById('play-pause-text');
+
+    if (isRunning) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      if (playIcon) playIcon.textContent = 'play_arrow';
+      if (playText) playText.textContent = 'Continuar';
+    } else {
+      isRunning = true;
+      if (playIcon) playIcon.textContent = 'pause';
+      if (playText) playText.textContent = 'Pausar';
+
+      timerInterval = setInterval(() => {
+        if (remainingSeconds > 0) {
+          remainingSeconds--;
+          updateDisplay();
+        } else {
+          clearInterval(timerInterval);
+          isRunning = false;
+          handleSessionComplete();
+        }
+      }, 1000);
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    isRunning = false;
+    remainingSeconds = timerDuration;
+    
+    const playIcon = document.getElementById('play-pause-icon');
+    const playText = document.getElementById('play-pause-text');
+    if (playIcon) playIcon.textContent = 'play_arrow';
+    if (playText) playText.textContent = 'Iniciar Bloco';
+
+    updateDisplay();
+  }
+
+  function skipTimer() {
+    clearInterval(timerInterval);
+    isRunning = false;
+    remainingSeconds = 0;
+    updateDisplay();
+    handleSessionComplete();
+  }
+
+  function setTimerMode(mode, minutes) {
+    currentMode = mode;
+    timerDuration = minutes * 60;
+    remainingSeconds = timerDuration;
+
+    if (isRunning) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      const playIcon = document.getElementById('play-pause-icon');
+      const playText = document.getElementById('play-pause-text');
+      if (playIcon) playIcon.textContent = 'play_arrow';
+      if (playText) playText.textContent = 'Iniciar Bloco';
+    }
+
+    // Visual button styling
+    ['focus', 'short', 'long'].forEach(m => {
+      const btn = document.getElementById(`mode-${m}`);
+      if (btn) {
+        if (m === mode) {
+          btn.className = 'mode-btn px-space-lg py-1.5 rounded font-title-sm text-title-sm font-medium transition-all bg-surface-container-high text-primary shadow-sm';
+        } else {
+          btn.className = 'mode-btn px-space-lg py-1.5 rounded font-title-sm text-title-sm font-medium transition-all text-on-surface-variant hover:text-on-surface';
+        }
+      }
+    });
+
+    updateDisplay();
+  }
+
+  function selectQuadrant(quad) {
+    selectedQuadrant = quad;
+    const cards = {
+      q1: document.getElementById('quadrant-card-q1'),
+      q2: document.getElementById('quadrant-card-q2'),
+      q3: document.getElementById('quadrant-card-q3')
+    };
+
+    const textIndicator = document.getElementById('active-quadrant-text');
+    const dotIndicator = document.getElementById('active-quadrant-indicator');
+    const progressRing = document.getElementById('timer-progress-ring');
+
+    ['q1', 'q2', 'q3'].forEach(k => {
+      if (cards[k]) {
+        if (k === quad) {
+          cards[k].className = 'cursor-pointer p-space-md rounded-lg bg-surface-container-highest transition-all flex flex-col gap-1 relative overflow-hidden group shadow-sm';
+        } else {
+          cards[k].className = 'cursor-pointer p-space-md rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col gap-1 relative overflow-hidden group';
+        }
+      }
+    });
+
+    if (quad === 'q1') {
+      if (textIndicator) textIndicator.textContent = 'Q1 • Crises & Urgências';
+      if (dotIndicator) dotIndicator.className = 'w-2 h-2 rounded-full bg-secondary';
+      if (progressRing) {
+        progressRing.classList.remove('text-primary', 'text-tertiary');
+        progressRing.classList.add('text-secondary');
+      }
+    } else if (quad === 'q2') {
+      if (textIndicator) textIndicator.textContent = 'Q2 • Estratégico';
+      if (dotIndicator) dotIndicator.className = 'w-2 h-2 rounded-full bg-primary';
+      if (progressRing) {
+        progressRing.classList.remove('text-secondary', 'text-tertiary');
+        progressRing.classList.add('text-primary');
+      }
+    } else if (quad === 'q3') {
+      if (textIndicator) textIndicator.textContent = 'Q3 • Interrupções';
+      if (dotIndicator) dotIndicator.className = 'w-2 h-2 rounded-full bg-tertiary';
+      if (progressRing) {
+        progressRing.classList.remove('text-primary', 'text-secondary');
+        progressRing.classList.add('text-tertiary');
+      }
+    }
+  }
+
+  function handleSessionComplete() {
+    alert(`Bloco ${selectedQuadrant.toUpperCase()} concluído com sucesso! Salvo localmente.`);
+    resetTimer();
+  }
+
+  function simulateSaveFeedback(btn) {
+    const originalText = btn.textContent;
+    btn.textContent = 'Salvo!';
+    btn.classList.add('text-primary');
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('text-primary');
+    }, 1500);
+  }
+
+  // Keyboard Navigation Listeners
+  document.addEventListener('keydown', (e) => {
+    // Avoid triggering when focused on text fields
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+    if (e.code === 'Space') {
+      e.preventDefault();
+      toggleTimer();
+    } else if (e.key === 'r' || e.key === 'R') {
+      resetTimer();
+    } else if (e.key === 's' || e.key === 'S') {
+      skipTimer();
+    }
+  });
+
+  // Initial Paint
+  updateDisplay();
+</script></main><footer class="w-full bg-surface-container-lowest py-space-xl"><div class="max-w-7xl mx-auto px-margin-desktop flex flex-col sm:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-body-sm text-body-sm text-on-surface-variant">FocusMatrix Atelier • Deep Work Protocol</span></div><div class="flex items-center gap-space-lg text-outline font-label-sm text-label-sm"><div class="flex items-center gap-space-xs"><span>[Space]</span><span class="text-on-surface-variant">Play/Pausa</span></div><div class="flex items-center gap-space-xs"><span>[Tab]</span><span class="text-on-surface-variant">Próximo Quadrante</span></div><div class="flex items-center gap-space-xs"><span>[⌘K]</span><span class="text-on-surface-variant">Captura Rápida</span></div></div></div></footer></body></html>
