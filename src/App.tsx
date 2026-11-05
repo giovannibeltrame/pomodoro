@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import * as timer from './domain/timer';
-import { startOfWeek, summarizeWeek, weekKey } from './domain/week';
+import { dayOfWeek, startOfWeek, summarizeWeek, weekKey } from './domain/week';
 import { QUADRANT_INFO } from './domain/types';
-import { load, planFor, reducer, save } from './state/store';
+import { DURATIONS, load, planFor, reducer, save, type AppState } from './state/store';
 import { beep } from './ui/beep';
-import { MODE_LABEL, QUADRANT_CLASS } from './ui/theme';
+import { Shortcuts } from './ui/Shortcuts';
+import { useClock } from './ui/useClock';
+import { MODE_LABEL, QUADRANT_CLASS, TABS, tabClass } from './ui/theme';
 import { TimerPage } from './pages/TimerPage';
 import { WeeklyPage } from './pages/WeeklyPage';
 
@@ -15,53 +17,55 @@ const NAV: { id: Page; label: string }[] = [
   { id: 'weekly', label: 'Painel Semanal' },
 ];
 
+const TEXT_ENTRY = 'input, textarea, select, [contenteditable="true"]';
+const ACTIVATABLE = 'button, a, [role="button"], [role="radio"], [role="tab"]';
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, undefined, () => load(localStorage));
   const [page, setPage] = useState<Page>('timer');
-  const [now, setNow] = useState(() => Date.now());
-  const { endsAt } = state.timer;
+  const { endsAt, mode } = state.timer;
+  const now = useClock(endsAt);
+  const running = endsAt !== null;
 
-  useEffect(() => save(localStorage, state), [state]);
+  const saved = useRef<AppState>();
+  useEffect(() => {
+    save(localStorage, state, saved.current);
+    saved.current = state;
+  }, [state]);
 
   useEffect(() => {
     if (endsAt === null) return;
-    const id = setInterval(() => setNow(Date.now()), 250);
-    return () => clearInterval(id);
+    const expire = (now: number) => dispatch({ type: 'expire', now, id: crypto.randomUUID() });
+    if (endsAt <= Date.now()) {
+      expire(Date.now());
+      return;
+    }
+    const id = setTimeout(() => {
+      expire(Math.max(Date.now(), endsAt));
+      beep();
+    }, endsAt - Date.now());
+    return () => clearTimeout(id);
   }, [endsAt]);
-
-  useEffect(() => {
-    if (endsAt === null || now < endsAt) return;
-    dispatch({ type: 'finish', now, id: crypto.randomUUID(), endsAt });
-    if (now - endsAt < 5_000) beep();
-  }, [now, endsAt]);
 
   const remainingMs = timer.remaining(state.timer, now);
-  const running = timer.isRunning(state.timer);
-
+  const title = running ? `${timer.formatClock(remainingMs)} · ${MODE_LABEL[mode]}` : 'Pomodoro';
   useEffect(() => {
-    document.title = running ? `${timer.formatClock(remainingMs)} · ${MODE_LABEL[state.timer.mode]}` : 'Pomodoro';
-  }, [running, remainingMs, state.timer.mode]);
+    document.title = title;
+  }, [title]);
 
   const toggle = useCallback(() => {
-    const t = Date.now();
-    setNow(t);
-    dispatch(running ? { type: 'pause', now: t } : { type: 'start', now: t });
+    dispatch(running ? { type: 'pause', now: Date.now() } : { type: 'start', now: Date.now() });
   }, [running]);
-
-  const skip = useCallback(() => {
-    const t = Date.now();
-    setNow(t);
-    dispatch({ type: 'finish', now: t, id: crypto.randomUUID(), endsAt });
-  }, [endsAt]);
-
+  const skip = useCallback(() => dispatch({ type: 'skip', now: Date.now(), id: crypto.randomUUID() }), []);
   const resetTimer = useCallback(() => dispatch({ type: 'reset' }), []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const el = e.target as HTMLElement | null;
-      if (el && ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'A'].includes(el.tagName)) return;
+      if (e.repeat || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target instanceof Element ? e.target : null;
+      if (el?.closest(TEXT_ENTRY)) return;
       if (e.code === 'Space') {
+        if (el?.closest(ACTIVATABLE)) return;
         e.preventDefault();
         toggle();
       } else if (e.key.toLowerCase() === 'r') {
@@ -75,8 +79,9 @@ export default function App() {
   }, [toggle, resetTimer, skip]);
 
   const thisWeek = startOfWeek(now);
-  const week = summarizeWeek(state.blocks, thisWeek, planFor(state, weekKey(thisWeek)));
-  const cycle = timer.cycleNumber(state.timer, state.durations);
+  const plan = planFor(state, weekKey(thisWeek));
+  const week = useMemo(() => summarizeWeek(state.blocks, thisWeek, plan), [state.blocks, thisWeek, plan]);
+  const cycle = timer.cycleNumber(state.timer, DURATIONS);
   const qc = QUADRANT_CLASS[state.quadrant];
 
   return (
@@ -93,27 +98,23 @@ export default function App() {
             <div className="hidden lg:flex items-center gap-space-sm px-space-sm py-1 rounded bg-surface-container-low">
               <span className={`w-2 h-2 rounded-full ${running ? `${qc.bg} animate-pulse` : 'bg-outline-variant'}`} />
               <span className={`font-mono text-label-md ${qc.text}`}>
-                Ciclo {cycle} de {state.durations.longEvery}
+                Ciclo {cycle} de {DURATIONS.longEvery}
               </span>
               <span className="text-outline-variant">•</span>
               <span className="font-mono text-label-md">
-                {MODE_LABEL[state.timer.mode]}
-                {state.timer.mode === 'focus' ? ` (${QUADRANT_INFO[state.quadrant].label})` : ''}
+                {MODE_LABEL[mode]}
+                {mode === 'focus' ? ` (${QUADRANT_INFO[state.quadrant].label})` : ''}
               </span>
             </div>
           </div>
-          <nav className="flex items-center gap-space-xs p-1 rounded-xl bg-surface-container-lowest">
+          <nav className={TABS}>
             {NAV.map((n) => (
               <button
                 key={n.id}
                 type="button"
                 aria-current={page === n.id ? 'page' : undefined}
                 onClick={() => setPage(n.id)}
-                className={`px-space-md py-1.5 rounded text-title-sm transition-all ${
-                  page === n.id
-                    ? 'bg-surface-container-high text-primary shadow-sm'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
-                }`}
+                className={tabClass(page === n.id)}
               >
                 {n.label}
               </button>
@@ -134,7 +135,7 @@ export default function App() {
           <TimerPage
             state={state}
             dispatch={dispatch}
-            now={now}
+            today={week.days[dayOfWeek(now)]}
             remainingMs={remainingMs}
             running={running}
             onToggle={toggle}
@@ -152,17 +153,7 @@ export default function App() {
             <span className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-body-sm text-on-surface-variant">Dados salvos localmente neste navegador</span>
           </div>
-          <div className="flex items-center gap-space-lg font-mono text-label-sm text-outline">
-            <span>
-              [Espaço] <span className="text-on-surface-variant">Play/Pausa</span>
-            </span>
-            <span>
-              [R] <span className="text-on-surface-variant">Reset</span>
-            </span>
-            <span>
-              [S] <span className="text-on-surface-variant">Pular</span>
-            </span>
-          </div>
+          <Shortcuts />
         </div>
       </footer>
     </div>

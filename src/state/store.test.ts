@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STORAGE_KEY, initialState, load, planFor, reducer, save, type AppState } from './store';
+import { BLOCKS_KEY, STATE_KEY, initialState, load, planFor, reducer, save, type AppState } from './store';
 
 const MIN = 60_000;
 
@@ -7,15 +7,29 @@ function run(state: AppState, ...actions: Parameters<typeof reducer>[1][]): AppS
   return actions.reduce(reducer, state);
 }
 
+function memoryStorage() {
+  const mem = new Map<string, string>();
+  const writes: string[] = [];
+  return {
+    mem,
+    writes,
+    getItem: (k: string) => mem.get(k) ?? null,
+    setItem: (k: string, v: string) => {
+      writes.push(k);
+      mem.set(k, v);
+    },
+  };
+}
+
 describe('store', () => {
-  it('records a block with the selected quadrant, role and goal when focus finishes', () => {
+  it('records a block with the selected quadrant, role and goal when focus expires', () => {
     const s = run(
       initialState(),
       { type: 'selectQuadrant', quadrant: 'q1' },
       { type: 'addRole', role: 'Revisor' },
       { type: 'setGoal', goal: '  Corrigir deploy  ' },
       { type: 'start', now: 0 },
-      { type: 'finish', now: 25 * MIN, id: 'b1', endsAt: 25 * MIN },
+      { type: 'expire', now: 25 * MIN, id: 'b1' },
     );
     expect(s.blocks).toEqual([
       { id: 'b1', quadrant: 'q1', role: 'Revisor', goal: 'Corrigir deploy', startedAt: 0, endedAt: 25 * MIN, focusMs: 25 * MIN },
@@ -26,19 +40,22 @@ describe('store', () => {
   it('does not record breaks or unstarted skipped focus blocks', () => {
     const s = run(
       initialState(),
-      { type: 'finish', now: 0, id: 'skip', endsAt: null },
+      { type: 'skip', now: 0, id: 'skip' },
       { type: 'start', now: 0 },
-      { type: 'finish', now: 5 * MIN, id: 'break', endsAt: 5 * MIN },
+      { type: 'expire', now: 5 * MIN, id: 'break' },
     );
     expect(s.blocks).toEqual([]);
     expect(s.timer.mode).toBe('focus');
   });
 
-  it('ignores a repeated completion of the same segment', () => {
-    const done = { type: 'finish', now: 25 * MIN, id: 'b1', endsAt: 25 * MIN } as const;
-    const s = run(initialState(), { type: 'start', now: 0 }, done, { ...done, id: 'b2' });
-    expect(s.blocks.map((b) => b.id)).toEqual(['b1']);
-    expect(s.timer.mode).toBe('short');
+  it('ignores an expiry that is early, repeated, or for a paused timer', () => {
+    const started = run(initialState(), { type: 'start', now: 0 });
+    expect(run(started, { type: 'expire', now: 24 * MIN, id: 'early' })).toBe(started);
+    const done = run(started, { type: 'expire', now: 25 * MIN, id: 'b1' }, { type: 'expire', now: 25 * MIN, id: 'b2' });
+    expect(done.blocks.map((b) => b.id)).toEqual(['b1']);
+    expect(done.timer.mode).toBe('short');
+    const paused = run(started, { type: 'pause', now: MIN });
+    expect(run(paused, { type: 'expire', now: 99 * MIN, id: 'x' })).toBe(paused);
   });
 
   it('carries the latest plan forward to weeks without their own plan', () => {
@@ -49,12 +66,22 @@ describe('store', () => {
   });
 
   it('round-trips state through storage and survives corrupt data', () => {
-    const mem = new Map<string, string>();
-    const storage = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
-    const s = run(initialState(), { type: 'start', now: 0 }, { type: 'finish', now: 25 * MIN, id: 'b1', endsAt: 25 * MIN });
+    const storage = memoryStorage();
+    const s = run(initialState(), { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN, id: 'b1' });
     save(storage, s);
     expect(load(storage)).toEqual(s);
-    mem.set(STORAGE_KEY, '{not json');
+    storage.mem.set(STATE_KEY, '{not json');
     expect(load(storage)).toEqual(initialState());
+  });
+
+  it('rewrites block history only when it changed', () => {
+    const storage = memoryStorage();
+    const a = initialState();
+    const b = run(a, { type: 'setGoal', goal: 'x' });
+    save(storage, b, a);
+    expect(storage.writes).toEqual([STATE_KEY]);
+    const c = run(b, { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN, id: 'b1' });
+    save(storage, c, b);
+    expect(storage.writes).toEqual([STATE_KEY, STATE_KEY, BLOCKS_KEY]);
   });
 });

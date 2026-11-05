@@ -1,19 +1,24 @@
 import { useState, type Dispatch } from 'react';
 import * as timer from '../domain/timer';
-import { QUADRANTS, QUADRANT_INFO, type Mode } from '../domain/types';
-import { blocksInRange, dayRange, formatDuration } from '../domain/week';
-import type { Action, AppState } from '../state/store';
+import { QUADRANTS, QUADRANT_INFO, quadrantName, type Mode } from '../domain/types';
+import { formatDuration, type DaySummary } from '../domain/week';
+import { DURATIONS, type Action, type AppState } from '../state/store';
+import { Bar } from '../ui/Bar';
 import { Icon } from '../ui/Icon';
-import { BREAK_STROKE, MODE_LABEL, QUADRANT_CLASS } from '../ui/theme';
+import { Shortcuts } from '../ui/Shortcuts';
+import { BREAK_STROKE, MODE_LABEL, PAGE, QUADRANT_CLASS, SECONDARY_BTN, TABS, pct, tabClass } from '../ui/theme';
 
 const RADIUS = 140;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const MODES: Mode[] = ['focus', 'short', 'long'];
+const ICON_BTN =
+  'w-12 h-12 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all';
+const FIELD = 'focus:outline-none focus:ring-1 focus:ring-primary/60';
 
 interface Props {
   state: AppState;
   dispatch: Dispatch<Action>;
-  now: number;
+  today: DaySummary;
   remainingMs: number;
   running: boolean;
   onToggle: () => void;
@@ -21,16 +26,15 @@ interface Props {
   onReset: () => void;
 }
 
-export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle, onSkip, onReset }: Props) {
+export function TimerPage({ state, dispatch, today, remainingMs, running, onToggle, onSkip, onReset }: Props) {
   const { mode } = state.timer;
-  const total = timer.durationMs(mode, state.durations);
+  const total = timer.durationMs(mode, DURATIONS);
   const offset = CIRCUMFERENCE * (1 - remainingMs / total);
-  const stroke = mode === 'focus' ? QUADRANT_CLASS[state.quadrant].stroke : BREAK_STROKE[mode];
+  const stroke = mode === 'focus' ? QUADRANT_CLASS[state.quadrant].text : BREAK_STROKE[mode];
   const started = state.timer.startedAt !== null;
-  const info = QUADRANT_INFO[state.quadrant];
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-margin md:px-margin-desktop py-space-xl flex flex-col gap-space-xl">
+    <div className={PAGE}>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md p-space-lg rounded-xl bg-surface-container-low shadow-sm">
         <div className="flex items-center gap-space-md">
           <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
@@ -49,7 +53,7 @@ export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle
             className="rounded-xl bg-surface-container-low p-space-xl shadow-md flex flex-col items-center transition-shadow"
             style={running && mode === 'focus' ? { boxShadow: '0 0 24px -4px rgba(99, 102, 241, 0.12)' } : undefined}
           >
-            <div role="tablist" className="flex items-center gap-space-xs p-1 rounded-lg bg-surface-container-lowest mb-space-xl">
+            <div role="tablist" className={`${TABS} mb-space-xl`}>
               {MODES.map((m) => (
                 <button
                   key={m}
@@ -57,11 +61,9 @@ export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle
                   role="tab"
                   aria-selected={mode === m}
                   onClick={() => dispatch({ type: 'setMode', mode: m })}
-                  className={`px-space-md sm:px-space-lg py-1.5 rounded text-title-sm transition-all ${
-                    mode === m ? 'bg-surface-container-high text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
+                  className={tabClass(mode === m)}
                 >
-                  {MODE_LABEL[m]} ({state.durations[m]}m)
+                  {MODE_LABEL[m]} ({DURATIONS[m]}m)
                 </button>
               ))}
             </div>
@@ -87,28 +89,16 @@ export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle
                   {timer.formatClock(remainingMs)}
                 </span>
                 <div className="flex items-center gap-space-xs mt-space-xs">
-                  {mode === 'focus' ? (
-                    <>
-                      <span className={`w-2 h-2 rounded-full ${QUADRANT_CLASS[state.quadrant].bg}`} />
-                      <span className="font-mono text-label-md text-on-surface-variant uppercase tracking-wider">
-                        {info.label} • {info.title}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="font-mono text-label-md text-on-surface-variant uppercase tracking-wider">{MODE_LABEL[mode]}</span>
-                  )}
+                  {mode === 'focus' && <span className={`w-2 h-2 rounded-full ${QUADRANT_CLASS[state.quadrant].bg}`} />}
+                  <span className="font-mono text-label-md text-on-surface-variant uppercase tracking-wider">
+                    {mode === 'focus' ? quadrantName(state.quadrant) : MODE_LABEL[mode]}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-space-md mt-space-lg">
-              <button
-                type="button"
-                onClick={onReset}
-                title="Reiniciar ciclo (R)"
-                aria-label="Reiniciar ciclo"
-                className="w-12 h-12 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all"
-              >
+              <button type="button" onClick={onReset} title="Reiniciar ciclo (R)" aria-label="Reiniciar ciclo" className={ICON_BTN}>
                 <Icon name="restart_alt" className="text-[22px]" />
               </button>
               <button
@@ -124,18 +114,14 @@ export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle
                 onClick={onSkip}
                 title="Completar & avançar bloco (S)"
                 aria-label="Completar e avançar bloco"
-                className="w-12 h-12 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all"
+                className={ICON_BTN}
               >
                 <Icon name="skip_next" className="text-[22px]" />
               </button>
             </div>
 
-            <div className="flex items-center gap-space-md mt-space-lg text-outline font-mono text-label-sm">
-              <Kbd k="Espaço" label="Toggle" />
-              <span className="text-surface-container-highest">•</span>
-              <Kbd k="R" label="Reset" />
-              <span className="text-surface-container-highest">•</span>
-              <Kbd k="S" label="Pular" />
+            <div className="mt-space-lg">
+              <Shortcuts />
             </div>
           </section>
 
@@ -143,7 +129,7 @@ export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-space-lg">
-          <DayBalance state={state} now={now} />
+          <DayBalance today={today} />
           <div className="p-space-md rounded-xl bg-surface-container-lowest flex items-center gap-space-sm">
             <Icon name="security_update_good" className="text-[20px] text-primary" />
             <div className="flex flex-col">
@@ -157,21 +143,8 @@ export function TimerPage({ state, dispatch, now, remainingMs, running, onToggle
   );
 }
 
-function Kbd({ k, label }: { k: string; label: string }) {
-  return (
-    <span className="flex items-center gap-1">
-      <kbd className="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface">{k}</kbd> {label}
-    </span>
-  );
-}
-
 function BlockSetup({ state, dispatch }: { state: AppState; dispatch: Dispatch<Action> }) {
   const [newRole, setNewRole] = useState('');
-
-  function addRole() {
-    dispatch({ type: 'addRole', role: newRole });
-    setNewRole('');
-  }
 
   return (
     <section className="rounded-xl bg-surface-container-low p-space-lg shadow-sm flex flex-col gap-space-lg">
@@ -221,7 +194,7 @@ function BlockSetup({ state, dispatch }: { state: AppState; dispatch: Dispatch<A
               id="block-role"
               value={state.role}
               onChange={(e) => dispatch({ type: 'selectRole', role: e.target.value })}
-              className="w-full bg-surface-container text-on-surface rounded-lg px-space-md py-2.5 text-body-md appearance-none focus:outline-none focus:ring-1 focus:ring-primary/60"
+              className={`w-full bg-surface-container text-on-surface rounded-lg px-space-md py-2.5 text-body-md appearance-none ${FIELD}`}
             >
               {state.roles.map((r) => (
                 <option key={r} value={r}>
@@ -235,7 +208,8 @@ function BlockSetup({ state, dispatch }: { state: AppState; dispatch: Dispatch<A
             className="flex gap-space-xs"
             onSubmit={(e) => {
               e.preventDefault();
-              addRole();
+              dispatch({ type: 'addRole', role: newRole });
+              setNewRole('');
             }}
           >
             <input
@@ -243,13 +217,9 @@ function BlockSetup({ state, dispatch }: { state: AppState; dispatch: Dispatch<A
               value={newRole}
               onChange={(e) => setNewRole(e.target.value)}
               placeholder="Novo papel…"
-              className="flex-1 bg-surface-container-lowest rounded-lg px-space-md py-1.5 text-body-sm focus:outline-none focus:ring-1 focus:ring-primary/60 placeholder:text-outline/60"
+              className={`flex-1 bg-surface-container-lowest rounded-lg px-space-md py-1.5 text-body-sm placeholder:text-outline/60 ${FIELD}`}
             />
-            <button
-              type="submit"
-              disabled={!newRole.trim()}
-              className="px-space-sm rounded-lg bg-white/[0.03] border border-white/[0.07] text-body-sm text-[#D4D4D8] hover:bg-white/[0.07] disabled:opacity-40"
-            >
+            <button type="submit" disabled={!newRole.trim()} className={`px-space-sm text-body-sm disabled:opacity-40 ${SECONDARY_BTN}`}>
               Adicionar
             </button>
           </form>
@@ -264,7 +234,7 @@ function BlockSetup({ state, dispatch }: { state: AppState; dispatch: Dispatch<A
             value={state.goal}
             onChange={(e) => dispatch({ type: 'setGoal', goal: e.target.value })}
             placeholder="Ex: Escrever especificação técnica do microsserviço..."
-            className="w-full bg-surface-container text-on-surface rounded-lg px-space-md py-2.5 text-body-md focus:outline-none focus:ring-1 focus:ring-primary/60 placeholder:text-outline/50"
+            className={`w-full bg-surface-container text-on-surface rounded-lg px-space-md py-2.5 text-body-md placeholder:text-outline/50 ${FIELD}`}
           />
         </div>
       </div>
@@ -272,13 +242,8 @@ function BlockSetup({ state, dispatch }: { state: AppState; dispatch: Dispatch<A
   );
 }
 
-function DayBalance({ state, now }: { state: AppState; now: number }) {
-  const [from, to] = dayRange(now);
-  const today = blocksInRange(state.blocks, from, to);
-  const counts = QUADRANTS.map((q) => ({ q, n: today.filter((b) => b.quadrant === q).length }));
-  const totalMs = today.reduce((n, b) => n + b.focusMs, 0);
-  const q2 = counts.find((c) => c.q === 'q2')!.n;
-  const ratio = today.length ? Math.round((q2 / today.length) * 1000) / 10 : 0;
+function DayBalance({ today }: { today: DaySummary }) {
+  const ratio = pct(today.counts.q2, today.total);
 
   return (
     <section className="rounded-xl bg-surface-container-low p-space-lg shadow-sm flex flex-col gap-space-md">
@@ -288,28 +253,25 @@ function DayBalance({ state, now }: { state: AppState; now: number }) {
           <h2 className="text-title-md font-semibold">Balanço do Dia</h2>
         </div>
         <span className="font-mono text-label-sm text-on-surface-variant">
-          {today.length} {today.length === 1 ? 'Bloco' : 'Blocos'} ({formatDuration(totalMs)})
+          {today.total} {today.total === 1 ? 'Bloco' : 'Blocos'} ({formatDuration(today.focusMs)})
         </span>
       </div>
       <div className="flex flex-col gap-space-sm">
-        {counts.map(({ q, n }) => {
+        {QUADRANTS.map((q) => {
+          const n = today.counts[q];
           const c = QUADRANT_CLASS[q];
           return (
             <div key={q} className="flex flex-col gap-1 p-space-sm rounded-lg bg-surface-container">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-space-xs">
                   <span className={`w-2.5 h-2.5 rounded-sm ${c.bg}`} />
-                  <span className="text-title-sm">
-                    {QUADRANT_INFO[q].label}: {QUADRANT_INFO[q].title}
-                  </span>
+                  <span className="text-title-sm">{quadrantName(q)}</span>
                 </div>
                 <span className={`font-mono text-label-md font-semibold ${c.text}`}>
                   {n} {n === 1 ? 'bloco' : 'blocos'}
                 </span>
               </div>
-              <div className="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
-                <div className={`${c.bg} h-full rounded-full`} style={{ width: `${today.length ? (n / today.length) * 100 : 0}%` }} />
-              </div>
+              <Bar value={pct(n, today.total)} className={c.bg} height="h-1.5" />
             </div>
           );
         })}
@@ -319,7 +281,7 @@ function DayBalance({ state, now }: { state: AppState; now: number }) {
           <span className="font-mono text-label-sm text-on-surface-variant uppercase">Índice de Soberania (Q2 vs Geral)</span>
           <span className="text-headline-sm font-bold">{ratio}%</span>
         </div>
-        {today.length > 0 && (
+        {today.total > 0 && (
           <span
             className={`px-2 py-1 rounded font-mono text-label-sm ${ratio > 50 ? 'bg-primary-container/20 text-primary' : 'bg-tertiary/15 text-tertiary'}`}
           >

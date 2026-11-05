@@ -20,7 +20,8 @@ export interface Block {
   focusMs: number;
 }
 
-export type Plan = Record<Quadrant, number>;
+export type Counts = Record<Quadrant, number>;
+export type Plan = Counts;
 
 export const QUADRANT_INFO: Record<Quadrant, { label: string; title: string; hint: string; axis: string }> = {
   q1: {
@@ -42,3 +43,7 @@ export const QUADRANT_INFO: Record<Quadrant, { label: string; title: string; hin
     axis: 'Urgente + Não Importante',
   },
 };
+
+export function quadrantName(q: Quadrant): string {
+  return `${QUADRANT_INFO[q].label} • ${QUADRANT_INFO[q].title}`;
+}

@@ -1,12 +1,15 @@
-import { useState, type Dispatch } from 'react';
-import { QUADRANTS, QUADRANT_INFO, type Plan } from '../domain/types';
+import { useMemo, useState, type Dispatch } from 'react';
+import { QUADRANTS, QUADRANT_INFO, quadrantName, type Plan } from '../domain/types';
 import { addWeeks, formatDuration, startOfWeek, summarizeWeek, weekKey, type WeekSummary } from '../domain/week';
 import { planFor, type Action, type AppState } from '../state/store';
+import { Bar } from '../ui/Bar';
 import { Icon } from '../ui/Icon';
-import { QUADRANT_CLASS, pct } from '../ui/theme';
+import { PAGE, QUADRANT_CLASS, SECONDARY_BTN, pct } from '../ui/theme';
 
 const DAY_FMT = new Intl.DateTimeFormat('pt-BR', { weekday: 'short', day: '2-digit' });
 const RANGE_FMT = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+const WEEKDAY_FMT = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' });
+const CARD = 'bg-surface-container-low rounded-xl p-space-lg shadow-sm';
 
 export function WeeklyPage({ state, dispatch, now }: { state: AppState; dispatch: Dispatch<Action>; now: number }) {
   const current = startOfWeek(now);
@@ -14,12 +17,12 @@ export function WeeklyPage({ state, dispatch, now }: { state: AppState; dispatch
   const [editing, setEditing] = useState(false);
   const key = weekKey(weekStart);
   const plan = planFor(state, key);
-  const summary = summarizeWeek(state.blocks, weekStart, plan);
+  const summary = useMemo(() => summarizeWeek(state.blocks, weekStart, plan), [state.blocks, weekStart, plan]);
   const isCurrent = weekStart === current;
   const lastDay = addWeeks(weekStart, 1) - 1;
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-margin md:px-margin-desktop py-space-xl flex flex-col gap-space-xl">
+    <div className={PAGE}>
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg">
         <div>
           <span className="font-mono text-label-sm uppercase tracking-wider text-primary px-space-xs py-0.5 rounded bg-surface-container-high">
@@ -84,7 +87,7 @@ export function WeeklyPage({ state, dispatch, now }: { state: AppState; dispatch
       <Overview summary={summary} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-space-lg">
-        <DailyChart summary={summary} />
+        <DailyChart summary={summary} now={now} />
         <Distribution summary={summary} />
       </div>
 
@@ -97,7 +100,7 @@ function PlanEditor({ plan, onSave, onCancel }: { plan: Plan; onSave: (p: Plan) 
   const [draft, setDraft] = useState<Plan>(plan);
   return (
     <form
-      className="rounded-xl bg-surface-container-low p-space-lg shadow-sm flex flex-col gap-space-md"
+      className={`${CARD} flex flex-col gap-space-md`}
       onSubmit={(e) => {
         e.preventDefault();
         onSave(draft);
@@ -110,9 +113,7 @@ function PlanEditor({ plan, onSave, onCancel }: { plan: Plan; onSave: (p: Plan) 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
         {QUADRANTS.map((q) => (
           <label key={q} className="flex flex-col gap-space-xs">
-            <span className={`font-mono text-label-md ${QUADRANT_CLASS[q].text}`}>
-              {QUADRANT_INFO[q].label} • {QUADRANT_INFO[q].title}
-            </span>
+            <span className={`font-mono text-label-md ${QUADRANT_CLASS[q].text}`}>{quadrantName(q)}</span>
             <input
               type="number"
               min={0}
@@ -127,11 +128,7 @@ function PlanEditor({ plan, onSave, onCancel }: { plan: Plan; onSave: (p: Plan) 
         ))}
       </div>
       <div className="flex justify-end gap-space-sm">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-space-md py-2 rounded-lg bg-white/[0.03] border border-white/[0.07] text-title-sm text-[#D4D4D8] hover:bg-white/[0.07]"
-        >
+        <button type="button" onClick={onCancel} className={`px-space-md py-2 text-title-sm ${SECONDARY_BTN}`}>
           Cancelar
         </button>
         <button type="submit" className="px-space-md py-2 rounded-lg bg-primary text-on-primary text-title-sm hover:brightness-95">
@@ -142,20 +139,12 @@ function PlanEditor({ plan, onSave, onCancel }: { plan: Plan; onSave: (p: Plan) 
   );
 }
 
-function Bar({ value, className }: { value: number; className: string }) {
-  return (
-    <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
-      <div className={`h-full rounded-full transition-all duration-700 ${className}`} style={{ width: `${Math.min(100, value)}%` }} />
-    </div>
-  );
-}
-
 function Overview({ summary }: { summary: WeekSummary }) {
   const overall = pct(summary.totalDone, summary.totalPlanned);
   const left = Math.max(0, summary.totalPlanned - summary.totalDone);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-lg">
-      <div className="bg-surface-container-low rounded-xl p-space-lg shadow-sm flex flex-col justify-between">
+      <div className={`${CARD} flex flex-col justify-between`}>
         <div>
           <div className="flex items-center justify-between mb-space-sm">
             <span className="font-mono text-label-sm uppercase tracking-wider text-outline">Aderência Geral</span>
@@ -185,14 +174,12 @@ function Overview({ summary }: { summary: WeekSummary }) {
         const c = QUADRANT_CLASS[q];
         const p = pct(done, planned);
         return (
-          <div key={q} className="bg-surface-container-low rounded-xl p-space-lg shadow-sm flex flex-col justify-between">
+          <div key={q} className={`${CARD} flex flex-col justify-between`}>
             <div>
               <div className="flex items-center justify-between mb-space-sm">
                 <div className="flex items-center gap-space-xs">
                   <span className={`w-2 h-2 rounded-full ${c.bg}`} />
-                  <span className={`font-mono text-label-sm uppercase tracking-wider ${c.text}`}>
-                    {QUADRANT_INFO[q].label} • {QUADRANT_INFO[q].title}
-                  </span>
+                  <span className={`font-mono text-label-sm uppercase tracking-wider ${c.text}`}>{quadrantName(q)}</span>
                 </div>
                 <span className={`font-mono text-label-sm px-space-xs py-0.5 rounded font-semibold ${c.soft} ${c.text}`}>{p}%</span>
               </div>
@@ -218,16 +205,16 @@ function Overview({ summary }: { summary: WeekSummary }) {
   );
 }
 
-function DailyChart({ summary }: { summary: WeekSummary }) {
+function DailyChart({ summary, now }: { summary: WeekSummary; now: number }) {
   const ideal = summary.totalPlanned / 7;
   const max = Math.max(1, Math.ceil(ideal), ...summary.days.map((d) => d.total));
   const worst = summary.days.reduce<{ date: number; gap: number } | null>((acc, d) => {
     const gap = ideal - d.total;
-    return d.date <= Date.now() && gap > 0 && (!acc || gap > acc.gap) ? { date: d.date, gap } : acc;
+    return d.date <= now && gap > 0 && (!acc || gap > acc.gap) ? { date: d.date, gap } : acc;
   }, null);
 
   return (
-    <div className="xl:col-span-2 bg-surface-container-low rounded-xl p-space-lg shadow-sm flex flex-col justify-between">
+    <div className={`xl:col-span-2 ${CARD} flex flex-col justify-between`}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md mb-space-lg">
         <div>
           <h2 className="text-title-md font-semibold">Comparativo Diário: Planejado vs. Realizado</h2>
@@ -244,41 +231,49 @@ function DailyChart({ summary }: { summary: WeekSummary }) {
           ))}
         </div>
       </div>
-      <div className="relative h-56 w-full flex items-end justify-between gap-2 sm:gap-6 px-2 pt-6 bg-surface-container-lowest/60 rounded-xl">
-        {ideal > 0 && (
-          <div
-            className="absolute inset-x-2 border-t border-dashed border-outline/60 pointer-events-none"
-            style={{ bottom: `${1.75 + (ideal / max) * 10.75}rem` }}
-          />
-        )}
-        {summary.days.map((d) => (
-          <div key={d.date} className="flex-1 h-full flex flex-col items-center justify-end gap-2 group">
-            <div className="relative h-[calc(100%-1.75rem)] w-4 sm:w-6 flex flex-col justify-end">
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 left-1/2 -translate-x-1/2 font-mono text-label-sm bg-surface-container-high px-1 rounded">
-                {d.total}
-              </span>
-              <div
-                className="w-full flex flex-col-reverse rounded-t overflow-hidden"
-                style={{ height: `${(d.total / max) * 100}%` }}
-                title={QUADRANTS.map((q) => `${QUADRANT_INFO[q].label}: ${d.counts[q]}`).join(' · ')}
-              >
-                {QUADRANTS.map((q) =>
-                  d.counts[q] ? (
-                    <div key={q} className={QUADRANT_CLASS[q].bg} style={{ height: `${(d.counts[q] / d.total) * 100}%` }} />
-                  ) : null,
-                )}
+      <div className="px-2 pt-6 pb-2 bg-surface-container-lowest/60 rounded-xl">
+        <div className="relative h-44 flex items-end gap-2 sm:gap-6">
+          {ideal > 0 && (
+            <div
+              className="absolute inset-x-0 border-t border-dashed border-outline/60 pointer-events-none"
+              style={{ bottom: `${(ideal / max) * 100}%` }}
+            />
+          )}
+          {summary.days.map((d) => (
+            <div key={d.date} className="flex-1 h-full flex justify-center group">
+              <div className="relative h-full w-4 sm:w-6 flex flex-col justify-end">
+                <div
+                  className="relative w-full"
+                  style={{ height: `${(d.total / max) * 100}%` }}
+                  title={QUADRANTS.map((q) => `${QUADRANT_INFO[q].label}: ${d.counts[q]}`).join(' · ')}
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6 left-1/2 -translate-x-1/2 font-mono text-label-sm bg-surface-container-high px-1 rounded">
+                    {d.total}
+                  </span>
+                  <div className="h-full flex flex-col-reverse rounded-t overflow-hidden">
+                    {QUADRANTS.map((q) =>
+                      d.counts[q] ? (
+                        <div key={q} className={QUADRANT_CLASS[q].bg} style={{ height: `${(d.counts[q] / d.total) * 100}%` }} />
+                      ) : null,
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-            <span className="h-5 leading-5 font-mono text-label-sm text-on-surface-variant uppercase">{DAY_FMT.format(d.date).replace('.', '')}</span>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div className="flex gap-2 sm:gap-6 mt-2">
+          {summary.days.map((d) => (
+            <span key={d.date} className="flex-1 text-center font-mono text-label-sm text-on-surface-variant uppercase">
+              {DAY_FMT.format(d.date).replace('.', '')}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="flex items-center justify-between gap-space-sm pt-space-md mt-space-sm border-t border-outline-variant/10">
         <span className="flex items-center gap-space-xs text-body-sm text-on-surface-variant">
           <Icon name="lightbulb" className="text-[16px] text-tertiary" />
-          {worst
-            ? `${new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(worst.date)} teve a maior distância da meta diária.`
-            : 'Nenhum dia abaixo da meta diária até agora.'}
+          {worst ? `${WEEKDAY_FMT.format(worst.date)} teve a maior distância da meta diária.` : 'Nenhum dia abaixo da meta diária até agora.'}
         </span>
         <span className="font-mono text-label-sm text-outline">Meta Diária Ideal: ~{ideal.toFixed(1)} blocos</span>
       </div>
@@ -298,10 +293,9 @@ function Distribution({ summary }: { summary: WeekSummary }) {
     acc += len;
     return seg;
   });
-  const q2Share = total ? Math.round((summary.byQuadrant.q2.done / total) * 100) : 0;
 
   return (
-    <div className="bg-surface-container-low rounded-xl p-space-lg shadow-sm flex flex-col">
+    <div className={`${CARD} flex flex-col`}>
       <h3 className="text-title-md font-semibold mb-space-md">Distribuição Estratégica</h3>
       <div className="relative w-44 h-44 mx-auto my-space-md">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
@@ -310,7 +304,7 @@ function Distribution({ summary }: { summary: WeekSummary }) {
             s.len > 0 ? (
               <circle
                 key={s.q}
-                className={QUADRANT_CLASS[s.q].stroke}
+                className={QUADRANT_CLASS[s.q].text}
                 cx="50"
                 cy="50"
                 r={r}
@@ -324,7 +318,7 @@ function Distribution({ summary }: { summary: WeekSummary }) {
           )}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-headline-sm font-bold">{q2Share}%</span>
+          <span className="text-headline-sm font-bold">{pct(summary.byQuadrant.q2.done, total)}%</span>
           <span className="font-mono text-label-sm text-outline uppercase">Foco Q2</span>
         </div>
       </div>
@@ -333,11 +327,11 @@ function Distribution({ summary }: { summary: WeekSummary }) {
           <div key={s.q} className="flex items-center justify-between p-space-xs rounded bg-surface-container-lowest">
             <span className="flex items-center gap-space-sm text-body-sm">
               <span className={`w-2.5 h-2.5 rounded-full ${QUADRANT_CLASS[s.q].bg}`} />
-              {QUADRANT_INFO[s.q].label} ({QUADRANT_INFO[s.q].title})
+              {quadrantName(s.q)}
             </span>
             <span className="flex items-center gap-space-sm">
               <span className="font-mono text-label-md font-semibold">{s.n} blocos</span>
-              <span className="font-mono text-label-sm text-outline">{total ? ((s.n / total) * 100).toFixed(1) : '0.0'}%</span>
+              <span className="font-mono text-label-sm text-outline">{pct(s.n, total)}%</span>
             </span>
           </div>
         ))}
@@ -348,7 +342,7 @@ function Distribution({ summary }: { summary: WeekSummary }) {
 
 function RoleTable({ summary }: { summary: WeekSummary }) {
   return (
-    <div className="bg-surface-container-low rounded-xl p-space-lg shadow-sm">
+    <div className={CARD}>
       <h2 className="text-title-md font-semibold">Detalhamento por Papel / Função</h2>
       <p className="text-body-sm text-on-surface-variant mb-space-md">Esforço investido por papel na semana</p>
       {summary.roles.length === 0 ? (
@@ -374,7 +368,7 @@ function RoleTable({ summary }: { summary: WeekSummary }) {
                     <div className="w-48 sm:w-64">
                       <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden flex">
                         {QUADRANTS.map((q) => (
-                          <div key={q} className={`h-full ${QUADRANT_CLASS[q].bg}`} style={{ width: `${(r.counts[q] / r.blocks) * 100}%` }} />
+                          <div key={q} className={`h-full ${QUADRANT_CLASS[q].bg}`} style={{ width: `${pct(r.counts[q], r.blocks)}%` }} />
                         ))}
                       </div>
                       <div className="flex justify-between font-mono text-label-sm mt-1">

@@ -15,11 +15,16 @@ describe('timer', () => {
   it('keeps remaining time across pause and resume', () => {
     let s = t.start(t.initialTimer(d), 0);
     s = t.pause(s, 10 * MIN);
-    expect(t.isRunning(s)).toBe(false);
+    expect(s.endsAt).toBeNull();
     expect(t.remaining(s, 99 * MIN)).toBe(15 * MIN);
     s = t.start(s, 100 * MIN);
     expect(s.startedAt).toBe(0);
     expect(t.remaining(s, 105 * MIN)).toBe(10 * MIN);
+  });
+
+  it('never reports more time than was left at the last start, even with an older clock', () => {
+    const s = t.start(t.initialTimer(d), 10 * MIN);
+    expect(t.remaining(s, 9 * MIN)).toBe(25 * MIN);
   });
 
   it('records the scheduled end, not the observation time, when completion is seen late', () => {
