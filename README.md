@@ -20,4 +20,4 @@ npm run lint     # eslint + tsc
 npm run build
 ```
 
-Os dados (blocos, plano semanal, papéis, estado do timer) ficam em `localStorage` sob a chave `pomodoro:v1`.
+Os dados (blocos, plano semanal, papéis, estado do timer) ficam em `localStorage` nas chaves `pomodoro:v1:state` e `pomodoro:v1:blocks`.
