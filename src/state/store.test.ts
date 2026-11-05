@@ -65,13 +65,30 @@ describe('store', () => {
     expect(planFor(initialState(), '2026-11-02')).toEqual({ q1: 6, q2: 8, q3: 4 });
   });
 
+  it('ignores a mode switch to the current mode', () => {
+    const started = run(initialState(), { type: 'start', now: 0 });
+    expect(run(started, { type: 'setMode', mode: 'focus' })).toBe(started);
+    expect(run(started, { type: 'setMode', mode: 'short' }).timer.endsAt).toBeNull();
+  });
+
   it('round-trips state through storage and survives corrupt data', () => {
     const storage = memoryStorage();
     const s = run(initialState(), { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN, id: 'b1' });
-    save(storage, s);
+    expect(save(storage, s)).toBe(true);
     expect(load(storage)).toEqual(s);
     storage.mem.set(STATE_KEY, '{not json');
+    expect(load(storage)).toEqual({ ...initialState(), blocks: s.blocks });
+    storage.mem.set(BLOCKS_KEY, '{not json');
     expect(load(storage)).toEqual(initialState());
+  });
+
+  it('reports a failed write so the caller can retry it', () => {
+    const failing = {
+      setItem: () => {
+        throw new Error('QuotaExceededError');
+      },
+    };
+    expect(save(failing, initialState())).toBe(false);
   });
 
   it('rewrites block history only when it changed', () => {

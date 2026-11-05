@@ -80,7 +80,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'reset':
       return { ...state, timer: timer.reset(state.timer, DURATIONS) };
     case 'setMode':
-      return { ...state, timer: timer.setMode(state.timer, action.mode, DURATIONS) };
+      return action.mode === state.timer.mode ? state : { ...state, timer: timer.setMode(state.timer, action.mode, DURATIONS) };
     case 'expire': {
       const { endsAt } = state.timer;
       return endsAt !== null && action.now >= endsAt ? finish(state, action.now, action.id) : state;
@@ -104,27 +104,38 @@ export function reducer(state: AppState, action: Action): AppState {
   }
 }
 
-export function load(storage: Pick<Storage, 'getItem'>): AppState {
-  const base = initialState();
+function read<T>(storage: Pick<Storage, 'getItem'>, key: string, fallback: T): T {
   try {
-    const rest = JSON.parse(storage.getItem(STATE_KEY) ?? '{}') as Partial<AppState>;
-    const blocks = JSON.parse(storage.getItem(BLOCKS_KEY) ?? '[]') as Block[];
-    return { ...base, ...rest, blocks };
+    return (JSON.parse(storage.getItem(key) ?? 'null') as T | null) ?? fallback;
   } catch {
-    return base;
+    return fallback;
   }
 }
 
 /**
- * Persists the state. Block history lives under its own key and is written
- * only when it changed since `prev`, so frequent edits stay cheap.
+ * Restores the state. Each key is read on its own, so a corrupt state entry
+ * does not discard the block history and vice versa.
  */
-export function save(storage: Pick<Storage, 'setItem'>, state: AppState, prev?: AppState): void {
+export function load(storage: Pick<Storage, 'getItem'>): AppState {
+  return {
+    ...initialState(),
+    ...read<Partial<AppState>>(storage, STATE_KEY, {}),
+    blocks: read<Block[]>(storage, BLOCKS_KEY, []),
+  };
+}
+
+/**
+ * Persists the state and returns whether every write succeeded. Block history
+ * lives under its own key and is written only when it changed since `prev`, so
+ * frequent edits stay cheap.
+ */
+export function save(storage: Pick<Storage, 'setItem'>, state: AppState, prev?: AppState): boolean {
   try {
     const { blocks, ...rest } = state;
     storage.setItem(STATE_KEY, JSON.stringify(rest));
     if (!prev || prev.blocks !== blocks) storage.setItem(BLOCKS_KEY, JSON.stringify(blocks));
+    return true;
   } catch {
-    return;
+    return false;
   }
 }

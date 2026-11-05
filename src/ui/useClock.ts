@@ -12,7 +12,7 @@ export function useClock(endsAt: number | null): number {
     const tick = () => {
       const t = Date.now();
       setNow(t);
-      const delay = endsAt === null ? 60_000 - (t % 60_000) : (endsAt - t) % 1000 || 1000;
+      const delay = endsAt === null || t >= endsAt ? 60_000 - (t % 60_000) : (endsAt - t) % 1000 || 1000;
       id = window.setTimeout(tick, Math.max(delay, 20));
     };
     tick();

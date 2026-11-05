@@ -29,8 +29,7 @@ export default function App() {
 
   const saved = useRef<AppState>();
   useEffect(() => {
-    save(localStorage, state, saved.current);
-    saved.current = state;
+    if (save(localStorage, state, saved.current)) saved.current = state;
   }, [state]);
 
   useEffect(() => {
