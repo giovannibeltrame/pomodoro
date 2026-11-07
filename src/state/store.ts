@@ -3,6 +3,7 @@ import type { Block, Durations, Mode, Plan, Quadrant } from '../domain/types';
 
 export const STATE_KEY = 'pomodoro:v1:state';
 export const BLOCKS_KEY = 'pomodoro:v1:blocks';
+const PROBE_KEY = 'pomodoro:v1:probe';
 
 export const DURATIONS: Durations = { focus: 25, short: 5, long: 15, longEvery: 4, minFocus: 5 };
 const DEFAULT_PLAN: Plan = { q1: 6, q2: 8, q3: 4 };
@@ -132,6 +133,21 @@ export function mergeBlocks(a: Block[], b: Block[]): Block[] {
   const byId = new Map(a.map((x) => [x.id, x]));
   for (const x of b) byId.set(x.id, x);
   return [...byId.values()].sort((x, y) => x.endedAt - y.endedAt);
+}
+
+/**
+ * Returns the storage if it can be read and written, or null when the
+ * browser blocks it (for example, with site data disabled).
+ */
+export function openStorage(get: () => Storage): Storage | null {
+  try {
+    const storage = get();
+    storage.setItem(PROBE_KEY, '1');
+    storage.removeItem(PROBE_KEY);
+    return storage;
+  } catch {
+    return null;
+  }
 }
 
 function read<T>(storage: Pick<Storage, 'getItem'>, key: string, fallback: T): T {

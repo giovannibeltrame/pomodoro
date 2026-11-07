@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BLOCKS_KEY, STATE_KEY, initialState, load, mergeBlocks, planFor, reducer, save, type AppState } from './store';
+import { BLOCKS_KEY, STATE_KEY, initialState, load, mergeBlocks, openStorage, planFor, reducer, save, type AppState } from './store';
 
 const MIN = 60_000;
 
@@ -133,6 +133,25 @@ describe('store', () => {
     expect(load(storage)).toEqual({ ...initialState(), blocks: s.blocks });
     storage.mem.set(BLOCKS_KEY, '{not json');
     expect(load(storage)).toEqual(initialState());
+  });
+
+  it('opens storage only when it can be read and written', () => {
+    const mem = new Map<string, string>();
+    const ok = { setItem: (k: string, v: string) => void mem.set(k, v), removeItem: (k: string) => void mem.delete(k) } as unknown as Storage;
+    expect(openStorage(() => ok)).toBe(ok);
+    expect(mem.size).toBe(0);
+    expect(
+      openStorage(() => {
+        throw new DOMException('denied', 'SecurityError');
+      }),
+    ).toBeNull();
+    const readOnly = {
+      setItem: () => {
+        throw new DOMException('full', 'QuotaExceededError');
+      },
+      removeItem: () => {},
+    } as unknown as Storage;
+    expect(openStorage(() => readOnly)).toBeNull();
   });
 
   it('reports a failed write so the caller can retry it', () => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import * as timer from './domain/timer';
 import { dayOfWeek, startOfWeek, summarizeWeek, weekKey } from './domain/week';
 import { QUADRANT_INFO } from './domain/types';
-import { BLOCKS_KEY, DURATIONS, STATE_KEY, load, planFor, reducer, save, type AppState } from './state/store';
+import { BLOCKS_KEY, DURATIONS, STATE_KEY, initialState, load, openStorage, planFor, reducer, save, type AppState } from './state/store';
 import { beep } from './ui/beep';
 import { Shortcuts } from './ui/Shortcuts';
 import { useClock } from './ui/useClock';
@@ -20,8 +20,10 @@ const NAV: { id: Page; label: string }[] = [
 const TEXT_ENTRY = 'input, textarea, select, [contenteditable="true"]';
 const ACTIVATABLE = 'button, a, [role="button"], [role="radio"], [role="tab"]';
 
+const storage = openStorage(() => window.localStorage);
+
 export default function App() {
-  const [state, dispatch] = useReducer(reducer, undefined, () => load(localStorage));
+  const [state, dispatch] = useReducer(reducer, undefined, () => (storage ? load(storage) : initialState()));
   const [page, setPage] = useState<Page>('timer');
   const { endsAt, mode } = state.timer;
   const now = useClock(endsAt);
@@ -29,13 +31,15 @@ export default function App() {
 
   const saved = useRef<AppState>();
   useEffect(() => {
-    if (save(localStorage, state, saved.current)) saved.current = state;
+    if (storage && save(storage, state, saved.current)) saved.current = state;
   }, [state]);
 
   useEffect(() => {
+    if (!storage) return;
+    const area = storage;
     function onStorage(e: StorageEvent) {
-      if (e.storageArea === localStorage && (e.key === null || e.key === STATE_KEY || e.key === BLOCKS_KEY)) {
-        dispatch({ type: 'sync', state: load(localStorage) });
+      if (e.storageArea === area && (e.key === null || e.key === STATE_KEY || e.key === BLOCKS_KEY)) {
+        dispatch({ type: 'sync', state: load(area) });
       }
     }
     window.addEventListener('storage', onStorage);
@@ -140,6 +144,13 @@ export default function App() {
       </header>
 
       <main className="flex-1 w-full">
+        {!storage && (
+          <div role="alert" className="max-w-7xl mx-auto mt-space-md px-margin md:px-margin-desktop">
+            <p className="px-space-md py-space-sm rounded-lg bg-surface-container-low text-body-sm text-error">
+              Seu navegador bloqueou o armazenamento — nada será salvo ao fechar ou recarregar a página.
+            </p>
+          </div>
+        )}
         {page === 'timer' ? (
           <TimerPage
             state={state}
