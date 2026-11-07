@@ -97,6 +97,12 @@ export function TimerPage({ state, dispatch, today, remainingMs, running, onTogg
               </div>
             </div>
 
+            {mode === 'focus' && started && (
+              <p className="font-mono text-label-md text-on-surface-variant">
+                Registrando como <span className={QUADRANT_CLASS[state.quadrant].text}>{QUADRANT_INFO[state.quadrant].label}</span> · {state.role}
+              </p>
+            )}
+
             <div className="flex items-center gap-space-md mt-space-lg">
               <button type="button" onClick={onReset} title="Reiniciar ciclo (R)" aria-label="Reiniciar ciclo" className={ICON_BTN}>
                 <Icon name="restart_alt" className="text-[22px]" />
