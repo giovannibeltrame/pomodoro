@@ -9,3 +9,15 @@ Regras e telas definidas no Google Stitch (projeto "Pomodoro Quadrant Tracker"),
 - `DESIGN.md` — design system "Atelier Focus" (tokens + regras)
 - `design-system.json`, `project.json` — export bruto do Stitch
 - `screens/` — HTML e screenshot de cada tela (Timer & Sessão Ativa, Painel Semanal)
+
+## Rodar
+
+```sh
+npm install
+npm run dev      # http://localhost:5173
+npm test         # vitest
+npm run lint     # eslint + tsc
+npm run build
+```
+
+Os dados (blocos, plano semanal, papéis, estado do timer) ficam em `localStorage` nas chaves `pomodoro:v1:state` e `pomodoro:v1:blocks`.
