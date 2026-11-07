@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import * as timer from './domain/timer';
 import { dayOfWeek, startOfWeek, summarizeWeek, weekKey } from './domain/week';
 import { QUADRANT_INFO } from './domain/types';
-import { DURATIONS, load, planFor, reducer, save, type AppState } from './state/store';
+import { BLOCKS_KEY, DURATIONS, STATE_KEY, load, planFor, reducer, save, type AppState } from './state/store';
 import { beep } from './ui/beep';
 import { Shortcuts } from './ui/Shortcuts';
 import { useClock } from './ui/useClock';
@@ -33,8 +33,18 @@ export default function App() {
   }, [state]);
 
   useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.storageArea === localStorage && (e.key === null || e.key === STATE_KEY || e.key === BLOCKS_KEY)) {
+        dispatch({ type: 'sync', state: load(localStorage) });
+      }
+    }
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  useEffect(() => {
     if (endsAt === null) return;
-    const expire = (now: number) => dispatch({ type: 'expire', now, id: crypto.randomUUID() });
+    const expire = (now: number) => dispatch({ type: 'expire', now });
     if (endsAt <= Date.now()) {
       expire(Date.now());
       return;
@@ -55,7 +65,7 @@ export default function App() {
   const toggle = useCallback(() => {
     dispatch(running ? { type: 'pause', now: Date.now() } : { type: 'start', now: Date.now() });
   }, [running]);
-  const skip = useCallback(() => dispatch({ type: 'skip', now: Date.now(), id: crypto.randomUUID() }), []);
+  const skip = useCallback(() => dispatch({ type: 'skip', now: Date.now() }), []);
   const resetTimer = useCallback(() => dispatch({ type: 'reset' }), []);
 
   useEffect(() => {

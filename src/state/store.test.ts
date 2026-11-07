@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BLOCKS_KEY, STATE_KEY, initialState, load, planFor, reducer, save, type AppState } from './store';
+import { BLOCKS_KEY, STATE_KEY, initialState, load, mergeBlocks, planFor, reducer, save, type AppState } from './store';
 
 const MIN = 60_000;
 
@@ -29,10 +29,10 @@ describe('store', () => {
       { type: 'addRole', role: 'Revisor' },
       { type: 'setGoal', goal: '  Corrigir deploy  ' },
       { type: 'start', now: 0 },
-      { type: 'expire', now: 25 * MIN, id: 'b1' },
+      { type: 'expire', now: 25 * MIN },
     );
     expect(s.blocks).toEqual([
-      { id: 'b1', quadrant: 'q1', role: 'Revisor', goal: 'Corrigir deploy', startedAt: 0, endedAt: 25 * MIN, focusMs: 25 * MIN },
+      { id: 'focus-0', quadrant: 'q1', role: 'Revisor', goal: 'Corrigir deploy', startedAt: 0, endedAt: 25 * MIN, focusMs: 25 * MIN },
     ]);
     expect(s.timer.mode).toBe('short');
   });
@@ -40,9 +40,9 @@ describe('store', () => {
   it('does not record breaks or unstarted skipped focus blocks', () => {
     const s = run(
       initialState(),
-      { type: 'skip', now: 0, id: 'skip' },
+      { type: 'skip', now: 0 },
       { type: 'start', now: 0 },
-      { type: 'expire', now: 5 * MIN, id: 'break' },
+      { type: 'expire', now: 5 * MIN },
     );
     expect(s.blocks).toEqual([]);
     expect(s.timer.mode).toBe('focus');
@@ -50,18 +50,18 @@ describe('store', () => {
 
   it('discards a skipped focus block shorter than five minutes', () => {
     const started = run(initialState(), { type: 'start', now: 0 });
-    expect(run(started, { type: 'skip', now: 5 * MIN - 1, id: 'short' }).blocks).toEqual([]);
-    expect(run(started, { type: 'skip', now: 5 * MIN, id: 'kept' }).blocks.map((b) => b.focusMs)).toEqual([5 * MIN]);
+    expect(run(started, { type: 'skip', now: 5 * MIN - 1 }).blocks).toEqual([]);
+    expect(run(started, { type: 'skip', now: 5 * MIN }).blocks.map((b) => b.focusMs)).toEqual([5 * MIN]);
   });
 
   it('ignores an expiry that is early, repeated, or for a paused timer', () => {
     const started = run(initialState(), { type: 'start', now: 0 });
-    expect(run(started, { type: 'expire', now: 24 * MIN, id: 'early' })).toBe(started);
-    const done = run(started, { type: 'expire', now: 25 * MIN, id: 'b1' }, { type: 'expire', now: 25 * MIN, id: 'b2' });
-    expect(done.blocks.map((b) => b.id)).toEqual(['b1']);
+    expect(run(started, { type: 'expire', now: 24 * MIN })).toBe(started);
+    const done = run(started, { type: 'expire', now: 25 * MIN }, { type: 'expire', now: 25 * MIN });
+    expect(done.blocks).toHaveLength(1);
     expect(done.timer.mode).toBe('short');
     const paused = run(started, { type: 'pause', now: MIN });
-    expect(run(paused, { type: 'expire', now: 99 * MIN, id: 'x' })).toBe(paused);
+    expect(run(paused, { type: 'expire', now: 99 * MIN })).toBe(paused);
   });
 
   it('carries a current or future plan forward to later weeks without their own plan', () => {
@@ -95,6 +95,29 @@ describe('store', () => {
     expect(planFor(s, '2026-11-09')).toMatchObject({ q1: 3, q2: 3, q3: 3 });
   });
 
+  it('records the same block id in every tab that finishes the same focus segment', () => {
+    const started = run(initialState(), { type: 'start', now: 7 });
+    const a = run(started, { type: 'expire', now: 7 + 25 * MIN });
+    const b = run(started, { type: 'skip', now: 8 + 25 * MIN });
+    expect(a.blocks[0].id).toBe('focus-7');
+    expect(b.blocks[0].id).toBe('focus-7');
+  });
+
+  it('syncs another tab by taking its state and merging block histories', () => {
+    const mine = run(initialState(), { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN });
+    const theirs = run(initialState(), { type: 'setGoal', goal: 'remoto' }, { type: 'start', now: 30 * MIN }, { type: 'skip', now: 40 * MIN });
+    const synced = run(mine, { type: 'sync', state: theirs });
+    expect(synced.goal).toBe('remoto');
+    expect(synced.timer).toEqual(theirs.timer);
+    expect(synced.blocks.map((b) => b.id)).toEqual(['focus-0', `focus-${30 * MIN}`]);
+    expect(run(synced, { type: 'sync', state: synced }).blocks).toHaveLength(2);
+  });
+
+  it('merges block lists by id in end order', () => {
+    const blk = (id: string, endedAt: number) => ({ id, quadrant: 'q1' as const, role: 'r', goal: '', startedAt: 0, endedAt, focusMs: 1 });
+    expect(mergeBlocks([blk('a', 2), blk('b', 5)], [blk('b', 5), blk('c', 1)]).map((b) => b.id)).toEqual(['c', 'a', 'b']);
+  });
+
   it('ignores a mode switch to the current mode', () => {
     const started = run(initialState(), { type: 'start', now: 0 });
     expect(run(started, { type: 'setMode', mode: 'focus' })).toBe(started);
@@ -103,7 +126,7 @@ describe('store', () => {
 
   it('round-trips state through storage and survives corrupt data', () => {
     const storage = memoryStorage();
-    const s = run(initialState(), { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN, id: 'b1' });
+    const s = run(initialState(), { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN });
     expect(save(storage, s)).toBe(true);
     expect(load(storage)).toEqual(s);
     storage.mem.set(STATE_KEY, '{not json');
@@ -127,7 +150,7 @@ describe('store', () => {
     const b = run(a, { type: 'setGoal', goal: 'x' });
     save(storage, b, a);
     expect(storage.writes).toEqual([STATE_KEY]);
-    const c = run(b, { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN, id: 'b1' });
+    const c = run(b, { type: 'start', now: 0 }, { type: 'expire', now: 25 * MIN });
     save(storage, c, b);
     expect(storage.writes).toEqual([STATE_KEY, STATE_KEY, BLOCKS_KEY]);
   });

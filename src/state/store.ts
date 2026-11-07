@@ -34,8 +34,9 @@ export type Action =
   | { type: 'pause'; now: number }
   | { type: 'reset' }
   | { type: 'setMode'; mode: Mode }
-  | { type: 'expire'; now: number; id: string }
-  | { type: 'skip'; now: number; id: string }
+  | { type: 'expire'; now: number }
+  | { type: 'skip'; now: number }
+  | { type: 'sync'; state: AppState }
   | { type: 'selectQuadrant'; quadrant: Quadrant }
   | { type: 'selectRole'; role: string }
   | { type: 'addRole'; role: string }
@@ -69,11 +70,15 @@ export function planFor(state: AppState, key: string): Plan {
   return best === null ? DEFAULT_PLAN : state.plans[best];
 }
 
-function finish(state: AppState, now: number, id: string): AppState {
+/**
+ * Records the finished focus segment as a block. The id derives from the
+ * segment's start, so tabs that finish the same segment record the same block.
+ */
+function finish(state: AppState, now: number): AppState {
   const { next, finished } = timer.finish(state.timer, DURATIONS, now);
   if (!finished.counted) return { ...state, timer: next };
   const block: Block = {
-    id,
+    id: `focus-${finished.startedAt}`,
     quadrant: state.quadrant,
     role: state.role,
     goal: state.goal.trim(),
@@ -96,10 +101,12 @@ export function reducer(state: AppState, action: Action): AppState {
       return action.mode === state.timer.mode ? state : { ...state, timer: timer.setMode(state.timer, action.mode, DURATIONS) };
     case 'expire': {
       const { endsAt } = state.timer;
-      return endsAt !== null && action.now >= endsAt ? finish(state, action.now, action.id) : state;
+      return endsAt !== null && action.now >= endsAt ? finish(state, action.now) : state;
     }
     case 'skip':
-      return finish(state, action.now, action.id);
+      return finish(state, action.now);
+    case 'sync':
+      return { ...action.state, blocks: mergeBlocks(state.blocks, action.state.blocks) };
     case 'selectQuadrant':
       return { ...state, quadrant: action.quadrant };
     case 'selectRole':
@@ -118,6 +125,13 @@ export function reducer(state: AppState, action: Action): AppState {
         plans: { ...state.plans, [action.weekKey]: { ...action.plan, carries: action.weekKey >= action.currentWeekKey } },
       };
   }
+}
+
+/** Union of two block lists by id, ordered by end time. */
+export function mergeBlocks(a: Block[], b: Block[]): Block[] {
+  const byId = new Map(a.map((x) => [x.id, x]));
+  for (const x of b) byId.set(x.id, x);
+  return [...byId.values()].sort((x, y) => x.endedAt - y.endedAt);
 }
 
 function read<T>(storage: Pick<Storage, 'getItem'>, key: string, fallback: T): T {
