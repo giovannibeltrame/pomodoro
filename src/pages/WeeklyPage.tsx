@@ -76,9 +76,10 @@ export function WeeklyPage({ state, dispatch, now }: { state: AppState; dispatch
         <PlanEditor
           key={key}
           plan={plan}
+          past={weekStart < current}
           onCancel={() => setEditing(false)}
           onSave={(p) => {
-            dispatch({ type: 'setPlan', weekKey: key, plan: p });
+            dispatch({ type: 'setPlan', weekKey: key, currentWeekKey: weekKey(current), plan: p });
             setEditing(false);
           }}
         />
@@ -96,7 +97,7 @@ export function WeeklyPage({ state, dispatch, now }: { state: AppState; dispatch
   );
 }
 
-function PlanEditor({ plan, onSave, onCancel }: { plan: Plan; onSave: (p: Plan) => void; onCancel: () => void }) {
+function PlanEditor({ plan, past, onSave, onCancel }: { plan: Plan; past: boolean; onSave: (p: Plan) => void; onCancel: () => void }) {
   const [draft, setDraft] = useState<Plan>(plan);
   return (
     <form
@@ -108,7 +109,9 @@ function PlanEditor({ plan, onSave, onCancel }: { plan: Plan; onSave: (p: Plan) 
     >
       <div>
         <h2 className="text-title-md font-semibold">Plano da semana (blocos por quadrante)</h2>
-        <p className="text-body-sm text-on-surface-variant">Semanas sem plano próprio herdam o último plano salvo.</p>
+        <p className="text-body-sm text-on-surface-variant">
+          {past ? 'Semana passada: este plano vale só para ela.' : 'As semanas seguintes sem plano próprio herdam este plano.'}
+        </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
         {QUADRANTS.map((q) => (

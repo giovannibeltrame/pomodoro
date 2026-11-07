@@ -15,6 +15,10 @@ const DEFAULT_ROLES = [
   'Operador de Infraestrutura',
 ];
 
+export interface SavedPlan extends Plan {
+  carries: boolean;
+}
+
 export interface AppState {
   timer: timer.TimerState;
   quadrant: Quadrant;
@@ -22,8 +26,7 @@ export interface AppState {
   goal: string;
   roles: string[];
   blocks: Block[];
-  plans: Record<string, Plan>;
-  defaultPlan: Plan;
+  plans: Record<string, SavedPlan>;
 }
 
 export type Action =
@@ -37,7 +40,7 @@ export type Action =
   | { type: 'selectRole'; role: string }
   | { type: 'addRole'; role: string }
   | { type: 'setGoal'; goal: string }
-  | { type: 'setPlan'; weekKey: string; plan: Plan };
+  | { type: 'setPlan'; weekKey: string; currentWeekKey: string; plan: Plan };
 
 export function initialState(): AppState {
   return {
@@ -48,12 +51,22 @@ export function initialState(): AppState {
     roles: DEFAULT_ROLES,
     blocks: [],
     plans: {},
-    defaultPlan: DEFAULT_PLAN,
   };
 }
 
+/**
+ * The plan for the week `key`: its own plan, else the latest carrying plan
+ * from an earlier week, else the built-in default. A plan saved for a past
+ * week does not carry.
+ */
 export function planFor(state: AppState, key: string): Plan {
-  return state.plans[key] ?? state.defaultPlan;
+  const own = state.plans[key];
+  if (own) return own;
+  let best: string | null = null;
+  for (const [k, p] of Object.entries(state.plans)) {
+    if (p.carries && k < key && (best === null || k > best)) best = k;
+  }
+  return best === null ? DEFAULT_PLAN : state.plans[best];
 }
 
 function finish(state: AppState, now: number, id: string): AppState {
@@ -100,7 +113,10 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'setGoal':
       return { ...state, goal: action.goal };
     case 'setPlan':
-      return { ...state, plans: { ...state.plans, [action.weekKey]: action.plan }, defaultPlan: action.plan };
+      return {
+        ...state,
+        plans: { ...state.plans, [action.weekKey]: { ...action.plan, carries: action.weekKey >= action.currentWeekKey } },
+      };
   }
 }
 
@@ -112,14 +128,24 @@ function read<T>(storage: Pick<Storage, 'getItem'>, key: string, fallback: T): T
   }
 }
 
+type StoredState = Partial<Omit<AppState, 'plans'>> & {
+  plans?: Record<string, Plan & { carries?: boolean }>;
+  defaultPlan?: Plan;
+};
+
 /**
  * Restores the state. Each key is read on its own, so a corrupt state entry
- * does not discard the block history and vice versa.
+ * does not discard the block history and vice versa. Plans stored before the
+ * `carries` flag existed carry, as they did then; the old `defaultPlan` is
+ * dropped.
  */
 export function load(storage: Pick<Storage, 'getItem'>): AppState {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { plans = {}, defaultPlan, ...rest } = read<StoredState>(storage, STATE_KEY, {});
   return {
     ...initialState(),
-    ...read<Partial<AppState>>(storage, STATE_KEY, {}),
+    ...rest,
+    plans: Object.fromEntries(Object.entries(plans).map(([k, p]) => [k, { ...p, carries: p.carries ?? true }])),
     blocks: read<Block[]>(storage, BLOCKS_KEY, []),
   };
 }
