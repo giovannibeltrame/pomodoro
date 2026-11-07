@@ -4,7 +4,7 @@ import type { Block, Durations, Mode, Plan, Quadrant } from '../domain/types';
 export const STATE_KEY = 'pomodoro:v1:state';
 export const BLOCKS_KEY = 'pomodoro:v1:blocks';
 
-export const DURATIONS: Durations = { focus: 25, short: 5, long: 15, longEvery: 4 };
+export const DURATIONS: Durations = { focus: 25, short: 5, long: 15, longEvery: 4, minFocus: 5 };
 const DEFAULT_PLAN: Plan = { q1: 6, q2: 8, q3: 4 };
 const DEFAULT_ROLES = [
   'Arquiteto de Software',
@@ -58,7 +58,7 @@ export function planFor(state: AppState, key: string): Plan {
 
 function finish(state: AppState, now: number, id: string): AppState {
   const { next, finished } = timer.finish(state.timer, DURATIONS, now);
-  if (finished.mode !== 'focus' || finished.elapsedMs <= 0) return { ...state, timer: next };
+  if (!finished.counted) return { ...state, timer: next };
   const block: Block = {
     id,
     quadrant: state.quadrant,

@@ -87,6 +87,21 @@ export function summarizeWeek(blocks: Block[], weekStart: number, plan: Plan): W
   };
 }
 
+/**
+ * The finished day of the week furthest below the daily target (weekly plan
+ * divided by seven), or null when no finished day fell short. Today and later
+ * days are excluded because they are not over yet.
+ */
+export function worstDay(summary: WeekSummary, now: number): DaySummary | null {
+  const ideal = summary.totalPlanned / 7;
+  const today = new Date(now).setHours(0, 0, 0, 0);
+  let worst: DaySummary | null = null;
+  for (const d of summary.days) {
+    if (d.date < today && d.total < ideal && (!worst || d.total < worst.total)) worst = d;
+  }
+  return worst;
+}
+
 export function formatDuration(ms: number): string {
   const totalMin = Math.round(ms / 60_000);
   const h = Math.floor(totalMin / 60);

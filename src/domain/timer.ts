@@ -13,6 +13,7 @@ interface FinishedSegment {
   startedAt: number;
   endedAt: number;
   elapsedMs: number;
+  counted: boolean;
 }
 
 export function durationMs(mode: Mode, d: Durations): number {
@@ -52,26 +53,31 @@ export function setMode(s: TimerState, mode: Mode, d: Durations): TimerState {
 export function cycleNumber(s: TimerState, d: Durations): number {
   const inSet = s.completedFocus % d.longEvery;
   if (s.mode === 'focus') return inSet + 1;
-  return inSet === 0 ? d.longEvery : inSet;
+  if (s.mode === 'long') return d.longEvery;
+  return Math.max(inSet, 1);
 }
 
 /**
  * Ends the current segment (natural completion or skip) and returns the next
- * segment's state. A completed focus advances the cycle count and chooses a
- * long break every `longEvery` focus blocks; a break always returns to focus.
+ * segment's state. A focus segment counts only if it lasted at least
+ * `minFocus` minutes; a counted focus advances the cycle and chooses a long
+ * break every `longEvery` focus blocks, while an uncounted one moves to a
+ * short break without advancing. A break always returns to focus.
  */
 export function finish(s: TimerState, d: Durations, now: number): { next: TimerState; finished: FinishedSegment } {
   const left = remaining(s, now);
   const endedAt = s.endsAt !== null && now > s.endsAt ? s.endsAt : now;
   const elapsedMs = durationMs(s.mode, d) - left;
+  const counted = s.mode === 'focus' && elapsedMs >= d.minFocus * 60_000;
   const finished: FinishedSegment = {
     mode: s.mode,
     startedAt: s.startedAt ?? endedAt - elapsedMs,
     endedAt,
     elapsedMs,
+    counted,
   };
-  const completedFocus = s.mode === 'focus' ? s.completedFocus + 1 : s.completedFocus;
-  const nextMode: Mode = s.mode !== 'focus' ? 'focus' : completedFocus % d.longEvery === 0 ? 'long' : 'short';
+  const completedFocus = counted ? s.completedFocus + 1 : s.completedFocus;
+  const nextMode: Mode = s.mode !== 'focus' ? 'focus' : counted && completedFocus % d.longEvery === 0 ? 'long' : 'short';
   return { next: setMode({ ...s, completedFocus }, nextMode, d), finished };
 }
 

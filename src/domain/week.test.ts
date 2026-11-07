@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Block } from './types';
-import { addWeeks, startOfWeek, summarizeWeek, weekKey } from './week';
+import { addWeeks, startOfWeek, summarizeWeek, weekKey, worstDay } from './week';
 
 function at(y: number, m: number, d: number, h = 10): number {
   return new Date(y, m - 1, d, h).getTime();
@@ -38,5 +38,14 @@ describe('week', () => {
       ['Dev', 3],
       ['Líder', 1],
     ]);
+  });
+
+  it('picks the finished day furthest below the daily target and ignores today', () => {
+    const ws = startOfWeek(at(2026, 11, 5));
+    const blocks = [block(at(2026, 11, 2), 'q1'), block(at(2026, 11, 2, 11), 'q2'), block(at(2026, 11, 3), 'q2')];
+    const summary = summarizeWeek(blocks, ws, { q1: 7, q2: 7, q3: 0 });
+    expect(worstDay(summary, at(2026, 11, 4))?.date).toBe(at(2026, 11, 3, 0));
+    expect(worstDay(summary, at(2026, 11, 3))).toBeNull();
+    expect(worstDay(summary, at(2026, 11, 2))).toBeNull();
   });
 });

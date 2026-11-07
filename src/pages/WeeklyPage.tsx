@@ -1,6 +1,6 @@
 import { useMemo, useState, type Dispatch } from 'react';
 import { QUADRANTS, QUADRANT_INFO, quadrantName, type Plan } from '../domain/types';
-import { addWeeks, formatDuration, startOfWeek, summarizeWeek, weekKey, type WeekSummary } from '../domain/week';
+import { addWeeks, formatDuration, startOfWeek, summarizeWeek, weekKey, worstDay, type WeekSummary } from '../domain/week';
 import { planFor, type Action, type AppState } from '../state/store';
 import { Bar } from '../ui/Bar';
 import { Icon } from '../ui/Icon';
@@ -208,10 +208,7 @@ function Overview({ summary }: { summary: WeekSummary }) {
 function DailyChart({ summary, now }: { summary: WeekSummary; now: number }) {
   const ideal = summary.totalPlanned / 7;
   const max = Math.max(1, Math.ceil(ideal), ...summary.days.map((d) => d.total));
-  const worst = summary.days.reduce<{ date: number; gap: number } | null>((acc, d) => {
-    const gap = ideal - d.total;
-    return d.date <= now && gap > 0 && (!acc || gap > acc.gap) ? { date: d.date, gap } : acc;
-  }, null);
+  const worst = worstDay(summary, now);
 
   return (
     <div className={`xl:col-span-2 ${CARD} flex flex-col justify-between`}>

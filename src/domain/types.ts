@@ -8,6 +8,7 @@ export interface Durations {
   short: number;
   long: number;
   longEvery: number;
+  minFocus: number;
 }
 
 export interface Block {

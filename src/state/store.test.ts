@@ -48,6 +48,12 @@ describe('store', () => {
     expect(s.timer.mode).toBe('focus');
   });
 
+  it('discards a skipped focus block shorter than five minutes', () => {
+    const started = run(initialState(), { type: 'start', now: 0 });
+    expect(run(started, { type: 'skip', now: 5 * MIN - 1, id: 'short' }).blocks).toEqual([]);
+    expect(run(started, { type: 'skip', now: 5 * MIN, id: 'kept' }).blocks.map((b) => b.focusMs)).toEqual([5 * MIN]);
+  });
+
   it('ignores an expiry that is early, repeated, or for a paused timer', () => {
     const started = run(initialState(), { type: 'start', now: 0 });
     expect(run(started, { type: 'expire', now: 24 * MIN, id: 'early' })).toBe(started);
