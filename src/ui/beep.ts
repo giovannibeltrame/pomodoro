@@ -1,6 +1,10 @@
+let ctx: AudioContext | null = null;
+
+/** Plays a short tone through one AudioContext shared by every beep. */
 export function beep(): void {
   try {
-    const ctx = new AudioContext();
+    ctx ??= new AudioContext();
+    if (ctx.state === 'suspended') void ctx.resume();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.frequency.value = 880;
@@ -9,7 +13,6 @@ export function beep(): void {
     osc.connect(gain).connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.6);
-    osc.onended = () => void ctx.close();
   } catch {
     return;
   }

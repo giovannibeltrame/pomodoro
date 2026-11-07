@@ -81,6 +81,11 @@ export function finish(s: TimerState, d: Durations, now: number): { next: TimerS
   return { next: setMode({ ...s, completedFocus }, nextMode, d), finished };
 }
 
+/** Whether an expiry observed at `now` is recent enough to announce with a beep. */
+export function beepDue(endsAt: number, now: number): boolean {
+  return now - endsAt <= 60_000;
+}
+
 export function formatClock(ms: number): string {
   const total = Math.ceil(ms / 1000);
   const m = Math.floor(total / 60);

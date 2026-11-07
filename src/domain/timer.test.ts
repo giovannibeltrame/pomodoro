@@ -80,6 +80,12 @@ describe('timer', () => {
     expect(t.cycleNumber(s, d)).toBe(4);
   });
 
+  it('beeps only for an expiry seen within a minute of the scheduled end', () => {
+    expect(t.beepDue(25 * MIN, 25 * MIN)).toBe(true);
+    expect(t.beepDue(25 * MIN, 26 * MIN)).toBe(true);
+    expect(t.beepDue(25 * MIN, 26 * MIN + 1)).toBe(false);
+  });
+
   it('formats the clock as mm:ss rounding partial seconds up', () => {
     expect(t.formatClock(25 * MIN)).toBe('25:00');
     expect(t.formatClock(61_001)).toBe('01:02');

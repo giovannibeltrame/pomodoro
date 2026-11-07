@@ -54,8 +54,9 @@ export default function App() {
       return;
     }
     const id = setTimeout(() => {
-      expire(Math.max(Date.now(), endsAt));
-      beep();
+      const now = Date.now();
+      expire(Math.max(now, endsAt));
+      if (timer.beepDue(endsAt, now)) beep();
     }, endsAt - Date.now());
     return () => clearTimeout(id);
   }, [endsAt]);
