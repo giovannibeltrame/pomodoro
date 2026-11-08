@@ -5,4 +5,4 @@ set -eu
 
 mise trust --quiet
 chmod 755 .agents/hooks/session-start .agents/hooks/worktree
-mise exec -- npm ci
+mise exec -- pnpm install --frozen-lockfile

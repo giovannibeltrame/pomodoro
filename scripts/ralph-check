@@ -2,6 +2,7 @@
 set -eu
 [ $# -eq 1 ] || { echo 'usage: scripts/ralph-check <base>' >&2; exit 2; }
 cd "$(git rev-parse --show-toplevel)"
-mise exec -- npm run lint
-mise exec -- npm test
-mise exec -- npm run build
+mise exec -- pnpm lint
+mise exec -- pnpm typecheck
+mise exec -- pnpm test
+mise exec -- pnpm build

@@ -5,5 +5,3 @@ A minimalist desktop web app that runs Pomodoro cycles. Every focus block is tag
 - Requirements: [issue #3](https://github.com/giovannibeltrame/pomodoro/issues/3)
 - Stack decision: [ADR 0001](docs/adr/0001-frontend-stack.md)
 - Design: the approved screens are in the Stitch project "Quadrantic Pomodoro". The tokens and component rules are in [`DESIGN.md`](DESIGN.md).
-
-The code currently in the repo is the previous app (React, weekly panel). The redesign implementation replaces it.

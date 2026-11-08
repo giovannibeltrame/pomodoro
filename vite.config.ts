@@ -1,6 +1,11 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import preact from '@preact/preset-vite';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [preact(), tailwindcss()],
+  test: {
+    environment: 'jsdom',
+  },
 });
