@@ -70,7 +70,7 @@ Enforced by `.agents/permission/policy.yaml`. A refusal is the rule working.
 - The agent layout and its policy: `.agents/README.md`.
 - Unattended runs: `.ralph-tui/bin/run <name> --agent claude --epic <id>`, then `.ralph-tui/bin/clean <name>`.
 <!-- cook:begin io.github.lmarqs.cookbook:git#worktrees/worktrees -->
-<!-- io.github.lmarqs.cookbook:git#worktrees --instructions=AGENTS.md --instructions=README.md -->
+<!-- io.github.lmarqs.cookbook:git#worktrees --instructions=AGENTS.md -->
 - Worktrees: branch `<branch>` is checked out at `.worktrees/<branch>`; `.worktrees/README.md` says how to
   create one ready to run and remove it.
 <!-- cook:end io.github.lmarqs.cookbook:git#worktrees/worktrees -->

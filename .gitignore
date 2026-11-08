@@ -17,7 +17,7 @@ CLAUDE.local.md
 **/.claude/CLAUDE.md
 # cook:end io.github.lmarqs.cookbook:agents#connect/harnesses
 # cook:begin io.github.lmarqs.cookbook:git#worktrees/worktrees
-# io.github.lmarqs.cookbook:git#worktrees --instructions=AGENTS.md --instructions=README.md
+# io.github.lmarqs.cookbook:git#worktrees --instructions=AGENTS.md
 /.worktrees/*
 !/.worktrees/README.md
 !/.worktrees/setup
