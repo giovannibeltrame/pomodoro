@@ -6,6 +6,8 @@ Quadrantic Pomodoro is a single-page, desktop-only web app with no backend. All 
 
 The timer has to be correct across reloads, hidden tabs and several open tabs, and the PRD requires unit tests for its logic.
 
+The repo already holds an app for the previous design: React 18, npm and Tailwind 3, with a weekly plan panel. The redesign changes the scope, the layout and the data model, so little of its UI carries over.
+
 ## Decision
 
 - **Preact + Vite + strict TypeScript**, with `@preact/signals` for UI state. No `preact/compat`.
@@ -31,6 +33,7 @@ The timer has to be correct across reloads, hidden tabs and several open tabs, a
 
 ## Alternatives rejected
 
+- **Evolving the existing React app:** most of its UI and data model serve the dropped weekly plan, so refactoring would cost about as much as a rewrite and leave React's extra runtime behind. Its proven ideas are ported to the new code rather than kept: timestamp-based expiry, tab sync, falling back to memory when storage is blocked, and a shared AudioContext.
 - **React:** it offers no feature this app needs that Preact lacks, at roughly ten times the runtime size.
 - **Vanilla TS:** rendering the drawer, menus, inline edit and drag would be written by hand, producing more code and more bugs.
 - **Svelte 5:** viable, but it adds a compiler and a component format that the team and agents use less reliably.
