@@ -3,20 +3,21 @@
 A desktop web app that runs Pomodoro cycles and tags each focus block with an Eisenhower quadrant and a role; all data
 stays in the browser. See the [README](README.md).
 
-Stack: TypeScript 5.6, React 18, Vite 5, Tailwind 3, Vitest 2, ESLint 9 (`package.json`), Node 26 LTS (`mise.toml`). The
-code is the previous app; [ADR 0001](docs/adr/0001-frontend-stack.md) decides the redesign's stack, which replaces it.
+Stack ([ADR 0001](docs/adr/0001-frontend-stack.md)): Preact 11 with `@preact/signals`, strict TypeScript 6, Vite 8,
+Tailwind 4, Vitest 5 with Testing Library, ESLint 10, Prettier (`package.json`); Node 26 LTS and pnpm 12 (`mise.toml`).
 
 ## Quick reference
 
-- Install or add a dependency: `mise exec -- npm ci`; `npm install <pkg>` (ask first)
-- Run: `mise exec -- npm run dev`
-- Build: `mise exec -- npm run build`
-- Test one file: `mise exec -- npx vitest run src/domain/timer.test.ts`
-- Lint or format one file: `mise exec -- npx eslint <file>`
+- Install or add a dependency: `mise exec -- pnpm install --frozen-lockfile`; `mise exec -- pnpm add <pkg>` (ask first)
+- Run: `mise exec -- pnpm dev`; for the `verify` skill, `mise exec -- pnpm dev --port 5199 --strictPort`
+- Build: `mise exec -- pnpm build`
+- Test one file: `mise exec -- pnpm exec vitest run src/ui/App.test.tsx`
+- Lint or format one file: `mise exec -- pnpm exec eslint <file>`; `mise exec -- pnpm exec prettier --write <file>`
 - Generate code: none
 - Local services: none
 - Worktrees: see the Worktrees line at the end of this file
-- Quick check, seconds on what changed: `mise exec -- npx vitest run <test file>` and `mise exec -- npx eslint <file>`
+- Quick check, seconds on what changed: `mise exec -- pnpm exec vitest run <test file>` and
+  `mise exec -- pnpm exec eslint <file>`
 - Done check, all that must pass before a change is done: `scripts/ralph-check HEAD` (lint, tsc, tests, build;
   about 5 s, no services)
 
@@ -44,9 +45,9 @@ Enforced by `.agents/permission/policy.yaml`. A refusal is the rule working.
 
 ## Where things go
 
-- New code: `src/domain/` for framework-free logic, `src/state/` for storage, `src/ui/` and `src/pages/` for
-  components; the design is [`DESIGN.md`](DESIGN.md).
-- Tests: next to the code as `<name>.test.ts`, such as `src/domain/timer.test.ts`.
+- New code: `src/domain/` for framework-free logic with no Preact or DOM imports, `src/state/` for storage, sync and
+  signals, `src/ui/` for components; the design is [`DESIGN.md`](DESIGN.md).
+- Tests: next to the code as `<name>.test.ts(x)`, such as `src/ui/App.test.tsx`.
 - Settings: none; the app has no configuration or secrets.
 - Decisions and domain rules: `docs/adr/`.
 - A procedure an agent repeats: a skill in `.agents/skills/`.
