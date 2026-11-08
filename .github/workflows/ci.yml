@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - run: mise exec -- pnpm install --frozen-lockfile
+      - run: mise exec -- pnpm lint
+      - run: mise exec -- pnpm typecheck
+      - run: mise exec -- pnpm test
+      - run: mise exec -- pnpm build
