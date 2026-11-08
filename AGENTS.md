@@ -3,7 +3,7 @@
 A desktop web app that runs Pomodoro cycles and tags each focus block with an Eisenhower quadrant and a role; all data
 stays in the browser. See the [README](README.md).
 
-Stack: TypeScript 5.6, React 18, Vite 5, Tailwind 3, Vitest 2, ESLint 9 (`package.json`), Node 22 (`mise.toml`). The
+Stack: TypeScript 5.6, React 18, Vite 5, Tailwind 3, Vitest 2, ESLint 9 (`package.json`), Node 24 (`mise.toml`). The
 code is the previous app; [ADR 0001](docs/adr/0001-frontend-stack.md) decides the redesign's stack, which replaces it.
 
 ## Quick reference
