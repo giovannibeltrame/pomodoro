@@ -21,7 +21,12 @@ beadsDir = "../../../.beads"
 name = "claude"
 plugin = "claude"
 command = ".ralph-tui/bin/worker"
-defaultFlags = ["claude", "--permission-prompts", "none", "--permission-mode", "acceptEdits"]
+defaultFlags = [
+  "claude", "--permission-prompts", "none", "--permission-mode", "acceptEdits", "--chrome",
+  "--allowedTools", "Bash(gh issue view *)", "Bash(mise exec -- pnpm exec prettier *)",
+  "Bash(mise exec -- pnpm exec eslint *)", "Bash(mise exec -- pnpm dev *)", "Bash(mise exec -- pnpm preview *)",
+  "mcp__claude-in-chrome__*",
+]
 
 [agents.options]
 skipPermissions = false
