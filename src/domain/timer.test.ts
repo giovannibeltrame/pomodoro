@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { initialState, reduce, remainingMs, type Classification, type TimerEvent, type TimerState } from './timer';
+import {
+  initialState,
+  reduce,
+  remainingMs,
+  restore,
+  scheduledEnd,
+  type Classification,
+  type TimerEvent,
+  type TimerState,
+} from './timer';
 
 const MIN = 60_000;
 const T0 = 1_000_000_000_000;
@@ -301,5 +310,79 @@ describe('setPreset', () => {
     expect(run(running, { type: 'setPreset', preset: 'deep' }, T0 + 1).state).toBe(running);
     const paused = run(running, { type: 'pause' }, T0 + 2).state;
     expect(run(paused, { type: 'setPreset', preset: 'deep' }, T0 + 3).state).toBe(paused);
+  });
+});
+
+describe('restore', () => {
+  it('restores a running phase with the remaining time to the scheduled end', () => {
+    const s = startFocus(initialState('classic'));
+    const now = T0 + 10 * MIN;
+    const { state, records } = restore(s, now);
+    expect(records).toEqual([]);
+    expect(state).toEqual(s);
+    expect(state.status).toBe('running');
+    expect(remainingMs(state, now)).toBe((scheduledEnd(s) as number) - now);
+    expect(remainingMs(state, now)).toBe(15 * MIN);
+  });
+
+  it('restores a paused phase with the same remaining time', () => {
+    let s = startFocus(initialState('classic'));
+    s = run(s, { type: 'pause' }, T0 + 5 * MIN).state;
+    const { state, records } = restore(s, T0 + 500 * MIN);
+    expect(records).toEqual([]);
+    expect(state).toEqual(s);
+    expect(remainingMs(state, T0 + 500 * MIN)).toBe(20 * MIN);
+  });
+
+  it('restores an idle state unchanged', () => {
+    const s = initialState('deep');
+    expect(restore(s, T0)).toEqual({ state: s, records: [] });
+  });
+
+  it('records an expired focus at the scheduled end and prepares a break', () => {
+    const s = startFocus(initialState('classic'));
+    const { state, records } = restore(s, T0 + 180 * MIN);
+    expect(records).toEqual([
+      {
+        start: T0,
+        end: T0 + 25 * MIN,
+        kind: 'focus',
+        activeMs: 25 * MIN,
+        quadrant: 2,
+        roleId: 'r1',
+        intention: 'write',
+      },
+    ]);
+    expect(state).toMatchObject({ kind: 'break', status: 'idle', position: 2 });
+  });
+
+  it('counts a phase ending exactly now as ended', () => {
+    const s = startFocus(initialState('classic'));
+    const { state, records } = restore(s, T0 + 25 * MIN);
+    expect(records).toHaveLength(1);
+    expect(records[0].end).toBe(T0 + 25 * MIN);
+    expect(state.status).toBe('idle');
+  });
+
+  it('keeps a phase running one millisecond before its end', () => {
+    const s = startFocus(initialState('classic'));
+    const { state, records } = restore(s, T0 + 25 * MIN - 1);
+    expect(records).toEqual([]);
+    expect(remainingMs(state, T0 + 25 * MIN - 1)).toBe(1);
+  });
+
+  it('records an expired break and prepares the next focus', () => {
+    const brk = completeFocus(initialState('classic'), T0).state;
+    const started = run(brk, { type: 'start' }, T0 + 30 * MIN).state;
+    const { state, records } = restore(started, T0 + 500 * MIN);
+    expect(records).toEqual([{ start: T0 + 30 * MIN, end: T0 + 35 * MIN, kind: 'break', activeMs: 5 * MIN }]);
+    expect(state).toMatchObject({ kind: 'focus', status: 'idle', position: 2 });
+  });
+
+  it('records an expired long break and returns the counter to 1', () => {
+    const started = run(deepLongBreak(), { type: 'start' }, T0 + 200 * MIN).state;
+    const { state, records } = restore(started, T0 + 900 * MIN);
+    expect(records).toEqual([{ start: T0 + 200 * MIN, end: T0 + 215 * MIN, kind: 'longBreak', activeMs: 15 * MIN }]);
+    expect(state).toMatchObject({ kind: 'focus', status: 'idle', position: 1 });
   });
 });

@@ -117,6 +117,10 @@ function makeRecord(state: TimerState, end: number, activeMs: number): PhaseReco
   return record;
 }
 
+export function restore(stored: TimerState, now: number): ReduceResult {
+  return reduce(stored, { type: 'tick' }, now);
+}
+
 export function reduce(state: TimerState, event: TimerEvent, now: number): ReduceResult {
   const unchanged: ReduceResult = { state, records: [] };
 
