@@ -1,0 +1,9 @@
+dist
+node_modules
+.worktrees
+.agents
+.claude
+.ralph-tui
+*.md
+cook.lock
+pnpm-lock.yaml
