@@ -1,0 +1,8 @@
+#!/bin/sh
+# Makes the worktree it runs in ready to run. It runs from the worktree's root, after `git worktree add`, by hand or
+# from a runner or hook configured with it, which stops when it exits non-zero.
+set -eu
+
+mise trust --quiet
+chmod 755 .agents/hooks/session-start .agents/hooks/worktree
+mise exec -- npm ci

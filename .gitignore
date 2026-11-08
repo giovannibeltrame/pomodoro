@@ -1,7 +1,33 @@
 node_modules/
 dist/
 coverage/
-.worktrees/
 .env
 .env.*
 *.log
+!/.ralph-tui/
+# cook:begin io.github.lmarqs.cookbook:agents#connect/harnesses
+# io.github.lmarqs.cookbook:agents#connect --harness=claude --worktree-setup=.worktrees/setup --worktree-teardown=.worktrees/teardown
+!/.claude/
+/.claude/*
+!/.claude/settings.json
+!/.claude/skills
+# Claude Code skips AGENTS.md while any of these exists, so they stay out of commits.
+CLAUDE.md
+CLAUDE.local.md
+**/.claude/CLAUDE.md
+# cook:end io.github.lmarqs.cookbook:agents#connect/harnesses
+# cook:begin io.github.lmarqs.cookbook:git#worktrees/worktrees
+# io.github.lmarqs.cookbook:git#worktrees --instructions=AGENTS.md
+/.worktrees/*
+!/.worktrees/README.md
+!/.worktrees/setup
+!/.worktrees/teardown
+# cook:end io.github.lmarqs.cookbook:git#worktrees/worktrees
+# cook:begin io.github.lmarqs.cookbook:ralph#ralph-tui/ralph-tui
+# io.github.lmarqs.cookbook:ralph#ralph-tui --harness=claude --worktree-setup=.worktrees/setup --worktree-teardown=.worktrees/teardown --worker-check=scripts/ralph-check --tracker=beads-bv
+/.ralph-tui/*
+!/.ralph-tui/config.toml
+!/.ralph-tui/templates/
+!/.ralph-tui/bin/
+/.worktrees/ralph/
+# cook:end io.github.lmarqs.cookbook:ralph#ralph-tui/ralph-tui

@@ -1,0 +1,78 @@
+# Written by the-cook; do not edit by hand.
+version: 1
+recipes:
+  - name: "io.github.lmarqs.cookbook:agents#connect"
+    source: "io.github.lmarqs.cookbook:agents:11.0.2#connect"
+    sha256: "3dce6e93e88bbb4e4ade7ec51067760e74308134d46296b9fb0aeca0470b916b"
+    arguments:
+      "harness": ["claude"]
+      "worktree-setup": [".worktrees/setup"]
+      "worktree-teardown": [".worktrees/teardown"]
+    owns:
+      sections:
+        - file: ".gitignore"
+          id: "io.github.lmarqs.cookbook:agents#connect/harnesses"
+      keys:
+        - file: ".agents/adapters/claude/settings.json"
+          path: ["hooks","SessionStart"]
+        - file: ".agents/adapters/claude/settings.json"
+          path: ["hooks","WorktreeCreate"]
+        - file: ".agents/adapters/claude/settings.json"
+          path: ["hooks","WorktreeRemove"]
+        - file: ".agents/adapters/claude/settings.json"
+          path: ["permissions"]
+      files:
+        - ".agents/hooks/session-start"
+        - ".agents/hooks/worktree"
+      links:
+        - ".claude/settings.json"
+        - ".claude/skills"
+  - name: "io.github.lmarqs.cookbook:agents#seed"
+    source: "io.github.lmarqs.cookbook:agents:11.0.2#seed"
+    sha256: "3dce6e93e88bbb4e4ade7ec51067760e74308134d46296b9fb0aeca0470b916b"
+    arguments: {}
+    owns:
+      files:
+        - ".agents/skills/agents-layout/SKILL.md"
+        - ".agents/skills/agents-layout/references/adopt.md"
+        - ".agents/skills/agents-layout/references/agents-md.md"
+        - ".agents/skills/agents-layout/references/claude.md"
+        - ".agents/skills/agents-layout/references/codex.md"
+        - ".agents/skills/agents-layout/references/design.md"
+        - ".agents/skills/agents-layout/references/glossary.md"
+        - ".agents/skills/agents-layout/references/investigate.md"
+        - ".agents/skills/agents-layout/references/policy.md"
+        - ".agents/skills/agents-layout/references/review.md"
+        - ".agents/skills/agents-layout/references/subagents.md"
+        - ".agents/skills/agents-layout/scripts/check.sh"
+        - ".agents/skills/agents-layout/templates/AGENTS.template.md"
+        - ".agents/skills/agents-layout/templates/README.template.md"
+        - ".agents/skills/agents-layout/templates/policy.template.yaml"
+  - name: "io.github.lmarqs.cookbook:git#worktrees"
+    source: "io.github.lmarqs.cookbook:git:11.0.2#worktrees"
+    sha256: "f7423fc4a23e095201def4311c844448e8038c33a269028eff185c9a19d86130"
+    arguments:
+      "instructions": ["AGENTS.md"]
+    owns:
+      sections:
+        - file: ".gitignore"
+          id: "io.github.lmarqs.cookbook:git#worktrees/worktrees"
+        - file: "AGENTS.md"
+          id: "io.github.lmarqs.cookbook:git#worktrees/worktrees"
+  - name: "io.github.lmarqs.cookbook:ralph#ralph-tui"
+    source: "io.github.lmarqs.cookbook:ralph:11.0.2#ralph-tui"
+    sha256: "16ca2f9c816cf9da344f9c45c779f58358e906a33472b27d5f418e7b043f286b"
+    arguments:
+      "harness": ["claude"]
+      "worktree-setup": [".worktrees/setup"]
+      "worktree-teardown": [".worktrees/teardown"]
+      "worker-check": ["scripts/ralph-check"]
+      "tracker": ["beads-bv"]
+    owns:
+      sections:
+        - file: ".gitignore"
+          id: "io.github.lmarqs.cookbook:ralph#ralph-tui/ralph-tui"
+      files:
+        - ".ralph-tui/bin/clean"
+        - ".ralph-tui/bin/run"
+        - ".ralph-tui/bin/worker"
