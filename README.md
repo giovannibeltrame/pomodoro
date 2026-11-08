@@ -1,23 +1,9 @@
-# pomodoro
+# Quadrantic Pomodoro
 
-Rastreador Pomodoro com timer por ciclos, seleção de quadrante (Eisenhower) e papel a cada bloco, e um painel semanal comparando o planejado com o realizado. Os dados ficam salvos no navegador entre sessões.
+A minimalist desktop web app that runs Pomodoro cycles. Every focus block is tagged with an Eisenhower quadrant, a role and an optional intention. Today's blocks and breaks are listed in a side panel. All data stays in the browser.
 
-## Design
+- Requirements: [issue #3](https://github.com/giovannibeltrame/pomodoro/issues/3)
+- Stack decision: [ADR 0001](docs/adr/0001-frontend-stack.md)
+- Design: the approved screens are in the Stitch project "Quadrantic Pomodoro". The tokens and component rules are in [`DESIGN.md`](DESIGN.md).
 
-Regras e telas definidas no Google Stitch (projeto "Pomodoro Quadrant Tracker"), exportadas em `design/stitch/`:
-
-- `DESIGN.md` — design system "Atelier Focus" (tokens + regras)
-- `design-system.json`, `project.json` — export bruto do Stitch
-- `screens/` — HTML e screenshot de cada tela (Timer & Sessão Ativa, Painel Semanal)
-
-## Rodar
-
-```sh
-npm install
-npm run dev      # http://localhost:5173
-npm test         # vitest
-npm run lint     # eslint + tsc
-npm run build
-```
-
-Os dados (blocos, plano semanal, papéis, estado do timer) ficam em `localStorage` nas chaves `pomodoro:v1:state` e `pomodoro:v1:blocks`.
+The code currently in the repo is the previous app (React, weekly panel). The redesign implementation replaces it.
