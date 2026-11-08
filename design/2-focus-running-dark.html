@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quadrantic Pomodoro - Focus running</title>
+<!-- Typography: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary": "#ffffff",
+            "tertiary-container": "#ebe0dd",
+            "on-tertiary-fixed-variant": "#4c4543",
+            "on-background": "#e5e2e1",
+            "secondary-fixed": "#e4e2e4",
+            "on-tertiary-fixed": "#1f1a19",
+            "on-surface-variant": "#c4c7c9",
+            "surface-dim": "#141313",
+            "secondary-container": "#474649",
+            "error": "#ffb4ab",
+            "surface-container": "#201f1f",
+            "inverse-primary": "#5d5e60",
+            "primary-container": "#e2e2e3",
+            "primary-fixed-dim": "#c6c6c7",
+            "on-surface": "#e5e2e1",
+            "surface-tint": "#c6c6c7",
+            "inverse-surface": "#e5e2e1",
+            "surface-bright": "#3a3939",
+            "surface": "#141313",
+            "background": "#141313",
+            "surface-container-highest": "#353434",
+            "primary": "#ffffff",
+            "tertiary-fixed": "#ebe0dd",
+            "surface-container-high": "#2a2a2a",
+            "secondary-fixed-dim": "#c8c6c8",
+            "secondary": "#c8c6c8",
+            "error-container": "#93000a",
+            "on-secondary-container": "#b6b4b7",
+            "surface-container-low": "#1c1b1b",
+            "on-secondary-fixed": "#1b1b1d",
+            "on-primary-fixed": "#1a1c1d",
+            "on-tertiary-container": "#6a6361",
+            "on-error": "#690005",
+            "outline": "#8e9193",
+            "on-secondary": "#303032",
+            "on-primary-fixed-variant": "#454748",
+            "surface-variant": "#353434",
+            "primary-fixed": "#e2e2e3",
+            "tertiary-fixed-dim": "#cec4c2",
+            "on-secondary-fixed-variant": "#474649",
+            "surface-container-lowest": "#0e0e0e",
+            "on-error-container": "#ffdad6",
+            "on-tertiary": "#352f2d",
+            "on-primary": "#2f3132",
+            "inverse-on-surface": "#313030",
+            "outline-variant": "#444749",
+            "on-primary-container": "#636466",
+            /* Strict Neutral Monochromatic Spec */
+            "pure-canvas": "#0f0f10",
+            "pure-card": "#161617",
+            "pure-border": "#2a2a2d",
+            "pure-stroke": "#3a3a3e",
+            "txt-primary": "#ededee",
+            "txt-secondary": "#a1a1a6",
+            "txt-muted": "#6b6b70",
+            /* Strict Quadrant Palette */
+            "q1": "#f87171",
+            "q2": "#818cf8",
+            "q3": "#f59e0b",
+            "q4": "#71717a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem",
+            "ctrl": "4px",
+            "panel": "8px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-lg": "1.25rem",
+            "gutter": "1rem",
+            "space-xs": "0.25rem",
+            "space-md": "0.75rem",
+            "margin": "2rem",
+            "space-xl": "2.0rem",
+            "margin-desktop": "2rem"
+          },
+          "fontFamily": {
+            "body-md": ["Geist", "sans-serif"],
+            "body-sm": ["Geist", "sans-serif"],
+            "headline-sm": ["Geist", "sans-serif"],
+            "label-sm": ["JetBrains Mono", "monospace"],
+            "label-md": ["JetBrains Mono", "monospace"],
+            "display-timer": ["JetBrains Mono", "monospace"]
+          },
+          "fontSize": {
+            "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "display-timer": ["72px", { "lineHeight": "72px", "letterSpacing": "-0.03em", "fontWeight": "400" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      background-color: #0f0f10;
+      color: #ededee;
+      min-width: 1024px;
+      overflow-x: hidden;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      white-space: nowrap;
+      direction: ltr;
+      letter-spacing: normal;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-[#0f0f10] text-[#ededee] font-body-md min-h-screen flex flex-col select-none antialiased">
+<!-- Top Navigation Bar (Shared Component TopNavBar) -->
+<header class="w-full px-8 py-3 flex items-center justify-between border-b border-[#2a2a2d] bg-[#161617] docked full-width top-0 z-30">
+<div class="flex items-center gap-3">
+<span class="text-headline-sm font-headline-sm uppercase tracking-widest text-[#ededee]">QUADRANTIC</span>
+<span class="text-label-sm font-label-sm text-[#6b6b70] tracking-wider pt-0.5">POMODORO</span>
+</div>
+<!-- Right Controls: Mode Toggle & Settings -->
+<div class="flex items-center gap-6">
+<!-- Navigation Links: Classic | Deep -->
+<nav class="flex items-center gap-1 text-label-md font-label-md bg-[#0f0f10] border border-[#2a2a2d] rounded-[6px] p-1 opacity-50 pointer-events-none"><a class="text-primary bg-[#161617] border-b-2 border-primary font-medium px-3 py-1 rounded-[4px] transition-colors duration-150" href="#classic">Classic</a><a class="text-[#6b6b70] hover:text-[#ededee] px-3 py-1 transition-colors duration-150" href="#deep">Deep</a></nav>
+<!-- Settings Icon Action -->
+<button aria-label="Open settings" class="text-[#a1a1a6] hover:text-[#ededee] transition-colors duration-150 flex items-center justify-center p-1 rounded-ctrl" type="button">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Viewport Layout -->
+<div class="flex-1 flex w-full">
+<!-- Center Column (Timer & Matrix Form Controls) -->
+<main class="flex-1 flex flex-col items-center justify-start pt-8 pb-16 px-6">
+<div class="max-w-[620px] w-full flex flex-col items-center text-center">
+<!-- Tomato Progress Indicator: Idle Geometric Line Art -->
+<div class="w-[180px] h-[180px] flex items-center justify-center mb-1">
+<svg class="w-[180px] h-[180px]" viewbox="0 0 32 32"><defs><clippath id="fill-clip"><rect height="16.15" width="32" x="0" y="12.85"></rect></clippath><path d="M16 10c-6.8 0-11 4.5-11 11.2C5 26.5 9.5 29 16 29s11-2.5 11-7.8C27 14.5 22.8 10 16 10z" id="tomato-body"></path></defs><use clip-path="url(#fill-clip)" fill="#ef4444" href="#tomato-body"></use><g fill="none" stroke="#3a3a3e" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M16 4v4"></path><path d="M16 8c-2.5-3-6-2.5-7.5-1.5 1 2 2.5 3.5 5.5 3.5"></path><path d="M16 8c2.5-3 6-2.5 7.5-1.5-1 2-2.5 3.5-5.5 3.5"></path><path d="M16 8l-2 3"></path><path d="M16 8l2 3"></path><use href="#tomato-body"></use></g></svg>
+</div>
+<!-- Phase Label -->
+<div class="font-label-sm text-label-sm uppercase tracking-wider text-[#6b6b70]">FOCUS · BLOCK 3 OF 4</div>
+<!-- Timer Display (JetBrains Mono 72px) -->
+<div class="font-display-timer text-display-timer tabular-nums text-[#ededee] font-normal mt-2 mb-6 tracking-tight">03:45</div>
+<!-- Primary Action Buttons Row -->
+<div class="flex items-center justify-center">
+<button class="bg-[#ededee] text-[#0f0f10] font-label-md text-label-md uppercase tracking-wider px-6 py-2 rounded-ctrl select-none hover:bg-white transition-colors duration-150" type="button">PAUSE</button>
+<button class="font-label-md text-label-md text-[#6b6b70] hover:text-[#ededee] ml-4 transition-colors duration-150" type="button">
+            Reset
+          </button>
+</div>
+<!-- Center Form Controls -->
+<div class="w-full text-left mt-8 flex flex-col gap-5">
+<!-- Quadrant Selection Group -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-[#6b6b70]">QUADRANT</span>
+<span class="font-body-sm text-body-sm text-[#6b6b70]"></span>
+</div>
+<!-- 4 Quadrant Cards in Single Row -->
+<div class="grid grid-cols-4 gap-3"><button class="group bg-[#161617] border border-[#2a2a2d] rounded-panel p-3 text-left opacity-45 cursor-default flex flex-col justify-between h-[76px]" disabled="" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#f87171]">Q1 Do</span><span class="w-1.5 h-1.5 rounded-full bg-[#f87171] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#6b6b70] leading-tight">Urgent · Important</span></button><button class="group bg-[#818cf8]/[0.06] border border-[#818cf8] rounded-panel p-3 text-left cursor-default flex flex-col justify-between h-[76px]" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#818cf8]">Q2 Schedule</span><span class="w-1.5 h-1.5 rounded-full bg-[#818cf8] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#6b6b70] leading-tight">Important · Not urgent</span></button><button class="group bg-[#161617] border border-[#2a2a2d] rounded-panel p-3 text-left opacity-45 cursor-default flex flex-col justify-between h-[76px]" disabled="" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#f59e0b]">Q3 Delegate</span><span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#6b6b70] leading-tight">Urgent · Not important</span></button><button class="group bg-[#161617] border border-[#2a2a2d] rounded-panel p-3 text-left opacity-45 cursor-default flex flex-col justify-between h-[76px]" disabled="" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#71717a]">Q4 Eliminate</span><span class="w-1.5 h-1.5 rounded-full bg-[#71717a] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#6b6b70] leading-tight">Neither</span></button></div></div>
+<!-- Role Selection Input -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-[#6b6b70]">ROLE</label>
+<div class="relative"><div class="w-full bg-[#161617] border border-[#2a2a2d] rounded-ctrl px-4 py-2.5 flex items-center justify-between text-[#ededee] font-body-md text-body-md opacity-50 cursor-not-allowed select-none"><span>Builder</span><svg class="w-4 h-4 text-[#6b6b70] shrink-0" fill="none" stroke="#6b6b70" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div></div>
+</div>
+<!-- Intention Input -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-[#6b6b70]">INTENTION (OPTIONAL)</label>
+<div class="w-full bg-[#161617] border border-[#2a2a2d] rounded-ctrl px-4 py-2.5 flex items-center justify-between text-[#ededee] font-body-md text-body-md opacity-50 cursor-not-allowed select-none"><span>Write API spec</span><svg class="w-4 h-4 text-[#6b6b70] shrink-0" fill="none" stroke="#6b6b70" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Dedicated Right-Hand Log Panel (300px fixed, min-h-screen) -->
+<aside class="w-[300px] shrink-0 border-l border-[#2a2a2d] bg-[#161617] p-6 flex flex-col">
+<!-- Panel Header -->
+<h2 class="font-headline-sm text-headline-sm font-medium text-[#ededee]">Today</h2>
+<div class="font-label-sm text-label-sm text-[#6b6b70] mt-1 tabular-nums">2 blocks · 0h50 focus</div>
+<!-- Divider line -->
+<div class="border-t border-[#2a2a2d] my-4"></div>
+<!-- Empty State Content -->
+<div class="flex flex-col"><div class="py-2.5 flex flex-col gap-1"><div class="font-label-sm text-label-sm text-[#6b6b70] whitespace-nowrap">#1 · 09:00–09:25 · Focus 25m</div><div class="font-body-sm text-body-sm flex items-center gap-1.5 overflow-hidden"><span class="text-[#a1a1a6] shrink-0">Builder</span><span class="text-[#6b6b70]">·</span><span class="text-[#818cf8] bg-[rgba(129,140,248,0.15)] px-1.5 py-0.5 rounded text-[11px] font-label-sm font-medium shrink-0">Q2</span><span class="text-[#6b6b70]">·</span><span class="text-[#ededee] truncate">“Draft API outline”</span></div></div><div class="border-t border-[#2a2a2d]/60"></div><div class="py-2.5"><div class="font-label-sm text-label-sm text-[#6b6b70] whitespace-nowrap">#2 · 09:25–09:30 · Break 5m</div></div><div class="border-t border-[#2a2a2d]/60"></div><div class="py-2.5 flex flex-col gap-1"><div class="font-label-sm text-label-sm text-[#6b6b70] whitespace-nowrap">#3 · 09:30–09:55 · Focus 25m</div><div class="font-body-sm text-body-sm flex items-center gap-1.5 overflow-hidden"><span class="text-[#a1a1a6] shrink-0">Manager</span><span class="text-[#6b6b70]">·</span><span class="text-[#f87171] bg-[rgba(248,113,113,0.15)] px-1.5 py-0.5 rounded text-[11px] font-label-sm font-medium shrink-0">Q1</span><span class="text-[#6b6b70]">·</span><span class="text-[#ededee] truncate">“Reply to incident th…”</span></div></div><div class="border-t border-[#2a2a2d]/60"></div><div class="py-2.5"><div class="font-label-sm text-label-sm text-[#6b6b70] whitespace-nowrap">#4 · 09:55–10:00 · Break 5m</div></div></div>
+</aside>
+</div>
+</body></html>

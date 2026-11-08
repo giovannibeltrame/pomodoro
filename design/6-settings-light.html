@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quadrantic Pomodoro - Settings (light)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          fontSize: {
+            'display-timer': ['72px', { lineHeight: '72px', letterSpacing: '-0.03em' }],
+            'headline-sm': ['16px', { lineHeight: '24px' }],
+            'body-md': ['13px', { lineHeight: '20px' }],
+            'body-sm': ['12px', { lineHeight: '18px' }],
+            'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.02em' }],
+            'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.04em' }],
+          },
+          borderRadius: {
+            'ctrl': '4px',
+            'panel': '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .font-display-timer { font-family: 'JetBrains Mono', monospace; font-size: 72px; line-height: 72px; letter-spacing: -0.03em; }
+    .font-headline-sm { font-family: 'Geist', sans-serif; font-size: 16px; line-height: 24px; }
+    .font-body-md { font-family: 'Geist', sans-serif; font-size: 13px; line-height: 20px; }
+    .font-body-sm { font-family: 'Geist', sans-serif; font-size: 12px; line-height: 18px; }
+    .font-label-md { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 16px; letter-spacing: 0.02em; }
+    .font-label-sm { font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 14px; letter-spacing: 0.04em; }
+    .rounded-ctrl { border-radius: 4px; }
+    .rounded-panel { border-radius: 8px; }
+  </style>
+</head>
+<body class="bg-[#fafafa] text-[#18181b] font-body-md min-h-screen flex flex-col relative font-sans">
+<header class="w-full px-8 py-3 flex items-center justify-between border-b border-[#e4e4e7] bg-[#ffffff] top-0 z-30">
+<div class="flex items-center gap-3"><span class="text-headline-sm font-headline-sm uppercase tracking-widest text-[#18181b]">QUADRANTIC</span><span class="text-label-sm font-label-sm text-[#a1a1aa] tracking-wider pt-0.5">POMODORO</span></div>
+<div class="flex items-center gap-6">
+<nav class="flex items-center gap-1 text-label-md font-label-md bg-[#fafafa] border border-[#e4e4e7] rounded-[6px] p-1 opacity-50 pointer-events-none"><a class="text-[#18181b] bg-[#ffffff] border-b-2 border-[#18181b] font-medium px-3 py-1 rounded-[4px]" href="#classic">Classic</a><a class="text-[#a1a1aa] px-3 py-1" href="#deep">Deep</a></nav>
+<button class="text-[#52525b] flex items-center justify-center p-1 rounded-ctrl" type="button"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</header>
+<div class="flex-1 flex w-full">
+<main class="flex-1 flex flex-col items-center justify-start pt-8 pb-16 px-6">
+<div class="max-w-[620px] w-full flex flex-col items-center text-center">
+<div class="w-[180px] h-[180px] flex items-center justify-center mb-1"><svg class="w-[180px] h-[180px]" viewBox="0 0 32 32"><defs><clipPath id="fill-clip"><rect height="16.15" width="32" x="0" y="12.85"/></clipPath><path d="M16 10c-6.8 0-11 4.5-11 11.2C5 26.5 9.5 29 16 29s11-2.5 11-7.8C27 14.5 22.8 10 16 10z" id="tomato-body"/></defs><use clip-path="url(#fill-clip)" fill="#ef4444" href="#tomato-body"/><g fill="none" stroke="#d4d4d8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M16 4v4"/><path d="M16 8c-2.5-3-6-2.5-7.5-1.5 1 2 2.5 3.5 5.5 3.5"/><path d="M16 8c2.5-3 6-2.5 7.5-1.5-1 2-2.5 3.5-5.5 3.5"/><path d="M16 8l-2 3"/><path d="M16 8l2 3"/><use href="#tomato-body"/></g></svg></div>
+<div class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">FOCUS · BLOCK 3 OF 4</div>
+<div class="font-display-timer text-display-timer tabular-nums text-[#18181b] font-normal mt-2 mb-6 tracking-tight">03:45</div>
+<div class="flex items-center justify-center"><button class="bg-[#18181b] text-[#ffffff] font-label-md text-label-md uppercase tracking-wider px-6 py-2 rounded-ctrl" type="button">PAUSE</button><button class="font-label-md text-label-md text-[#a1a1aa] ml-4" type="button">Reset</button></div>
+<div class="w-full text-left mt-8 flex flex-col gap-5">
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">QUADRANT</span>
+<div class="grid grid-cols-4 gap-3"><button class="bg-[#ffffff] border border-[#e4e4e7] rounded-panel p-3 text-left opacity-45 flex flex-col justify-between h-[76px]" disabled type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#ef4444]">Q1 Do</span><span class="w-1.5 h-1.5 rounded-full bg-[#ef4444] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#a1a1aa] leading-tight">Urgent · Important</span></button><button class="bg-[#6366f1]/[0.06] border border-[#6366f1] rounded-panel p-3 text-left flex flex-col justify-between h-[76px]" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#6366f1]">Q2 Schedule</span><span class="w-1.5 h-1.5 rounded-full bg-[#6366f1] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#a1a1aa] leading-tight">Important · Not urgent</span></button><button class="bg-[#ffffff] border border-[#e4e4e7] rounded-panel p-3 text-left opacity-45 flex flex-col justify-between h-[76px]" disabled type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#d97706]">Q3 Delegate</span><span class="w-1.5 h-1.5 rounded-full bg-[#d97706] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#a1a1aa] leading-tight">Urgent · Not important</span></button><button class="bg-[#ffffff] border border-[#e4e4e7] rounded-panel p-3 text-left opacity-45 flex flex-col justify-between h-[76px]" disabled type="button"><div class="flex items-center justify-between w-full"><span class="font-label-md text-label-md font-medium text-[#71717a]">Q4 Eliminate</span><span class="w-1.5 h-1.5 rounded-full bg-[#71717a] inline-block"></span></div><span class="font-body-sm text-body-sm text-[#a1a1aa] leading-tight">Neither</span></button></div>
+</div>
+<div class="flex flex-col gap-1.5"><label class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">ROLE</label><div class="w-full bg-[#ffffff] border border-[#e4e4e7] rounded-ctrl px-4 py-2.5 flex items-center justify-between text-[#18181b] font-body-md text-body-md opacity-50"><span>Builder</span><span class="material-symbols-outlined text-[16px] text-[#a1a1aa]">lock</span></div></div>
+<div class="flex flex-col gap-1.5"><label class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">INTENTION (OPTIONAL)</label><div class="w-full bg-[#ffffff] border border-[#e4e4e7] rounded-ctrl px-4 py-2.5 flex items-center justify-between text-[#18181b] font-body-md text-body-md opacity-50"><span>Write API spec</span><span class="material-symbols-outlined text-[16px] text-[#a1a1aa]">lock</span></div></div>
+</div>
+</div>
+</main>
+<aside class="w-[300px] shrink-0 border-l border-[#e4e4e7] bg-[#ffffff] p-6 flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-medium text-[#18181b]">Today</h2>
+<div class="font-label-sm text-label-sm text-[#a1a1aa] mt-1 tabular-nums">2 blocks · 0h50 focus</div>
+<div class="border-t border-[#e4e4e7] my-4"></div>
+<div class="flex flex-col"><div class="py-2.5 flex flex-col gap-1"><div class="font-label-sm text-label-sm text-[#a1a1aa]">#1 · 09:00–09:25 · Focus 25m</div><div class="font-body-sm text-body-sm flex items-center gap-1.5"><span class="text-[#52525b]">Builder</span><span class="text-[#a1a1aa]">·</span><span class="text-[#6366f1] bg-[rgba(99,102,241,0.12)] px-1.5 py-0.5 rounded text-[11px] font-label-sm font-medium">Q2</span><span class="text-[#a1a1aa]">·</span><span class="text-[#18181b] truncate">“Draft API outline”</span></div></div><div class="border-t border-[#e4e4e7]/60"></div><div class="py-2.5"><div class="font-label-sm text-label-sm text-[#a1a1aa]">#2 · 09:25–09:30 · Break 5m</div></div><div class="border-t border-[#e4e4e7]/60"></div><div class="py-2.5 flex flex-col gap-1"><div class="font-label-sm text-label-sm text-[#a1a1aa]">#3 · 09:30–09:55 · Focus 25m</div><div class="font-body-sm text-body-sm flex items-center gap-1.5"><span class="text-[#52525b]">Manager</span><span class="text-[#a1a1aa]">·</span><span class="text-[#ef4444] bg-[rgba(239,68,68,0.12)] px-1.5 py-0.5 rounded text-[11px] font-label-sm font-medium">Q1</span><span class="text-[#a1a1aa]">·</span><span class="text-[#18181b] truncate">“Reply to incident th…”</span></div></div><div class="border-t border-[#e4e4e7]/60"></div><div class="py-2.5"><div class="font-label-sm text-label-sm text-[#a1a1aa]">#4 · 09:55–10:00 · Break 5m</div></div></div>
+</aside>
+</div>
+<div class="fixed inset-0 z-40" style="background-color: rgba(24,24,27,0.25);"></div>
+<aside class="fixed top-0 right-0 bottom-0 z-50 w-[400px] h-full bg-[#ffffff] border-l border-[#e4e4e7] p-6 flex flex-col overflow-y-auto">
+<div class="flex items-center justify-between pb-5 border-b border-[#e4e4e7]"><h2 class="font-headline-sm text-headline-sm font-medium text-[#18181b]">Settings</h2><button class="text-[#52525b] p-1" type="button"><span class="material-symbols-outlined">close</span></button></div>
+<div class="py-5 border-b border-[#e4e4e7] flex flex-col gap-2.5"><span class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">THEME</span>
+<div class="flex items-center gap-1 text-label-md font-label-md bg-[#fafafa] border border-[#e4e4e7] rounded-[6px] p-1 w-full"><button class="flex-1 text-[#18181b] bg-[#ffffff] border-b-2 border-[#18181b] font-medium py-1.5 rounded-[4px] text-center" type="button">System</button><button class="flex-1 text-[#52525b] py-1.5 text-center" type="button">Light</button><button class="flex-1 text-[#52525b] py-1.5 text-center" type="button">Dark</button></div></div>
+<div class="py-5 border-b border-[#e4e4e7] flex flex-col gap-2.5"><span class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">SOUND</span>
+<div class="flex items-center justify-between"><span class="font-body-md text-body-md text-[#18181b]">Play a sound when a phase ends</span><button class="w-11 h-6 bg-[#18181b] rounded-full p-0.5 flex items-center justify-end" role="switch" type="button"><span class="w-5 h-5 bg-[#ffffff] rounded-full"></span></button></div></div>
+<div class="py-5 border-b border-[#e4e4e7] flex flex-col gap-2.5"><span class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">NOTIFICATIONS</span>
+<div class="flex items-center justify-between"><span class="font-body-md text-body-md text-[#18181b]">Browser notification when a phase ends</span><button class="w-11 h-6 bg-[#18181b] rounded-full p-0.5 flex items-center justify-end" role="switch" type="button"><span class="w-5 h-5 bg-[#ffffff] rounded-full"></span></button></div></div>
+<div class="pt-5 flex flex-col gap-3"><span class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">ROLES</span>
+<div class="flex flex-col">
+<div class="h-10 flex items-center justify-between border-b border-[#e4e4e7]/60"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[16px] text-[#a1a1aa]">drag_indicator</span><span class="font-body-md text-body-md text-[#18181b]">Builder</span></div><div class="flex items-center gap-3 text-[#a1a1aa]"><span class="material-symbols-outlined text-[16px]">edit</span><span class="material-symbols-outlined text-[16px]">archive</span></div></div>
+<div class="h-10 flex items-center justify-between border-b border-[#e4e4e7]/60"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[16px] text-[#a1a1aa]">drag_indicator</span><span class="font-body-md text-body-md text-[#18181b]">Manager</span></div><div class="flex items-center gap-3 text-[#a1a1aa]"><span class="material-symbols-outlined text-[16px]">edit</span><span class="material-symbols-outlined text-[16px]">archive</span></div></div>
+<div class="h-10 flex items-center justify-between border-b border-[#e4e4e7]/60"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[16px] text-[#a1a1aa]">drag_indicator</span><span class="font-body-md text-body-md text-[#18181b]">Learner</span></div><div class="flex items-center gap-3 text-[#a1a1aa]"><span class="material-symbols-outlined text-[16px]">edit</span><span class="material-symbols-outlined text-[16px]">archive</span></div></div>
+</div>
+<button class="w-full h-9 border border-[#e4e4e7] rounded-[4px] text-body-sm font-body-sm text-[#52525b] flex items-center justify-center mt-1" type="button">+ Add role</button>
+<div class="mt-3 flex flex-col gap-2"><button class="flex items-center gap-1.5 text-left" type="button"><span class="material-symbols-outlined text-[14px] text-[#a1a1aa]">expand_more</span><span class="font-label-sm text-label-sm uppercase tracking-wider text-[#a1a1aa]">ARCHIVED (1)</span></button>
+<div class="h-9 px-1 flex items-center justify-between"><span class="font-body-md text-body-md text-[#a1a1aa]">Researcher</span><button class="font-body-sm text-body-sm text-[#52525b]" type="button">Restore</button></div></div>
+</div>
+</aside>
+</body>
+</html>
