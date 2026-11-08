@@ -7,5 +7,6 @@ export default defineConfig({
   plugins: [preact(), tailwindcss()],
   test: {
     environment: 'jsdom',
+    env: { TZ: 'Europe/Rome' },
   },
 });
