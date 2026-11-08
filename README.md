@@ -7,3 +7,9 @@ A minimalist desktop web app that runs Pomodoro cycles. Every focus block is tag
 - Design: the approved screens are in the Stitch project "Quadrantic Pomodoro". The tokens and component rules are in [`DESIGN.md`](DESIGN.md).
 
 The code currently in the repo is the previous app (React, weekly panel). The redesign implementation replaces it.
+
+<!-- cook:begin io.github.lmarqs.cookbook:git#worktrees/worktrees -->
+<!-- io.github.lmarqs.cookbook:git#worktrees --instructions=AGENTS.md --instructions=README.md -->
+- Worktrees: branch `<branch>` is checked out at `.worktrees/<branch>`; `.worktrees/README.md` says how to
+  create one ready to run and remove it.
+<!-- cook:end io.github.lmarqs.cookbook:git#worktrees/worktrees -->

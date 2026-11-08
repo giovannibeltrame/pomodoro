@@ -1,0 +1,83 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git switch *)",
+      "Bash(git push *)",
+      "Bash(git worktree list *)",
+      "Bash(git worktree add *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(npm ci *)",
+      "Bash(npm test *)",
+      "Bash(npm run lint *)",
+      "Bash(npm run build *)",
+      "Bash(npm run test *)",
+      "Bash(npx vitest run *)",
+      "Bash(mise exec -- npm ci *)",
+      "Bash(mise exec -- npm test *)",
+      "Bash(mise exec -- npm run lint *)",
+      "Bash(mise exec -- npm run build *)",
+      "Bash(mise exec -- npm run test *)",
+      "Bash(mise exec -- cook check *)",
+      "Bash(mise exec -- cook help *)",
+      "Bash(mise exec -- cook --dry-run *)",
+      "Bash(scripts/ralph-check *)",
+      "Bash(python3 -m json.tool *)",
+      "Bash(sh .agents/skills/agents-layout/scripts/check.sh *)"
+    ],
+    "ask": [
+      "Bash(gh pr merge *)",
+      "Bash(npm install *)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push * --force*)",
+      "Bash(git reset --hard *)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.agents/hooks/session-start claude"
+          }
+        ]
+      }
+    ],
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.agents/hooks/worktree create"
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.agents/hooks/worktree remove"
+          }
+        ]
+      }
+    ]
+  }
+}
