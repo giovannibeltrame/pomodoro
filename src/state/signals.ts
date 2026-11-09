@@ -1,5 +1,12 @@
 import { computed, signal } from '@preact/signals';
-import { reduce, restore, type PhaseRecord, type TimerEvent, type TimerState } from '../domain/timer';
+import {
+  reduce,
+  restore,
+  type Classification,
+  type PhaseRecord,
+  type TimerEvent,
+  type TimerState,
+} from '../domain/timer';
 import { todayPhases } from '../domain/today';
 import {
   KEYS,
@@ -15,6 +22,7 @@ import {
 
 export const settings = signal<Settings>(readSettings());
 export const timer = signal<TimerState>(readTimer(settings.value.preset));
+export const selection = signal<Classification | null>(settings.value.lastClassification ?? null);
 export const phases = signal<PhaseRecord[]>(readPhases());
 export const roles = signal<Role[]>(readRoles());
 export const todayRecords = computed(() => todayPhases(phases.value, Date.now()));

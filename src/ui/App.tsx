@@ -1,4 +1,5 @@
 import { timer } from '../state/signals';
+import { TimerPanel } from './TimerPanel';
 
 export function App() {
   const onBreak = timer.value.kind !== 'focus';
@@ -37,7 +38,9 @@ export function App() {
         </div>
       </header>
       <div class="relative flex flex-1">
-        <main aria-label="Quadrantic Pomodoro" class="flex-1 px-8 py-8" />
+        <main aria-label="Quadrantic Pomodoro" class="flex-1 px-8 py-8">
+          <TimerPanel />
+        </main>
         <aside
           aria-label="Today"
           class="w-[300px] shrink-0 border-l border-outline-variant bg-surface-container-low p-5"
