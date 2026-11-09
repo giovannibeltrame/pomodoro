@@ -1,7 +1,8 @@
 import { signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-import { PRESETS, remainingMs, type TimerState } from '../domain/timer';
+import { durationMs, PRESETS, remainingMs, type TimerState } from '../domain/timer';
 import { dispatch, selection, timer } from '../state/signals';
+import { Tomato } from './Tomato';
 
 const APP_TITLE = 'Quadrantic Pomodoro';
 const KIND_NAMES = { focus: 'Focus', break: 'Break', longBreak: 'Long break' } as const;
@@ -88,9 +89,12 @@ export function TimerPanel() {
   }, [title]);
 
   const isFocus = state.kind === 'focus';
+  const total = durationMs(state.preset, state.kind);
+  const progress = state.status === 'idle' ? 0 : 1 - remaining / total;
 
   return (
     <section class="flex flex-col items-center gap-6 py-6" aria-label="Timer">
+      <Tomato kind={state.kind} status={state.status} progress={progress} />
       <div class="font-mono text-xs font-medium tracking-[0.02em] text-on-surface-variant">{phaseLabel(state)}</div>
       <div class="font-mono text-[72px] leading-none font-medium tabular-nums" aria-live="off">
         {formatClock(remaining)}

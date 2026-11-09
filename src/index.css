@@ -22,8 +22,15 @@ html {
   opacity: 0.05;
 }
 
+.tomato-fill {
+  transition:
+    transform 250ms linear,
+    fill 250ms linear;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .break-tint {
+  .break-tint,
+  .tomato-fill {
     transition: none;
   }
 }
