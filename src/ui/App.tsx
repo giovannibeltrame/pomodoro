@@ -1,10 +1,13 @@
-import { timer } from '../state/signals';
+import { useRef } from 'preact/hooks';
+import { settingsOpen, timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
 import { PresetToggle } from './PresetToggle';
+import { SettingsDrawer } from './SettingsDrawer';
 import { TimerPanel } from './TimerPanel';
 import { TodayList } from './TodayList';
 
 export function App() {
+  const gearRef = useRef<HTMLButtonElement>(null);
   const onBreak = timer.value.kind !== 'focus';
   return (
     <div class="relative flex min-h-screen flex-col bg-background text-on-surface">
@@ -23,8 +26,13 @@ export function App() {
             <PresetToggle />
           </div>
           <button
+            ref={gearRef}
             type="button"
             aria-label="Settings"
+            aria-haspopup="dialog"
+            onClick={() => {
+              settingsOpen.value = true;
+            }}
             class="flex h-8 w-8 items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-high"
           >
             <svg
@@ -56,6 +64,7 @@ export function App() {
           <TodayList />
         </aside>
       </div>
+      {settingsOpen.value ? <SettingsDrawer returnFocus={gearRef} /> : null}
     </div>
   );
 }

@@ -93,6 +93,14 @@ export function removePhase(start: number): void {
   phases.value = deletePhase(start);
 }
 
+export function updateSettings(patch: Partial<Settings>): void {
+  settings.value = writeSettings(patch);
+}
+
+export function closeSettings(): void {
+  settingsOpen.value = false;
+}
+
 export function selectPreset(preset: Preset): void {
   const current = readTimer(settings.value.preset);
   if (current.status !== 'idle' || preset === settings.value.preset) return;
