@@ -1,0 +1,21 @@
+<!--
+  Tomato icon from TDesign Icons (https://github.com/Tencent/tdesign-icons), recoloured.
+
+  MIT License
+
+  Copyright (c) 2021-present TDesign
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+  documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+  the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+  WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-linecap="square" stroke-width="2"><path d="M9.5 3L12 5.513L14.69 3m.959 2.687l-.352.512c-1.589 2.314-5.005 2.314-6.594 0l-.352-.512M12 5.514s-2.553-.752-4-.338C5.113 6 3 8.004 3 12.5s4 9.244 7.557 8.4c.902-.214.867-.299 1.443-.299s.541.085 1.443.3c3.575.847 7.56-3.899 7.557-8.4c-.002-4.503-2.183-6.497-5-7.325c-1.444-.425-4 .338-4 .338Z"/></svg>
