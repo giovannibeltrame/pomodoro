@@ -104,7 +104,7 @@ test('controls are locked with a lock icon while running or paused', async () =>
       dispatch({ type: 'start', classification: { quadrant: 1, roleId: 'r1', intention: 'x' } });
       if (status === 'paused') dispatch({ type: 'pause' });
     });
-    expect(screen.getByTestId('lock')).toBeTruthy();
+    expect(screen.getAllByTestId('lock')).toHaveLength(2);
     expect(role().disabled).toBe(true);
     expect((screen.getByPlaceholderText('What will you work on?') as HTMLInputElement).disabled).toBe(true);
     expect((screen.getByRole('button', { name: /Q1/ }) as HTMLButtonElement).disabled).toBe(true);
