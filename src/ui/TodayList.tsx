@@ -119,7 +119,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
   const line = formatRow(record, index);
   if (record.kind !== 'focus') {
     return (
-      <li class="today-row truncate py-2.5 font-mono text-[11px] text-outline" data-kind={record.kind}>
+      <li class="today-row truncate py-2.5 font-mono text-[11px] leading-[14px] text-outline" data-kind={record.kind}>
         {line}
       </li>
     );
@@ -127,7 +127,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
   if (mode === 'edit') {
     return (
       <li class="today-row flex flex-col gap-1 py-2.5" data-kind="focus" ref={ref}>
-        <span class="truncate font-mono text-[11px] text-outline">{line}</span>
+        <span class="truncate font-mono text-[11px] leading-[14px] text-outline">{line}</span>
         <EditForm record={record} onDone={() => setMode('view')} />
       </li>
     );
@@ -135,7 +135,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
   if (mode === 'confirm') {
     return (
       <li class="today-row flex flex-col gap-1 py-2.5" data-kind="focus" ref={ref}>
-        <span class="truncate font-mono text-[11px] text-outline">{line}</span>
+        <span class="truncate font-mono text-[11px] leading-[14px] text-outline">{line}</span>
         <span class="text-xs text-on-surface">Delete this block?</span>
         <div class="flex gap-2">
           <button type="button" class={action} onClick={() => removePhase(record.start)}>
@@ -156,14 +156,14 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
       ref={ref}
     >
       <div class="flex items-center justify-between gap-2">
-        <span class="truncate font-mono text-[11px] text-outline">{line}</span>
+        <span class="truncate font-mono text-[11px] leading-[14px] text-outline">{line}</span>
         <button
           type="button"
           aria-label="Block actions"
           aria-haspopup="menu"
           aria-expanded={open}
           onClick={() => setMode(open ? 'view' : 'menu')}
-          class={`flex shrink-0 items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
+          class={`-my-[3px] flex shrink-0 items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
         >
           <MoreIcon />
         </button>
@@ -171,7 +171,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
       {open && (
         <div
           role="menu"
-          class="absolute right-2 top-8 z-20 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
+          class="absolute right-2 top-7 z-20 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
         >
           <button
             type="button"
@@ -193,13 +193,13 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
           </button>
         </div>
       )}
-      <span class="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-xs">
+      <span class="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-xs leading-[18px]">
         {role && <span class="shrink-0 text-on-surface-variant">{role.name}</span>}
         {record.quadrant && (
           <>
             {role && <span class="shrink-0 text-outline">·</span>}
             <span
-              class="shrink-0 rounded px-1.5 py-0.5 font-mono text-[11px] font-medium"
+              class="shrink-0 rounded px-1.5 py-0.5 font-mono text-[11px] leading-[14px] font-medium"
               data-testid="chip"
               style={{
                 color: `var(--q${record.quadrant})`,
@@ -226,7 +226,7 @@ export function TodayList() {
   return (
     <section class="flex flex-col">
       <h2 class="text-base leading-6 font-medium text-on-surface">Today</h2>
-      <p class="mt-1 font-mono text-[11px] text-outline">{totals(records)}</p>
+      <p class="mt-1 font-mono text-[11px] leading-[14px] text-outline">{totals(records)}</p>
       <hr class="my-4 border-outline-variant" />
       {records.length === 0 ? (
         <p class="text-xs text-on-surface-variant">No blocks yet today. Start your first focus block.</p>

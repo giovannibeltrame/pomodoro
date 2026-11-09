@@ -9,7 +9,7 @@ import {
   settingsView,
 } from '../state/signals';
 import type { Role } from '../state/storage';
-import { EditIcon, strokeIcon } from './icons';
+import { ArchiveIcon, EditIcon, ExpandMoreIcon, strokeIcon } from './icons';
 import { sectionLabel } from './styles';
 
 function ActiveRow({
@@ -142,11 +142,7 @@ function ActiveRow({
             onClick={() => setRoleArchived(role.id, true)}
             class="text-outline transition-colors duration-150 hover:text-on-surface"
           >
-            <svg {...strokeIcon} class="h-3.5 w-3.5">
-              <polyline points="21 8 21 21 3 21 3 8" />
-              <rect x="1" y="3" width="22" height="5" />
-              <line x1="10" y1="12" x2="14" y2="12" />
-            </svg>
+            <ArchiveIcon class="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -283,8 +279,11 @@ export function RolesSection() {
         + Add role
       </button>
       {archived.length > 0 ? (
-        <details class="mt-3">
-          <summary class={`${sectionLabel} cursor-pointer hover:text-on-surface-variant`}>
+        <details class="group mt-3">
+          <summary
+            class={`${sectionLabel} flex cursor-pointer list-none items-center gap-1.5 hover:text-on-surface-variant`}
+          >
+            <ExpandMoreIcon class="h-3.5 w-3.5 -rotate-90 group-open:rotate-0" />
             Archived ({archived.length})
           </summary>
           <ul class="mt-2 flex flex-col">

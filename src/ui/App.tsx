@@ -6,6 +6,7 @@ import { PresetToggle } from './PresetToggle';
 import { SettingsDrawer } from './SettingsDrawer';
 import { TimerPanel } from './TimerPanel';
 import { TodayList } from './TodayList';
+import { SettingsIcon } from './icons';
 
 const onBreak = computed(() => timer.value.kind !== 'focus');
 
@@ -34,19 +35,7 @@ export function App() {
             onClick={openSettings}
             class="flex items-center justify-center rounded p-1 text-on-surface-variant hover:text-on-surface"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="3" />
-              <path d="M10.3 3h3.4l.5 2.4 1.9.8 2.1-1.3 2.4 2.4-1.3 2.1.8 1.9 2.4.5v3.4l-2.4.5-.8 1.9 1.3 2.1-2.4 2.4-2.1-1.3-1.9.8-.5 2.4h-3.4l-.5-2.4-1.9-.8-2.1 1.3-2.4-2.4 1.3-2.1-.8-1.9L3 13.7v-3.4l2.4-.5.8-1.9-1.3-2.1 2.4-2.4 2.1 1.3 1.9-.8z" />
-            </svg>
+            <SettingsIcon width="20" height="20" />
           </button>
         </div>
       </header>
@@ -59,7 +48,7 @@ export function App() {
         </main>
         <aside
           aria-label="Today"
-          class="w-[300px] shrink-0 border-l border-outline-variant bg-surface-container-low p-5"
+          class="w-[300px] shrink-0 border-l border-outline-variant bg-surface-container-low p-6"
         >
           <TodayList />
         </aside>
