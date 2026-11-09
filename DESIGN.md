@@ -135,6 +135,7 @@ Focus is neutral. Breaks get a faint green tint on the canvas (`#10b981` at 4–
   - A muted hint "Choose a quadrant and role to start" sits right-aligned on the label row while nothing is selected.
 - **Role select**: placeholder "Select a role"; the options end with "Manage roles…".
 - **Intention input**: single line, placeholder "What will you work on?".
+- **Locked classification**: while a focus block runs or is paused, the quadrant cards, the role select and the intention input are disabled and each shows a muted lock icon at its right edge, at 50% opacity: inside the field for the role and the intention, on the label row for the cards. The role and intention fields dim to 50%. The selected card keeps its border and tint at full opacity; the other cards dim to 45%.
 - **Today panel**: secondary, small text.
   - Heading "Today", a mono totals line `4 blocks · 3h20 focus`, then a divider.
   - Rows, oldest first:
