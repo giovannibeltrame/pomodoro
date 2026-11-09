@@ -35,7 +35,7 @@ export function App() {
             onClick={openSettings}
             class="flex items-center justify-center rounded p-1 text-on-surface-variant hover:text-on-surface"
           >
-            <SettingsIcon width="20" height="20" />
+            <SettingsIcon width="18" height="18" />
           </button>
         </div>
       </header>
