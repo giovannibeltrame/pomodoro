@@ -7,3 +7,4 @@ node_modules
 *.md
 cook.lock
 pnpm-lock.yaml
+.beads
