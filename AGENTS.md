@@ -59,7 +59,8 @@ Enforced by `.agents/permission/policy.yaml`. A refusal is the rule working.
 - Comments record only reasons the code cannot show.
 - Change only what the task needs, matching the surrounding code.
 - Commits: one change per commit on a feature branch; open a pull request against `main`.
-- Deploy: none; there is no hosting yet.
+- Deploy: GitHub Pages, by `.github/workflows/deploy.yml` on each push to `main`; `base: './'` in `vite.config.ts`
+  keeps asset paths relative.
 
 ## Gotchas
 
