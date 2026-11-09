@@ -109,7 +109,7 @@ function ActiveRow({
                 refocus.current = true;
                 commit(event.currentTarget);
               } else if (event.key === 'Escape' && !event.altKey) {
-                event.stopPropagation();
+                event.preventDefault();
                 event.currentTarget.value = role.name;
                 refocus.current = true;
                 finish();
@@ -187,7 +187,7 @@ function AddRow({ onDone }: { onDone: () => void }) {
               event.preventDefault();
               submit(event.currentTarget.value);
             } else if (event.key === 'Escape') {
-              event.stopPropagation();
+              event.preventDefault();
               onDone();
             }
           }}

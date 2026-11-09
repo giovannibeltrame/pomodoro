@@ -98,6 +98,26 @@ test('role rows show the plain name and an input only while renaming', async () 
   expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
 });
 
+test('Escape in the rename and new-role inputs is cancelled so the drawer stays open', async () => {
+  render(<RolesSection />);
+  const rename = await startRename('Builder');
+  let notCancelled = true;
+  await act(() => {
+    notCancelled = fireEvent.keyDown(rename, { key: 'Escape', cancelable: true });
+  });
+  expect(notCancelled).toBe(false);
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add role' }));
+  });
+  await act(() => {
+    notCancelled = fireEvent.keyDown(screen.getByRole('textbox', { name: 'New role name' }), {
+      key: 'Escape',
+      cancelable: true,
+    });
+  });
+  expect(notCancelled).toBe(false);
+});
+
 test('rename persists and keeps the id', async () => {
   render(<RolesSection />);
   const input = await startRename('Builder');
@@ -186,8 +206,10 @@ test('the role picker follows the new order', async () => {
 test('"Manage roles…" opens the drawer and scrolls to Roles', async () => {
   const scroll = (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
   let scrolled = 0;
+  let openWhenScrolled = false;
   Element.prototype.scrollIntoView = () => {
     scrolled += 1;
+    openWhenScrolled = document.querySelector('dialog')?.open ?? false;
   };
   try {
     render(<App />);
@@ -197,6 +219,7 @@ test('"Manage roles…" opens the drawer and scrolls to Roles', async () => {
     });
     expect(screen.getByRole('dialog', { name: 'Settings' })).toBeTruthy();
     expect(scrolled).toBe(1);
+    expect(openWhenScrolled).toBe(true);
   } finally {
     (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = scroll;
   }

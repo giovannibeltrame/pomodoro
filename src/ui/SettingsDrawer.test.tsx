@@ -24,37 +24,19 @@ async function open() {
   return gear;
 }
 
-test('the gear opens the drawer and focus moves to the close button', async () => {
+test('the gear opens the drawer as a modal dialog', async () => {
+  const showModal = vi.spyOn(HTMLDialogElement.prototype, 'showModal');
   await open();
-  expect(screen.getByRole('dialog', { name: 'Settings' })).toBeTruthy();
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close settings' }));
-});
-
-test('the close button shows no focus ring on open, only once a key is pressed', async () => {
-  await open();
-  const close = screen.getByRole('button', { name: 'Close settings' });
-  expect(close.className).not.toContain('focus-visible:ring');
-  await act(() => {
-    fireEvent.keyDown(document, { key: 'Tab' });
-  });
-  expect(close.className).toContain('focus-visible:ring');
-});
-
-test('focusing the close button does not scroll the drawer, so Manage roles can scroll to Roles', async () => {
-  const focus = vi.spyOn(HTMLElement.prototype, 'focus');
-  await open();
-  const closeCall = focus.mock.instances.findIndex(
-    (el) => (el as HTMLElement).getAttribute('aria-label') === 'Close settings',
-  );
-  expect(closeCall).toBeGreaterThanOrEqual(0);
-  expect(focus.mock.calls[closeCall]?.[0]).toEqual({ preventScroll: true });
-  focus.mockRestore();
+  const dialog = screen.getByRole('dialog', { name: 'Settings' }) as HTMLDialogElement;
+  expect(showModal).toHaveBeenCalledTimes(1);
+  expect(dialog.open).toBe(true);
+  showModal.mockRestore();
 });
 
 test('Escape, the close button and the backdrop close it and focus returns to the gear', async () => {
   const gear = await open();
   await act(() => {
-    fireEvent.keyDown(document, { key: 'Escape' });
+    fireEvent(screen.getByRole('dialog'), new Event('cancel', { cancelable: true }));
   });
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(document.activeElement).toBe(gear);
@@ -72,10 +54,18 @@ test('Escape, the close button and the backdrop close it and focus returns to th
     fireEvent.click(gear);
   });
   await act(() => {
-    fireEvent.click(screen.getByTestId('drawer-backdrop'));
+    fireEvent.click(screen.getByRole('dialog'));
   });
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(document.activeElement).toBe(gear);
+});
+
+test('a click inside the panel does not close it', async () => {
+  await open();
+  await act(() => {
+    fireEvent.click(screen.getByRole('heading', { name: 'Settings' }));
+  });
+  expect(screen.getByRole('dialog')).toBeTruthy();
 });
 
 test('the theme control applies immediately and persists', async () => {

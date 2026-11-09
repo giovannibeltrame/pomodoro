@@ -8,5 +8,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     env: { TZ: 'Europe/Rome' },
+    setupFiles: ['src/test/setup.ts'],
   },
 });
