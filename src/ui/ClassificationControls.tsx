@@ -53,7 +53,7 @@ export function ClassificationControls() {
             <span class="text-xs leading-[18px] text-outline">Choose a quadrant and role to start</span>
           )}
           {locked && (
-            <span class="mr-4 text-outline opacity-50">
+            <span class={`mr-4 text-outline ${dim}`}>
               <Lock />
             </span>
           )}
