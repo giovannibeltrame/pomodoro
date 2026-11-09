@@ -19,7 +19,7 @@ The repo already holds an app for the previous design: React 18, npm and Tailwin
 - **Tabs are kept in sync through the `storage` event.** Each phase is recorded once, keyed by its start timestamp.
 - **The tomato is plain SVG.** The fill is clipped to the progress, and its color is interpolated along the ripening scale. The phase-end sound is a Web Audio chime.
 - **Roles reorder with native HTML5 drag and drop**, plus Alt+↑/↓ on the keyboard.
-- **Tooling:** pnpm, Vitest with Testing Library, ESLint with typescript-eslint, Prettier, and `tsc --noEmit`. GitHub Actions runs them on every PR. There is no hosting yet.
+- **Tooling:** pnpm, Vitest with Testing Library, ESLint with typescript-eslint, Prettier, and `tsc --noEmit`. GitHub Actions runs them on every PR and deploys `main` to GitHub Pages.
 
 ## Consequences
 
