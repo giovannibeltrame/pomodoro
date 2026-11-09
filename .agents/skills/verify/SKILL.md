@@ -1,12 +1,13 @@
 ---
 name: verify
-description: Run the Quadrantic Pomodoro app in Chrome and drive the timer, Today list, theme, tab sync, alarm and storage paths to observe a change.
+description: Run the Quadrantic Pomodoro app in Chrome and drive the timer, Today list, roles, theme, tab sync, alarm and storage paths to observe a change.
 ---
 
 # Verify Quadrantic Pomodoro
 
-Status marks: **[works]** exercised against the app at US-007; **[needs US-0xx]** the UI it depends on is not built yet, so
-the step is unexercised. Remove each mark when the step has been run against the real UI.
+Every flow below was run in Chrome against the commit that last changed this file, except steps marked
+**[not driven]**. Chrome is the supported browser; the iframe harnesses rely on its `document.open()` behaviour. Any
+tool that opens tabs, clicks, types and runs JavaScript in a page works; Claude in Chrome is the one in use.
 
 ## Launch and stop
 
@@ -16,14 +17,35 @@ Run with the Bash tool's `run_in_background` option, without `&` or redirects:
 mise exec -- pnpm dev --port 5199 --strictPort
 ```
 
-Open `http://localhost:5199` with the Claude in Chrome tools. Stop it with TaskStop on the background task id.
+Open `http://localhost:5199`. Stop it with TaskStop on the background task id, then check the port is free:
+`ss -ltn 'sport = :5199'` lists no socket.
 
 For the build: `mise exec -- pnpm build`, then `mise exec -- pnpm preview --port 4173 --strictPort` the same way, and open
 `http://localhost:4173`. Stop it the same way. Close every tab you opened.
 
-## Seed state [works]
+A non-app tab on the same origin hosts the harnesses and cross-tab writes. On the dev server use
+`http://localhost:5199/src/domain/timer.ts`. Preview serves the app for any unknown path, so there use the built script,
+the `src` of `script[type=module]` in an app tab.
 
-Each key holds `{ "v": 1, "data": … }`. Run in the page, then reload. Seed from an app tab, and seed before the app
+## Wait for a condition
+
+Never sleep for a fixed time. Define this in the page, and again after every reload, then await a condition:
+
+```js
+window.until = async (check, ms = 30000) => {
+  for (const t = Date.now(); Date.now() - t < ms; await new Promise((r) => setTimeout(r, 200))) {
+    const v = check();
+    if (v) return v;
+  }
+  throw new Error('until: timed out');
+};
+window.read = (k) => JSON.parse(localStorage.getItem('quadrantic:v1:' + k) ?? 'null')?.data;
+```
+
+## Seed state
+
+The keys and their shapes are defined by `KEYS` and the `is*` guards in `src/state/storage.ts`; update this skill when
+they change. Each key holds `{ "v": 1, "data": … }`. Run in the only open app tab, then reload. Seed before the app
 writes: a running app overwrites `timer` on every dispatch.
 
 ```js
@@ -49,86 +71,171 @@ location.reload();
 
 - The timer above is a Focus started 6 minutes ago: 19 minutes remain. `status` is `idle`, `running` or `paused`; `kind` is
   `focus`, `break` or `longBreak`.
-- `phases` is today's list: one Focus block (Q1, Builder) and one Break. `start` is the unique key.
+- `phases` holds one Focus block (Q1, Builder) and one Break. `start` is the unique key. Before 01:30 local time they
+  fall on yesterday and the Today list hides them; shift them or wait.
 - If `roles` is absent, the app seeds Builder, Manager and Learner. If `settings` is absent, it uses the defaults
   (`system`, sound and notifications on, `classic`).
-- Read results back with `JSON.parse(localStorage['quadrantic:v1:phases']).data`.
-- Clear state by closing app tabs, then `localStorage.clear()` from a same-origin non-app tab. A tab left open writes
-  its state back.
+- Clear state in the only open app tab, then reload. Remove only the app's keys:
+  `Object.keys(localStorage).filter((k) => k.startsWith('quadrantic:v1:')).forEach((k) => localStorage.removeItem(k))`.
+  Another open app tab writes `roles` back when it sees the removal.
 
 ## Flows
 
-### Reload resume [works]
+### Reload resume
 
-Seed the running timer above and reload. `timer.status` stays `running` and `start` is unchanged. A timer whose end passed
-while no tab was open is closed on reload by the same path as Phase end; that case is covered by unit tests and was not
-driven in the browser.
+Seed the running timer above and reload. `read('timer').status` stays `running` and `start` is unchanged. A timer whose
+end passed while no tab was open is closed on reload with the same record as Phase end, but with no chime and no
+notification; unit tests cover it **[not driven]**.
 
-### Phase end [works]
+### Phase end
 
-Seed a running Focus with `start: now - 25 * M + 4000`, `segmentStart` the same, and reload. About 4 s later the alarm
-worker fires: `phases` gains one record, and the timer is an idle Break (or Long break) with the cycle position advanced.
-Wait 7 s before reading.
+Seed a running Focus at position 2 with `start: now - 25 * M + 20000`, `segmentStart` the same, and reload. Note
+`S = read('timer').start`, then `await until(() => read('phases').some((p) => p.start === S))`. The alarm worker
+closes it: `phases` gains one Focus record ending at `S + 25 * M`, and the timer is an idle Break at position 3. After
+the last Focus of a cycle (position 4 in Classic, 2 in Deep) it is an idle Long break at the same position.
 
-### Start, pause, resume with Space [works]
+The 20 s margin covers a slow reload: a phase that ends before the app loads closes on the reload path, with no chime
+or notification.
 
-Select a quadrant and a role, press Space (focus not in an input, select, textarea or button): the timer runs. Space
-again pauses, and again resumes. Check `timer.status` in `quadrantic:v1:timer` after each press, and that no other key
-does anything.
+### Start, pause, resume with Space
 
-### Two-tab sync [works]
+Select a quadrant and a role, press Space: the timer runs. Space again pauses, and again resumes. Check
+`read('timer').status` after each press. Space does nothing with focus in an input, select, textarea, button or
+`contenteditable`, while a dialog is open, or with Ctrl, Meta or Alt held; unit tests cover these **[not driven]**.
 
-Open two app tabs and a third same-origin tab that is not the app, for example `http://localhost:5199/src/domain/timer.ts`.
-From the third tab, write a running Focus ending in 4 s (`start: now - 25 * M + 4000`) to `quadrantic:v1:timer` with
-`localStorage.setItem`. That fires `storage` in both app tabs. After 7 s, `phases` holds exactly one record for that
-`start`.
+### Reset, Skip, End break
 
-### Theme [works]
+- Reset on a running or paused Focus: an idle Focus at the same position, no record.
+- Skip on an idle Break: an idle Focus, no record.
+- End break on a running Break: an idle Focus and one `break` record whose `activeMs` is the time it ran.
+
+### Preset
+
+With the timer idle, choose Deep in the Preset group: `read('settings').preset` and `read('timer').preset` are `deep`
+and the clock shows 50:00; the timer goes back to block 1. The group does nothing while the timer runs.
+
+### Today list
+
+On a Focus row, open Block actions, then Edit: change the quadrant, role and intention, then Save. The record with that
+`start` in `read('phases')` changes. Block actions, Delete, then Delete again removes it; Cancel keeps it. Break rows
+have no actions.
+
+### Roles
+
+In Settings, Add role, type a name, press Enter: `read('roles')` gains it. A duplicate name, ignoring case, shows
+"Name already in use". Rename with the pencil (`Edit <name>`, then the `Rename <name>` input); Archive moves a role
+under Archived and Restore brings it back last. Alt+↑/↓ with focus on a row moves it. A role row shows its plain name;
+the rename input exists only after the pencil is clicked, so find the Add role input as the last `input` in the dialog
+after clicking Add role.
+
+Rows reorder by native drag and drop, which `left_click_drag` did not trigger. Dispatch the events instead:
+
+```js
+const row = (n) => document.querySelector(`dialog[open] li[aria-label="${n}"]`);
+const dt = new DataTransfer();
+row('Manager').dispatchEvent(new DragEvent('dragstart', { bubbles: true, dataTransfer: dt }));
+row('Builder').dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt }));
+row('Builder').dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }));
+row('Manager').dispatchEvent(new DragEvent('dragend', { bubbles: true, dataTransfer: dt }));
+```
+
+Manager moves to Builder's place.
+
+### Day rollover
+
+At local midnight the Today list drops yesterday's rows without a reload. Unit tests cover it **[not driven]**.
+
+### Two-tab sync
+
+Open two app tabs and a non-app tab. From the non-app tab, write a running Focus ending in 20 s (`start: now - 25 * M +
+20000`) to `quadrantic:v1:timer` with `localStorage.setItem`, wrapped in `{ v: 1, data }`. That fires `storage` in both
+app tabs. `await until(() => read('timer').status === 'idle')`, then `phases` holds exactly one record for that `start`.
+Both tabs may chime; the PRD allows one chime per tab.
+
+### Theme
 
 Set `settings.theme` to `light` or `dark` and reload: `document.documentElement.dataset.theme` equals it. The settings
-drawer's Light and Dark buttons change it at once. With `system`, emulate `prefers-color-scheme` and check `data-theme`
-changes without a reload. Chrome cannot emulate it from the tools, so load the app into a same-origin iframe (as in
-Blocked storage) whose `matchMedia` is replaced before the page script runs with a fake `MediaQueryList` that records
-`change` listeners; call them with `{ matches: true }` and read `data-theme` in the iframe. Run every UI check in both
-themes.
+drawer's Light and Dark buttons change it at once. Chrome cannot emulate `prefers-color-scheme` from the tools, so for
+`system` load the app into an iframe with a fake `matchMedia`. With `settings.theme` set to `system`, run on a non-app
+tab:
 
-### Sound [works]
+```js
+const f = document.createElement('iframe');
+document.body.append(f);
+const w = f.contentWindow, mq = { matches: false, listeners: [] };
+w.matchMedia = () => ({
+  get matches() { return mq.matches; },
+  addEventListener: (_, l) => mq.listeners.push(l),
+  removeEventListener() {},
+});
+const html = await (await fetch('/')).text();
+f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
+const theme = () => f.contentDocument.documentElement.dataset.theme;
+await until(() => theme() === 'light');
+mq.matches = true; mq.listeners.forEach((l) => l({ matches: true }));
+await until(() => theme() === 'dark');
+```
 
-Run it in the same iframe harness as Blocked storage, stubbing `AudioContext` on the iframe window before the app loads.
-Before the phase ends, wrap `window.AudioContext` with a counter and `OscillatorNode.prototype.start` too, then let a
-phase end in an app tab. With `sound: true` the counts rise by one in the tab that fires; with `sound: false` they stay
-at zero.
+The app reads `matches` from the query object, not from the event, so flip `mq.matches` before calling the listeners.
+The iframe is an app tab: it reads and writes the same storage. Run every UI check in both themes.
 
-### Notification [works]
+### Sound
 
-Before the phase ends, replace `window.Notification` with a stub that records its constructor calls and has
-`permission: 'granted'`. With `notifications: true`, a phase end records one call; with `false`, none.
+After the seed and reload of Phase end, in the same app tab:
 
-### Blocked storage [works]
+```js
+window.snd = { ctors: 0, starts: 0 };
+const A = window.AudioContext;
+window.AudioContext = class extends A { constructor(...a) { super(...a); snd.ctors++; } };
+const start = OscillatorNode.prototype.start;
+OscillatorNode.prototype.start = function (...a) { snd.starts++; return start.apply(this, a); };
+```
 
-The app must keep working from memory for the session: no thrown error, no crash. Storage has to throw before the app
-script runs, so load the app into a same-origin iframe whose `Storage` is already broken. Run on a same-origin non-app
-tab, for example `http://localhost:5199/src/domain/timer.ts`:
+With `sound: true`, each phase end adds 2 to `starts`, one per note. The tab creates its `AudioContext` once, at its first
+Start or first chime, so `ctors` rises by one only then. With `sound: false` both stay at 0.
+
+### Notification
+
+After the seed and reload of Phase end, in the same app tab:
+
+```js
+window.notes = [];
+window.Notification = class {
+  static permission = 'granted';
+  static requestPermission = async () => 'granted';
+  constructor(title, options) { notes.push([title, options?.body]); }
+};
+```
+
+`permission` must be static: the app reads `Notification.permission`. With `notifications: true`, a phase end pushes one
+entry, `['Focus complete', 'Next: Break']`; with `false`, none.
+
+### Blocked storage
+
+The app must keep working from memory for the session: no thrown error, no crash. A browser that blocks storage throws
+on reading `window.localStorage`, before the app script runs, so load the app into an iframe where that getter throws.
+Run on a non-app tab:
 
 ```js
 const f = document.createElement('iframe');
 document.body.append(f);
 const w = f.contentWindow, errs = [];
+const boom = () => { throw new DOMException('blocked', 'SecurityError'); };
+Object.defineProperty(w, 'localStorage', { get: boom, configurable: true });
+const html = await (await fetch('/')).text();
+f.contentDocument.open();
 w.addEventListener('error', (e) => errs.push(String(e.message)));
 w.addEventListener('unhandledrejection', (e) => errs.push('rej ' + e.reason));
-const boom = () => { throw new DOMException('blocked', 'SecurityError'); };
-w.Storage.prototype.setItem = boom;
-w.Storage.prototype.getItem = boom;
-const html = await (await fetch('/')).text();
-f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
-await new Promise((r) => setTimeout(r, 2500));
-({ errs, main: !!f.contentDocument.querySelector('main') })
+f.contentDocument.write(html); f.contentDocument.close();
+const doc = f.contentDocument;
+await until(() => doc.querySelector('main'));
 ```
 
-Pass: `errs` is empty and `main` is `true`. Once the UI exists, also start and pause a timer inside the iframe and check
-that the state changes with no entry in `errs`.
+Add the listeners after `document.open()`: it removes every listener already on the iframe's window, and errors would
+go unseen. Then select a quadrant and a role, click Start and Pause inside the iframe, and check the clock changes and
+`errs` stays empty.
 
-### Zero requests [works]
+### Zero requests
 
 On `pnpm preview`, load the page, run a focus→break cycle, then in the page:
 
@@ -136,12 +243,7 @@ On `pnpm preview`, load the page, run a focus→break cycle, then in the page:
 performance.getEntriesByType('resource').map((r) => r.name)
 ```
 
-Every URL must start with `http://localhost:4173/`. The list at US-007: the page, one script, one stylesheet, the alarm
-worker and `favicon.ico`. The network-request tool reports nothing if it was first called after the load, so prefer the
-list above.
-
-## State of the UI
-
-The full UI exists (US-009 to US-018). Drive it with real clicks and keys where a script cannot, for example the role
-drag handle (`left_click_drag`) and Alt+↑/↓. A role row shows its plain name; the rename input exists only after the
-pencil is clicked, so find the Add role input as the last `input` in the dialog after clicking Add role.
+Every URL must start with `http://localhost:4173/`. Expect one script, one stylesheet, three `.woff2` fonts, the alarm
+worker and `favicon.ico`; the page itself is a navigation entry, not listed. Requests made from inside the worker go to the
+worker's own timeline and do not show here; `src/state/alarm.worker.ts` makes none. The network-request tool reports
+nothing if it was first called after the load, so prefer the list above.
