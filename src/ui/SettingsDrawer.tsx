@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { closeSettings, settings, updateSettings } from '../state/signals';
 import type { Settings } from '../state/storage';
 import { RolesSection } from './RolesSection';
@@ -11,6 +11,10 @@ const THEMES: { value: Settings['theme']; label: string }[] = [
 
 function notificationsBlocked(): boolean {
   return typeof Notification !== 'undefined' && Notification.permission === 'denied';
+}
+
+function openedByKeyboard(): boolean {
+  return document.activeElement?.matches(':focus-visible') ?? false;
 }
 
 function Toggle({
@@ -47,7 +51,7 @@ function Toggle({
             checked ? 'justify-end bg-primary' : 'justify-start bg-outline-variant'
           } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
-          <span class={`h-5 w-5 rounded-full shadow-sm ${checked ? 'bg-background' : 'bg-outline'}`} />
+          <span class={`h-5 w-5 rounded-full shadow-sm ${checked ? 'bg-switch-knob' : 'bg-outline'}`} />
         </button>
       </div>
     </section>
@@ -56,10 +60,12 @@ function Toggle({
 
 export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLElement | null } }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [quiet, setQuiet] = useState(() => !openedByKeyboard());
 
   useEffect(() => {
     closeRef.current?.focus({ preventScroll: true });
     const onKey = (event: KeyboardEvent): void => {
+      setQuiet(false);
       if (event.key === 'Escape') closeSettings();
     };
     document.addEventListener('keydown', onKey);
@@ -75,12 +81,12 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
 
   return (
     <div class="fixed inset-0 z-20 flex justify-end">
-      <div class="absolute inset-0 bg-black/50" data-testid="drawer-backdrop" onClick={closeSettings} />
+      <div class="absolute inset-0 bg-scrim" data-testid="drawer-backdrop" onClick={closeSettings} />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
-        class="relative flex h-full w-[400px] flex-col overflow-y-auto border-l border-tomato-stroke bg-surface-container-high p-6"
+        class="relative flex h-full w-[400px] flex-col overflow-y-auto border-l border-menu-border bg-menu-bg p-6"
       >
         <div class="flex items-center justify-between border-b border-outline-variant pb-5">
           <h2 class="text-base font-medium leading-6 text-on-surface">Settings</h2>
@@ -89,7 +95,9 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
             type="button"
             aria-label="Close settings"
             onClick={closeSettings}
-            class="flex items-center justify-center rounded-[4px] p-1 text-on-surface-variant transition-colors duration-150 hover:text-on-surface focus:outline-none focus-visible:ring-1 focus-visible:ring-outline"
+            class={`flex items-center justify-center rounded-[4px] p-1 text-on-surface-variant transition-colors duration-150 hover:text-on-surface focus:outline-none ${
+              quiet ? '' : 'focus-visible:ring-1 focus-visible:ring-outline'
+            }`}
           >
             <svg
               width="20"

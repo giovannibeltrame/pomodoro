@@ -23,20 +23,43 @@ function ActiveRow({
   onDropOn: (index: number) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const finished = useRef(false);
+  const editRef = useRef<HTMLButtonElement>(null);
+  const refocus = useRef(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    } else if (refocus.current) {
+      refocus.current = false;
+      editRef.current?.focus();
+    }
+  }, [editing]);
+
+  const finish = (): void => {
+    finished.current = true;
+    setError(null);
+    setEditing(false);
+  };
 
   const commit = (input: HTMLInputElement): void => {
+    if (finished.current) return;
     const value = input.value;
     if (value.trim() === role.name) {
-      setError(null);
-      input.value = role.name;
+      finish();
       return;
     }
-    if (roleNameError(value, role.id) !== null) {
-      setError(roleNameError(value, role.id));
+    const problem = roleNameError(value, role.id);
+    if (problem !== null) {
+      setError(problem);
       return;
     }
     changeRoleName(role.id, value);
-    setError(null);
+    finish();
   };
 
   return (
@@ -81,33 +104,39 @@ function ActiveRow({
           <circle cx="15" cy="12" r="1" />
           <circle cx="15" cy="19" r="1" />
         </svg>
-        <input
-          key={role.name}
-          type="text"
-          aria-label={`Rename ${role.name}`}
-          aria-invalid={error !== null}
-          defaultValue={role.name}
-          onBlur={(event) => commit(event.currentTarget)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              commit(event.currentTarget);
-            } else if (event.key === 'Escape' && !event.altKey) {
-              event.stopPropagation();
-              event.currentTarget.value = role.name;
-              setError(null);
-            }
-          }}
-          class="min-w-0 flex-1 bg-transparent text-[13px] leading-5 text-on-surface outline-none"
-        />
+        {editing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            aria-label={`Rename ${role.name}`}
+            aria-invalid={error !== null}
+            defaultValue={role.name}
+            onBlur={(event) => commit(event.currentTarget)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                refocus.current = true;
+                commit(event.currentTarget);
+              } else if (event.key === 'Escape' && !event.altKey) {
+                event.stopPropagation();
+                event.currentTarget.value = role.name;
+                refocus.current = true;
+                finish();
+              }
+            }}
+            class="min-w-0 flex-1 border-b border-outline bg-transparent text-[13px] leading-5 text-on-surface outline-none"
+          />
+        ) : (
+          <span class="min-w-0 flex-1 truncate text-[13px] leading-5 text-on-surface">{role.name}</span>
+        )}
         <div class="flex items-center gap-3">
           <button
+            ref={editRef}
             type="button"
             aria-label={`Edit ${role.name}`}
-            onClick={(event) => {
-              const input = event.currentTarget.closest('li')?.querySelector('input');
-              input?.focus();
-              input?.select();
+            onClick={() => {
+              finished.current = false;
+              setEditing(true);
             }}
             class="text-outline transition-colors duration-150 hover:text-on-surface"
           >

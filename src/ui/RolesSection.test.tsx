@@ -78,20 +78,42 @@ test('archive moves a role to the Archived group and restore appends it last', a
   expect(screen.queryByText(/Archived/)).toBeNull();
 });
 
+async function startRename(name: string): Promise<HTMLInputElement> {
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: `Edit ${name}` }));
+  });
+  return screen.getByRole('textbox', { name: `Rename ${name}` }) as HTMLInputElement;
+}
+
+test('role rows show the plain name and an input only while renaming', async () => {
+  render(<RolesSection />);
+  expect(screen.queryByRole('textbox', { name: /Rename/ })).toBeNull();
+  expect(within(screen.getByRole('listitem', { name: 'Builder' })).getByText('Builder')).toBeTruthy();
+  const input = await startRename('Builder');
+  expect(document.activeElement).toBe(input);
+  await act(() => {
+    fireEvent.keyDown(input, { key: 'Escape' });
+  });
+  expect(screen.queryByRole('textbox', { name: /Rename/ })).toBeNull();
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Edit Builder' }));
+  expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
+});
+
 test('rename persists and keeps the id', async () => {
   render(<RolesSection />);
-  const input = screen.getByRole('textbox', { name: 'Rename Builder' }) as HTMLInputElement;
+  const input = await startRename('Builder');
   await act(() => {
     fireEvent.input(input, { target: { value: 'Maker' } });
     fireEvent.keyDown(input, { key: 'Enter' });
   });
   expect(names()).toEqual(['Maker', 'Manager', 'Learner']);
   expect(readRoles()[0]).toMatchObject({ id: 'builder', name: 'Maker' });
+  expect(screen.queryByRole('textbox', { name: /Rename/ })).toBeNull();
 });
 
 test('rename rejects empty and duplicate names case-insensitively', async () => {
   render(<RolesSection />);
-  const input = screen.getByRole('textbox', { name: 'Rename Builder' }) as HTMLInputElement;
+  const input = await startRename('Builder');
   await act(() => {
     fireEvent.input(input, { target: { value: '  ' } });
     fireEvent.keyDown(input, { key: 'Enter' });

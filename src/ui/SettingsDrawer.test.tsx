@@ -30,6 +30,16 @@ test('the gear opens the drawer and focus moves to the close button', async () =
   expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close settings' }));
 });
 
+test('the close button shows no focus ring on open, only once a key is pressed', async () => {
+  await open();
+  const close = screen.getByRole('button', { name: 'Close settings' });
+  expect(close.className).not.toContain('focus-visible:ring');
+  await act(() => {
+    fireEvent.keyDown(document, { key: 'Tab' });
+  });
+  expect(close.className).toContain('focus-visible:ring');
+});
+
 test('focusing the close button does not scroll the drawer, so Manage roles can scroll to Roles', async () => {
   const focus = vi.spyOn(HTMLElement.prototype, 'focus');
   await open();

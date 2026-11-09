@@ -143,5 +143,5 @@ list above.
 ## State of the UI
 
 The full UI exists (US-009 to US-018). Drive it with real clicks and keys where a script cannot, for example the role
-drag handle (`left_click_drag`) and Alt+↑/↓. Rename inputs in the Roles section are always rendered, so find the Add role
-input as the last `input` in the dialog after clicking Add role.
+drag handle (`left_click_drag`) and Alt+↑/↓. A role row shows its plain name; the rename input exists only after the
+pencil is clicked, so find the Add role input as the last `input` in the dialog after clicking Add role.
