@@ -20,6 +20,10 @@
   --q4: #71717a;
   --break-tint: #10b981;
   --break-label: #10b981;
+  --chip-tint: 15%;
+  --menu-bg: #1d1d1f;
+  --menu-border: #3a3a3e;
+  --menu-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 [data-theme='light'] {
@@ -44,6 +48,10 @@
   --q4: #71717a;
   --break-tint: #10b981;
   --break-label: #059669;
+  --chip-tint: 12%;
+  --menu-bg: #ffffff;
+  --menu-border: #e4e4e7;
+  --menu-shadow: none;
 }
 
 @theme inline {
@@ -67,6 +75,9 @@
   --color-q4: var(--q4);
   --color-break-tint: var(--break-tint);
   --color-break-label: var(--break-label);
+  --color-menu-bg: var(--menu-bg);
+  --color-menu-border: var(--menu-border);
+  --shadow-menu: var(--menu-shadow);
 }
 
 @theme {

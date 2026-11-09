@@ -190,7 +190,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
       {open && (
         <div
           role="menu"
-          class="absolute right-2 top-8 z-20 flex w-[140px] flex-col rounded-md border border-tomato-stroke bg-surface-container-high py-1 text-[13px] shadow-lg"
+          class="absolute right-2 top-8 z-20 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
         >
           <button
             type="button"
@@ -222,7 +222,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
               data-testid="chip"
               style={{
                 color: `var(--q${record.quadrant})`,
-                backgroundColor: `color-mix(in srgb, var(--q${record.quadrant}) 15%, transparent)`,
+                backgroundColor: `color-mix(in srgb, var(--q${record.quadrant}) var(--chip-tint), transparent)`,
               }}
             >
               {`Q${record.quadrant}`}
