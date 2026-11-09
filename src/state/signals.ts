@@ -10,6 +10,7 @@ import {
   type TimerState,
 } from '../domain/timer';
 import { todayPhases } from '../domain/today';
+import { announcePhaseEnd, primeFeedback } from './feedback';
 import {
   deletePhase,
   KEYS,
@@ -77,12 +78,16 @@ function commit(state: TimerState, records: PhaseRecord[]): void {
 export function dispatch(event: TimerEvent, now: number = Date.now()): void {
   const current = readTimer(settings.value.preset);
   const result = reduce(current, event, now);
+  if (event.type === 'start') primeFeedback(settings.value);
   if (event.type === 'start' && result.state.status === 'running') intention.value = '';
   if (result.state === current && result.records.length === 0) {
     timer.value = current;
     return;
   }
   commit(result.state, result.records);
+  if (event.type === 'tick' && result.records.length > 0) {
+    announcePhaseEnd(current.kind, result.state.kind, settings.value);
+  }
 }
 
 export function editPhase(start: number, edit: PhaseEdit): void {
