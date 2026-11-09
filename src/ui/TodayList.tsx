@@ -9,6 +9,47 @@ const field =
   'h-8 w-full rounded border border-outline-variant bg-surface-container px-2 text-xs text-on-surface placeholder:text-outline';
 const action = 'rounded border border-outline-variant px-2 py-1 text-xs text-on-surface hover:bg-surface-container';
 
+const iconProps = {
+  width: 14,
+  height: 14,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  'stroke-width': 2,
+  'stroke-linecap': 'round' as const,
+  'stroke-linejoin': 'round' as const,
+  'aria-hidden': true,
+};
+
+function EditIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
+}
+
+function DeleteIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+    </svg>
+  );
+}
+
+function MoreIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="19" cy="12" r="1.8" />
+    </svg>
+  );
+}
+
 function EditForm({ record, onDone }: { record: PhaseRecord; onDone: () => void }) {
   const [q, setQ] = useState<Quadrant | undefined>(record.quadrant);
   const [roleId, setRoleId] = useState(record.roleId ?? '');
@@ -97,23 +138,23 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
   const line = formatRow(record, index);
   if (record.kind !== 'focus') {
     return (
-      <li class="today-row truncate font-mono text-xs text-on-surface-variant" data-kind={record.kind}>
+      <li class="today-row truncate py-2.5 font-mono text-[11px] text-outline" data-kind={record.kind}>
         {line}
       </li>
     );
   }
   if (mode === 'edit') {
     return (
-      <li class="today-row flex flex-col gap-1" data-kind="focus" ref={ref}>
-        <span class="truncate font-mono text-xs text-on-surface-variant">{line}</span>
+      <li class="today-row flex flex-col gap-1 py-2.5" data-kind="focus" ref={ref}>
+        <span class="truncate font-mono text-[11px] text-outline">{line}</span>
         <EditForm record={record} onDone={() => setMode('view')} />
       </li>
     );
   }
   if (mode === 'confirm') {
     return (
-      <li class="today-row flex flex-col gap-1" data-kind="focus" ref={ref}>
-        <span class="truncate font-mono text-xs text-on-surface-variant">{line}</span>
+      <li class="today-row flex flex-col gap-1 py-2.5" data-kind="focus" ref={ref}>
+        <span class="truncate font-mono text-[11px] text-outline">{line}</span>
         <span class="text-xs text-on-surface">Delete this block?</span>
         <div class="flex gap-2">
           <button type="button" class={action} onClick={() => removePhase(record.start)}>
@@ -128,50 +169,61 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
   }
   const role = roles.value.find((r) => r.id === record.roleId);
   return (
-    <li class="today-row group relative flex flex-col gap-0.5" data-kind="focus" ref={ref}>
-      <button
-        type="button"
-        aria-label="Block actions"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setMode(open ? 'view' : 'menu')}
-        class={`absolute right-0 top-0 rounded px-1 text-on-surface-variant hover:bg-surface-container focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
-      >
-        ⋯
-      </button>
+    <li
+      class={`today-row group relative -mx-2 flex flex-col gap-1 rounded px-2 py-2.5 hover:bg-surface-container-high ${open ? 'bg-surface-container-high' : ''}`}
+      data-kind="focus"
+      ref={ref}
+    >
+      <div class="flex items-center justify-between gap-2">
+        <span class="truncate font-mono text-[11px] text-outline">{line}</span>
+        <button
+          type="button"
+          aria-label="Block actions"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setMode(open ? 'view' : 'menu')}
+          class={`flex shrink-0 items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <MoreIcon />
+        </button>
+      </div>
       {open && (
         <div
           role="menu"
-          class="absolute right-0 top-5 z-10 flex flex-col rounded border border-outline-variant bg-surface-container py-1 text-xs text-on-surface"
+          class="absolute right-2 top-8 z-20 flex w-[140px] flex-col rounded-md border border-tomato-stroke bg-surface-container-high py-1 text-[13px] shadow-lg"
         >
           <button
             type="button"
             role="menuitem"
-            class="px-3 py-1 text-left hover:bg-surface"
+            class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-on-surface transition-colors hover:bg-outline-variant"
             onClick={() => setMode('edit')}
           >
-            Edit
+            <EditIcon />
+            <span>Edit</span>
           </button>
           <button
             type="button"
             role="menuitem"
-            class="px-3 py-1 text-left hover:bg-surface"
+            class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-q1 transition-colors hover:bg-outline-variant"
             onClick={() => setMode('confirm')}
           >
-            Delete
+            <DeleteIcon />
+            <span>Delete</span>
           </button>
         </div>
       )}
-      <span class="truncate pr-5 font-mono text-xs text-on-surface-variant">{line}</span>
-      <span class="flex min-w-0 items-baseline gap-1 whitespace-nowrap text-xs text-on-surface">
-        {role && <span class="shrink-0">{role.name}</span>}
+      <span class="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-xs">
+        {role && <span class="shrink-0 text-on-surface-variant">{role.name}</span>}
         {record.quadrant && (
           <>
             {role && <span class="shrink-0 text-outline">·</span>}
             <span
-              class="shrink-0 font-mono font-medium"
+              class="shrink-0 rounded px-1.5 py-0.5 font-mono text-[11px] font-medium"
               data-testid="chip"
-              style={{ color: `var(--q${record.quadrant})` }}
+              style={{
+                color: `var(--q${record.quadrant})`,
+                backgroundColor: `color-mix(in srgb, var(--q${record.quadrant}) 15%, transparent)`,
+              }}
             >
               {`Q${record.quadrant}`}
             </span>
@@ -180,7 +232,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
         {record.intention && (
           <>
             <span class="shrink-0 text-outline">·</span>
-            <span class="truncate text-on-surface-variant">{`"${record.intention}"`}</span>
+            <span class="truncate text-on-surface">{`"${record.intention}"`}</span>
           </>
         )}
       </span>
@@ -192,14 +244,14 @@ export function TodayList() {
   useEffect(() => startDayWatch(), []);
   const records = todayRecords.value;
   return (
-    <section class="flex flex-col gap-2">
+    <section class="flex flex-col">
       <h2 class="text-base leading-6 font-medium text-on-surface">Today</h2>
-      <p class="font-mono text-xs text-on-surface-variant">{totals(records)}</p>
-      <hr class="border-outline-variant" />
+      <p class="mt-1 font-mono text-[11px] text-outline">{totals(records)}</p>
+      <hr class="my-4 border-outline-variant" />
       {records.length === 0 ? (
         <p class="text-xs text-on-surface-variant">No blocks yet today. Start your first focus block.</p>
       ) : (
-        <ol class="flex flex-col gap-3">
+        <ol class="flex flex-col divide-y divide-outline-variant/60">
           {records.map((record, index) => (
             <Row key={record.start} record={record} index={index} />
           ))}
