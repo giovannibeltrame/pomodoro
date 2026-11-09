@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { closeSettings, settings, updateSettings } from '../state/signals';
 import type { Settings } from '../state/storage';
 import { RolesSection } from './RolesSection';
+import { sectionLabel } from './styles';
 
 const THEMES: { value: Settings['theme']; label: string }[] = [
   { value: 'system', label: 'System' },
@@ -34,7 +35,7 @@ function Toggle({
 }) {
   return (
     <section class="flex flex-col gap-2.5 border-b border-outline-variant py-5">
-      <h3 class="font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline">{label}</h3>
+      <h3 class={sectionLabel}>{label}</h3>
       <div class="flex items-center justify-between gap-4">
         <div class="flex flex-col">
           <span class="text-[13px] leading-5 text-on-surface">{description}</span>
@@ -114,7 +115,7 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
           </button>
         </div>
         <section class="flex flex-col gap-2.5 border-b border-outline-variant py-5">
-          <h3 class="font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline">Theme</h3>
+          <h3 class={sectionLabel}>Theme</h3>
           <div
             role="group"
             aria-label="Theme"

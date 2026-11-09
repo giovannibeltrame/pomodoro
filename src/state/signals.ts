@@ -9,7 +9,7 @@ import {
   type TimerEvent,
   type TimerState,
 } from '../domain/timer';
-import { todayPhases } from '../domain/today';
+import { nextStartOfDay, todayPhases } from '../domain/today';
 import { announcePhaseEnd, primeFeedback } from './feedback';
 import {
   addRole,
@@ -39,7 +39,7 @@ export const roles = signal<Role[]>(readRoles());
 export const quadrant = signal<Quadrant | null>(settings.value.lastClassification?.quadrant ?? null);
 export const roleId = signal<string | null>(settings.value.lastClassification?.roleId ?? null);
 export const intention = signal('');
-export const settingsOpen = signal(false);
+export const settingsView = signal<'top' | 'roles' | null>(null);
 export const activeRoles = computed(() => roles.value.filter((r) => !r.archived).sort((a, b) => a.order - b.order));
 export const selection = computed<Classification | null>(() => {
   const id = roleId.value;
@@ -53,14 +53,13 @@ export const todayRecords = computed(() => todayPhases(phases.value, now.value))
 export function startDayWatch(): () => void {
   let id: ReturnType<typeof setTimeout>;
   const arm = () => {
-    const current = new Date();
-    const next = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 1).getTime();
+    const current = Date.now();
     id = setTimeout(
       () => {
         now.value = Date.now();
         arm();
       },
-      Math.max(1, next - current.getTime()),
+      Math.max(1, nextStartOfDay(current) - current),
     );
   };
   arm();
@@ -107,16 +106,16 @@ export function updateSettings(patch: Partial<Settings>): void {
   settings.value = writeSettings(patch);
 }
 
-export const settingsToRoles = signal(false);
+export function openSettings(): void {
+  settingsView.value = 'top';
+}
 
 export function openRoles(): void {
-  settingsToRoles.value = true;
-  settingsOpen.value = true;
+  settingsView.value = 'roles';
 }
 
 export function closeSettings(): void {
-  settingsOpen.value = false;
-  settingsToRoles.value = false;
+  settingsView.value = null;
 }
 
 export function roleNameError(name: string, exceptId?: string): string | null {
@@ -127,16 +126,16 @@ export function roleNameError(name: string, exceptId?: string): string | null {
   return taken ? 'Name already in use' : null;
 }
 
-export function createRole(name: string): boolean {
-  if (roleNameError(name) !== null) return false;
-  roles.value = addRole(name.trim());
-  return true;
+export function createRole(name: string): string | null {
+  const problem = roleNameError(name);
+  if (problem === null) roles.value = addRole(name.trim());
+  return problem;
 }
 
-export function changeRoleName(id: string, name: string): boolean {
-  if (roleNameError(name, id) !== null) return false;
-  roles.value = renameRole(id, name.trim());
-  return true;
+export function changeRoleName(id: string, name: string): string | null {
+  const problem = roleNameError(name, id);
+  if (problem === null) roles.value = renameRole(id, name.trim());
+  return problem;
 }
 
 export function setRoleArchived(id: string, archived: boolean): void {
@@ -162,11 +161,13 @@ export function selectPreset(preset: Preset): void {
 }
 
 export function restoreTimer(now: number = Date.now()): void {
-  const result = restore(readTimer(settings.value.preset), now);
+  const stored = readTimer(settings.value.preset);
+  const result = restore(stored, now);
+  if (result.state === stored && result.records.length === 0) return;
   commit(result.state, result.records);
 }
 
-export function reloadKey(key: string): void {
+function reloadKey(key: string): void {
   switch (key) {
     case KEYS.phases:
       phases.value = readPhases();

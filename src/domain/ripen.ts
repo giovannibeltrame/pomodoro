@@ -9,8 +9,12 @@ function hex(channel: number): string {
   return Math.round(channel).toString(16).padStart(2, '0');
 }
 
+export function clampProgress(progress: number): number {
+  return Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0;
+}
+
 export function ripenColor(progress: number): string {
-  const p = Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0;
+  const p = clampProgress(progress);
   let index = 0;
   while (index < STOPS.length - 1 && p >= STOPS[index + 1][0]) index += 1;
   if (index === STOPS.length - 1) {

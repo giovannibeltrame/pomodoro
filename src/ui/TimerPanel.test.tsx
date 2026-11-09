@@ -20,7 +20,7 @@ function setState(patch: Partial<TimerState>): void {
 }
 
 const running: Partial<TimerState> = { status: 'running', start: Date.now(), segmentStart: Date.now() };
-const paused: Partial<TimerState> = { status: 'paused', start: Date.now(), pausedAt: Date.now(), activeMs: 1000 };
+const paused: Partial<TimerState> = { status: 'paused', start: Date.now(), activeMs: 1000 };
 
 beforeEach(() => {
   localStorage.clear();

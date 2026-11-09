@@ -2,7 +2,7 @@ import { act, cleanup, render, screen, within } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import type { PhaseRecord } from '../domain/timer';
-import { now, phases, roles } from '../state/signals';
+import { now, phases, roles, startDayWatch } from '../state/signals';
 import { readPhases, recordPhase, resetMemory } from '../state/storage';
 import { TodayList } from './TodayList';
 
@@ -95,11 +95,13 @@ test('the list rerenders when the local day changes', async () => {
   vi.useFakeTimers();
   vi.setSystemTime(at(23, 59));
   phases.value = [focus];
+  const stop = startDayWatch();
   render(<TodayList />);
   expect(screen.getAllByRole('listitem')).toHaveLength(1);
   await act(() => {
     vi.advanceTimersByTime(61_000);
   });
+  stop();
   expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   expect(screen.getByText('No blocks yet today. Start your first focus block.')).toBeTruthy();
 });

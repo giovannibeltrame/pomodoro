@@ -1,14 +1,16 @@
+import { computed } from '@preact/signals';
 import { useRef } from 'preact/hooks';
-import { settingsOpen, timer } from '../state/signals';
+import { openSettings, settingsView, timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
 import { PresetToggle } from './PresetToggle';
 import { SettingsDrawer } from './SettingsDrawer';
 import { TimerPanel } from './TimerPanel';
 import { TodayList } from './TodayList';
 
+const onBreak = computed(() => timer.value.kind !== 'focus');
+
 export function App() {
   const gearRef = useRef<HTMLButtonElement>(null);
-  const onBreak = timer.value.kind !== 'focus';
   return (
     <div class="relative flex min-h-screen flex-col bg-background text-on-surface">
       <div
@@ -23,17 +25,13 @@ export function App() {
           <span class="pt-0.5 font-mono text-[11px] leading-[14px] tracking-wider text-outline">POMODORO</span>
         </div>
         <div class="flex items-center gap-6">
-          <div data-slot="preset-toggle">
-            <PresetToggle />
-          </div>
+          <PresetToggle />
           <button
             ref={gearRef}
             type="button"
             aria-label="Settings"
             aria-haspopup="dialog"
-            onClick={() => {
-              settingsOpen.value = true;
-            }}
+            onClick={openSettings}
             class="flex items-center justify-center rounded p-1 text-on-surface-variant hover:text-on-surface"
           >
             <svg
@@ -66,7 +64,7 @@ export function App() {
           <TodayList />
         </aside>
       </div>
-      {settingsOpen.value ? <SettingsDrawer returnFocus={gearRef} /> : null}
+      {settingsView.value ? <SettingsDrawer returnFocus={gearRef} /> : null}
     </div>
   );
 }

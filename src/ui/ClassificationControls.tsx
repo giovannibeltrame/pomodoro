@@ -1,29 +1,13 @@
-import type { Quadrant } from '../domain/timer';
+import { QUADRANTS } from '../domain/timer';
 import { activeRoles, intention, openRoles, quadrant, roleId, selection, timer } from '../state/signals';
+import { strokeIcon } from './icons';
+import { sectionLabel as label } from './styles';
 
 const MANAGE = '__manage__';
 
-const QUADRANTS: { id: Quadrant; name: string; descriptor: string }[] = [
-  { id: 1, name: 'Do', descriptor: 'Urgent · Important' },
-  { id: 2, name: 'Schedule', descriptor: 'Important · Not urgent' },
-  { id: 3, name: 'Delegate', descriptor: 'Urgent · Not important' },
-  { id: 4, name: 'Eliminate', descriptor: 'Neither' },
-];
-
 function Lock() {
   return (
-    <svg
-      data-testid="lock"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
+    <svg data-testid="lock" width="16" height="16" {...strokeIcon}>
       <rect x="3" y="11" width="18" height="11" rx="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
@@ -32,23 +16,11 @@ function Lock() {
 
 function Chevron() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
+    <svg width="16" height="16" {...strokeIcon}>
       <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }
-
-const label = 'font-mono text-[11px] leading-[14px] uppercase tracking-wider text-outline';
 
 const field =
   'w-full appearance-none rounded border border-outline-variant bg-surface-container px-4 py-2.5 text-[13px] leading-5 placeholder:text-outline enabled:hover:border-tomato-stroke focus:outline-none focus-visible:ring-1 focus-visible:ring-outline disabled:cursor-not-allowed';

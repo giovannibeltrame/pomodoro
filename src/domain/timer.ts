@@ -2,6 +2,19 @@ export type Preset = 'classic' | 'deep';
 export type PhaseKind = 'focus' | 'break' | 'longBreak';
 export type Quadrant = 1 | 2 | 3 | 4;
 
+export const PHASE_LABEL: Record<PhaseKind, string> = {
+  focus: 'Focus',
+  break: 'Break',
+  longBreak: 'Long break',
+};
+
+export const QUADRANTS: readonly { id: Quadrant; name: string; descriptor: string }[] = [
+  { id: 1, name: 'Do', descriptor: 'Urgent · Important' },
+  { id: 2, name: 'Schedule', descriptor: 'Important · Not urgent' },
+  { id: 3, name: 'Delegate', descriptor: 'Urgent · Not important' },
+  { id: 4, name: 'Eliminate', descriptor: 'Neither' },
+];
+
 export interface Classification {
   quadrant: Quadrant;
   roleId: string;
@@ -26,7 +39,6 @@ export interface TimerState {
   start: number | null;
   activeMs: number;
   segmentStart: number | null;
-  pausedAt: number | null;
   classification: Classification | null;
 }
 
@@ -45,7 +57,7 @@ export interface ReduceResult {
   records: PhaseRecord[];
 }
 
-const MINUTE = 60_000;
+export const MINUTE = 60_000;
 
 export const PRESETS: Record<Preset, { focus: number; break: number; longBreak: number; blocksPerCycle: number }> = {
   classic: { focus: 25 * MINUTE, break: 5 * MINUTE, longBreak: 15 * MINUTE, blocksPerCycle: 4 },
@@ -69,7 +81,6 @@ function idle(preset: Preset, kind: PhaseKind, position: number): TimerState {
     start: null,
     activeMs: 0,
     segmentStart: null,
-    pausedAt: null,
     classification: null,
   };
 }
@@ -140,7 +151,6 @@ export function reduce(state: TimerState, event: TimerEvent, now: number): Reduc
           start: now,
           activeMs: 0,
           segmentStart: now,
-          pausedAt: null,
           classification,
         },
         records: [],
@@ -154,7 +164,6 @@ export function reduce(state: TimerState, event: TimerEvent, now: number): Reduc
           status: 'paused',
           activeMs: activeSoFar(state, now),
           segmentStart: null,
-          pausedAt: now,
         },
         records: [],
       };
@@ -162,7 +171,7 @@ export function reduce(state: TimerState, event: TimerEvent, now: number): Reduc
     case 'resume': {
       if (state.status !== 'paused') return unchanged;
       return {
-        state: { ...state, status: 'running', segmentStart: now, pausedAt: null },
+        state: { ...state, status: 'running', segmentStart: now },
         records: [],
       };
     }

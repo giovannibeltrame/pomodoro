@@ -4,12 +4,13 @@ import {
   changeRoleName,
   createRole,
   moveRole,
-  roleNameError,
   roles,
   setRoleArchived,
-  settingsToRoles,
+  settingsView,
 } from '../state/signals';
 import type { Role } from '../state/storage';
+import { EditIcon, strokeIcon } from './icons';
+import { sectionLabel } from './styles';
 
 function ActiveRow({
   role,
@@ -53,12 +54,11 @@ function ActiveRow({
       finish();
       return;
     }
-    const problem = roleNameError(value, role.id);
+    const problem = changeRoleName(role.id, value);
     if (problem !== null) {
       setError(problem);
       return;
     }
-    changeRoleName(role.id, value);
     finish();
   };
 
@@ -87,16 +87,7 @@ function ActiveRow({
       class="flex flex-col border-b border-outline-variant/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-outline"
     >
       <div class="flex h-10 items-center gap-2.5">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="h-4 w-4 shrink-0 cursor-grab text-outline"
-        >
+        <svg {...strokeIcon} class="h-4 w-4 shrink-0 cursor-grab text-outline">
           <circle cx="9" cy="5" r="1" />
           <circle cx="9" cy="12" r="1" />
           <circle cx="9" cy="19" r="1" />
@@ -140,19 +131,7 @@ function ActiveRow({
             }}
             class="text-outline transition-colors duration-150 hover:text-on-surface"
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-3.5 w-3.5"
-            >
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-            </svg>
+            <EditIcon class="h-3.5 w-3.5" />
           </button>
           <button
             type="button"
@@ -160,16 +139,7 @@ function ActiveRow({
             onClick={() => setRoleArchived(role.id, true)}
             class="text-outline transition-colors duration-150 hover:text-on-surface"
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-3.5 w-3.5"
-            >
+            <svg {...strokeIcon} class="h-3.5 w-3.5">
               <polyline points="21 8 21 21 3 21 3 8" />
               <rect x="1" y="3" width="22" height="5" />
               <line x1="10" y1="12" x2="14" y2="12" />
@@ -195,12 +165,11 @@ function AddRow({ onDone }: { onDone: () => void }) {
   }, []);
 
   const submit = (value: string): void => {
-    const problem = roleNameError(value);
+    const problem = createRole(value);
     if (problem !== null) {
       setError(problem);
       return;
     }
-    createRole(value);
     onDone();
   };
 
@@ -259,7 +228,7 @@ export function RolesSection() {
   const focusId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (settingsToRoles.value) sectionRef.current?.scrollIntoView?.({ block: 'start' });
+    if (settingsView.value === 'roles') sectionRef.current?.scrollIntoView?.({ block: 'start' });
   }, []);
 
   useEffect(() => {
@@ -272,7 +241,7 @@ export function RolesSection() {
 
   return (
     <section ref={sectionRef} aria-label="Roles" class="flex flex-col gap-3 pt-5">
-      <h3 class="font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline">Roles</h3>
+      <h3 class={sectionLabel}>Roles</h3>
       <ul
         ref={listRef}
         class="flex flex-col"
@@ -309,7 +278,7 @@ export function RolesSection() {
       </button>
       {archived.length > 0 ? (
         <details class="mt-3">
-          <summary class="cursor-pointer font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline hover:text-on-surface-variant">
+          <summary class={`${sectionLabel} cursor-pointer hover:text-on-surface-variant`}>
             Archived ({archived.length})
           </summary>
           <ul class="mt-2 flex flex-col">

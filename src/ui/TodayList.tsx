@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import type { PhaseRecord, Quadrant } from '../domain/timer';
+import { QUADRANTS, type PhaseRecord, type Quadrant } from '../domain/timer';
 import { formatRow, totals } from '../domain/today';
-import { activeRoles, editPhase, removePhase, roles, startDayWatch, todayRecords } from '../state/signals';
+import { activeRoles, editPhase, removePhase, roles, todayRecords } from '../state/signals';
+import type { PhaseEdit } from '../state/storage';
+import { EditIcon, strokeIcon } from './icons';
 
 type Mode = 'view' | 'menu' | 'edit' | 'confirm';
 
@@ -9,30 +11,9 @@ const field =
   'h-8 w-full rounded border border-outline-variant bg-surface-container px-2 text-xs text-on-surface placeholder:text-outline';
 const action = 'rounded border border-outline-variant px-2 py-1 text-xs text-on-surface hover:bg-surface-container';
 
-const iconProps = {
-  width: 14,
-  height: 14,
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  'stroke-width': 2,
-  'stroke-linecap': 'round' as const,
-  'stroke-linejoin': 'round' as const,
-  'aria-hidden': true,
-};
-
-function EditIcon() {
-  return (
-    <svg {...iconProps}>
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
-  );
-}
-
 function DeleteIcon() {
   return (
-    <svg {...iconProps}>
+    <svg width={14} height={14} {...strokeIcon}>
       <path d="M3 6h18" />
       <path d="M8 6V4h8v2" />
       <path d="M19 6l-1 14H6L5 6" />
@@ -56,7 +37,7 @@ function EditForm({ record, onDone }: { record: PhaseRecord; onDone: () => void 
   const [text, setText] = useState(record.intention ?? '');
   const ordered = [...activeRoles.value, ...roles.value.filter((r) => r.archived && r.id === record.roleId)];
   const save = () => {
-    const edit: { quadrant?: Quadrant; roleId?: string; intention?: string } = { intention: text.trim() };
+    const edit: PhaseEdit = { intention: text.trim() };
     if (q !== undefined) edit.quadrant = q;
     if (roleId) edit.roleId = roleId;
     editPhase(record.start, edit);
@@ -65,7 +46,7 @@ function EditForm({ record, onDone }: { record: PhaseRecord; onDone: () => void 
   return (
     <div class="flex flex-col gap-2" data-testid="edit-form">
       <div class="flex gap-1" role="group" aria-label="Quadrant">
-        {([1, 2, 3, 4] as const).map((n) => (
+        {QUADRANTS.map(({ id: n }) => (
           <button
             key={n}
             type="button"
@@ -198,7 +179,7 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
             class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-on-surface transition-colors hover:bg-outline-variant"
             onClick={() => setMode('edit')}
           >
-            <EditIcon />
+            <EditIcon width={14} height={14} />
             <span>Edit</span>
           </button>
           <button
@@ -241,7 +222,6 @@ function Row({ record, index }: { record: PhaseRecord; index: number }) {
 }
 
 export function TodayList() {
-  useEffect(() => startDayWatch(), []);
   const records = todayRecords.value;
   return (
     <section class="flex flex-col">

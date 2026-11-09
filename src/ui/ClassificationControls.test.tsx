@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test } from 'vitest';
 import { initialState, type TimerState } from '../domain/timer';
 import { readSettings, writeTimer } from '../state/storage';
-import { dispatch, intention, quadrant, roleId, roles, settings, settingsOpen, timer } from '../state/signals';
+import { dispatch, intention, quadrant, roleId, roles, settings, settingsView, timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
 import { TimerPanel } from './TimerPanel';
 
@@ -35,7 +35,7 @@ beforeEach(() => {
   quadrant.value = null;
   roleId.value = null;
   intention.value = '';
-  settingsOpen.value = false;
+  settingsView.value = null;
   settings.value = readSettings();
   setState({});
 });
@@ -77,7 +77,7 @@ test('Manage roles opens settings and keeps the selection', async () => {
   roleId.value = 'r2';
   render(<App />);
   await user.selectOptions(role(), '__manage__');
-  expect(settingsOpen.value).toBe(true);
+  expect(settingsView.value).toBe('roles');
   expect(roleId.value).toBe('r2');
   expect(role().value).toBe('r2');
 });

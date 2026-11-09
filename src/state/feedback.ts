@@ -1,6 +1,5 @@
-import type { PhaseKind } from '../domain/timer';
+import { PHASE_LABEL, type PhaseKind } from '../domain/timer';
 
-const LABELS: Record<PhaseKind, string> = { focus: 'Focus', break: 'Break', longBreak: 'Long break' };
 const NOTES = [660, 880];
 const NOTE_SECONDS = 0.3;
 const PEAK_GAIN = 0.15;
@@ -59,6 +58,6 @@ export function announcePhaseEnd(ended: PhaseKind, next: PhaseKind, settings: Fe
     }
   }
   if (settings.notifications && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-    new Notification(`${LABELS[ended]} complete`, { body: `Next: ${LABELS[next]}` });
+    new Notification(`${PHASE_LABEL[ended]} complete`, { body: `Next: ${PHASE_LABEL[next]}` });
   }
 }

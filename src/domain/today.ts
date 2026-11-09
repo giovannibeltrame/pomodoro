@@ -1,19 +1,11 @@
-import type { PhaseKind, PhaseRecord } from './timer';
-
-const MINUTE = 60_000;
-
-const KIND_LABEL: Record<PhaseKind, string> = {
-  focus: 'Focus',
-  break: 'Break',
-  longBreak: 'Long break',
-};
+import { MINUTE, PHASE_LABEL, type PhaseRecord } from './timer';
 
 function startOfDay(ms: number): number {
   const d = new Date(ms);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 }
 
-function nextStartOfDay(ms: number): number {
+export function nextStartOfDay(ms: number): number {
   const d = new Date(ms);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
 }
@@ -42,6 +34,6 @@ export function totals(records: readonly PhaseRecord[]): string {
 }
 
 export function formatRow(record: PhaseRecord, index: number): string {
-  const label = KIND_LABEL[record.kind];
+  const label = PHASE_LABEL[record.kind];
   return `#${index + 1} · ${clock(record.start)}–${clock(record.end)} · ${label} ${minutes(record.activeMs)}m`;
 }

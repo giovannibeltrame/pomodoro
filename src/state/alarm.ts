@@ -1,4 +1,4 @@
-import { effect } from '@preact/signals';
+import { computed, effect } from '@preact/signals';
 import { scheduledEnd } from '../domain/timer';
 import type { AlarmCommand } from './alarm.worker';
 import { dispatch, timer } from './signals';
@@ -15,8 +15,9 @@ export function createAlarmWorker(): AlarmWorker {
 
 export function startAlarm(worker: AlarmWorker = createAlarmWorker()): () => void {
   worker.addEventListener('message', () => dispatch({ type: 'tick' }));
+  const end = computed(() => scheduledEnd(timer.value));
   const stop = effect(() => {
-    const at = scheduledEnd(timer.value);
+    const at = end.value;
     worker.postMessage(at === null ? { type: 'cancel' } : { type: 'schedule', at });
   });
   return () => {

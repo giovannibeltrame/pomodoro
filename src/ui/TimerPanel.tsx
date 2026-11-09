@@ -1,54 +1,45 @@
-import { signal } from '@preact/signals';
+import { computed, signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-import { durationMs, PRESETS, remainingMs, type TimerState } from '../domain/timer';
+import { durationMs, PHASE_LABEL, PRESETS, remainingMs, type TimerState } from '../domain/timer';
 import { dispatch, selection, timer } from '../state/signals';
 import { Tomato } from './Tomato';
 
 const APP_TITLE = 'Quadrantic Pomodoro';
-const KIND_NAMES = { focus: 'Focus', break: 'Break', longBreak: 'Long break' } as const;
 
 const now = signal(Date.now());
+const remainingSeconds = computed(() => Math.ceil(remainingMs(timer.value, now.value) / 1000));
+const canStart = computed(
+  () => timer.value.status === 'idle' && (timer.value.kind !== 'focus' || selection.value !== null),
+);
 
-export function formatClock(ms: number): string {
-  const total = Math.ceil(ms / 1000);
+function formatClock(total: number): string {
   const minutes = Math.floor(total / 60);
   const seconds = total % 60;
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-export function phaseLabel(state: TimerState): string {
-  if (state.kind === 'break') return 'BREAK';
-  if (state.kind === 'longBreak') return 'LONG BREAK';
-  return `FOCUS · Block ${state.position} of ${PRESETS[state.preset].blocksPerCycle}`;
+function phaseLabel(state: TimerState): string {
+  const label = PHASE_LABEL[state.kind].toUpperCase();
+  if (state.kind !== 'focus') return label;
+  return `${label} · Block ${state.position} of ${PRESETS[state.preset].blocksPerCycle}`;
 }
 
-export function tabTitle(state: TimerState, remaining: number): string {
+function tabTitle(state: TimerState, seconds: number): string {
   if (state.status === 'idle') return APP_TITLE;
-  return `${formatClock(remaining)} · ${KIND_NAMES[state.kind]} — ${APP_TITLE}`;
-}
-
-export function canStart(state: TimerState): boolean {
-  return state.status === 'idle' && (state.kind !== 'focus' || selection.value !== null);
-}
-
-export function toggleFromKeyboard(): void {
-  const state = timer.value;
-  if (state.status === 'idle') {
-    if (canStart(state)) start();
-    return;
-  }
-  dispatch({ type: state.status === 'running' ? 'pause' : 'resume' });
+  return `${formatClock(seconds)} · ${PHASE_LABEL[state.kind]} — ${APP_TITLE}`;
 }
 
 function start(): void {
-  const state = timer.value;
-  if (state.kind === 'focus') {
-    const classification = selection.value;
-    if (!classification) return;
-    dispatch({ type: 'start', classification });
+  dispatch({ type: 'start', classification: selection.value ?? undefined });
+}
+
+function toggleFromKeyboard(): void {
+  const { status } = timer.value;
+  if (status === 'idle') {
+    if (canStart.value) start();
     return;
   }
-  dispatch({ type: 'start' });
+  dispatch({ type: status === 'running' ? 'pause' : 'resume' });
 }
 
 function PhaseLabel({ state }: { state: TimerState }) {
@@ -104,8 +95,8 @@ export function TimerPanel() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const remaining = remainingMs(state, now.value);
-  const title = tabTitle(state, remaining);
+  const seconds = remainingSeconds.value;
+  const title = tabTitle(state, seconds);
 
   useEffect(() => {
     document.title = title;
@@ -113,7 +104,7 @@ export function TimerPanel() {
 
   const isFocus = state.kind === 'focus';
   const total = durationMs(state.preset, state.kind);
-  const progress = state.status === 'idle' ? 0 : 1 - remaining / total;
+  const progress = state.status === 'idle' ? 0 : 1 - (seconds * 1000) / total;
 
   return (
     <section class="flex flex-col items-center" aria-label="Timer">
@@ -125,11 +116,11 @@ export function TimerPanel() {
         class={`mt-2 mb-6 font-mono text-[72px] leading-[72px] font-normal tracking-[-0.03em] tabular-nums ${state.status === 'paused' ? 'opacity-50' : ''}`}
         aria-live="off"
       >
-        {formatClock(remaining)}
+        {formatClock(seconds)}
       </div>
       <div class="flex items-center justify-center">
         {state.status === 'idle' && (
-          <button type="button" class={primary} disabled={!canStart(state)} onClick={start}>
+          <button type="button" class={primary} disabled={!canStart.value} onClick={start}>
             Start
           </button>
         )}

@@ -1,13 +1,13 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/preact';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { settings, settingsOpen } from '../state/signals';
+import { settings, settingsView } from '../state/signals';
 import { readSettings } from '../state/storage';
 import { App } from './App';
 
 beforeEach(() => {
   localStorage.clear();
   settings.value = readSettings();
-  settingsOpen.value = false;
+  settingsView.value = null;
 });
 
 afterEach(() => {

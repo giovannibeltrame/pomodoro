@@ -1,5 +1,6 @@
 import {
   initialState,
+  QUADRANTS,
   type Classification,
   type PhaseKind,
   type PhaseRecord,
@@ -91,7 +92,7 @@ function isNumber(value: unknown): value is number {
 }
 
 function isQuadrant(value: unknown): value is Quadrant {
-  return value === 1 || value === 2 || value === 3 || value === 4;
+  return QUADRANTS.some((q) => q.id === value);
 }
 
 function isKind(value: unknown): value is PhaseKind {
@@ -160,7 +161,6 @@ function isTimerState(value: unknown): value is TimerState {
     (value.start === null || isNumber(value.start)) &&
     isNumber(value.activeMs) &&
     (value.segmentStart === null || isNumber(value.segmentStart)) &&
-    (value.pausedAt === null || isNumber(value.pausedAt)) &&
     (value.classification === null || isClassification(value.classification))
   );
 }
@@ -170,7 +170,7 @@ const isArrayOf =
   (value: unknown): value is T[] =>
     Array.isArray(value) && value.every(test);
 
-export const DEFAULT_SETTINGS: Settings = {
+const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   sound: true,
   notifications: true,
@@ -200,14 +200,7 @@ export function recordPhase(record: PhaseRecord): PhaseRecord[] {
 
 export function updatePhase(start: number, edit: PhaseEdit): PhaseRecord[] {
   const phases = readPhases();
-  const next = phases.map((p) => {
-    if (p.start !== start) return p;
-    const updated = { ...p };
-    if (edit.quadrant !== undefined) updated.quadrant = edit.quadrant;
-    if (edit.roleId !== undefined) updated.roleId = edit.roleId;
-    if (edit.intention !== undefined) updated.intention = edit.intention;
-    return updated;
-  });
+  const next = phases.map((p) => (p.start === start ? { ...p, ...edit } : p));
   save(KEYS.phases, next);
   return next;
 }

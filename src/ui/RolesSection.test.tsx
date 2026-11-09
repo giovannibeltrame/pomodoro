@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/preact';
 import { afterEach, beforeEach, expect, test } from 'vitest';
-import { roles, settingsOpen, settingsToRoles } from '../state/signals';
+import { roles, settingsView } from '../state/signals';
 import { readRoles, resetMemory } from '../state/storage';
 import { App } from './App';
 import { RolesSection } from './RolesSection';
@@ -9,8 +9,7 @@ beforeEach(() => {
   localStorage.clear();
   resetMemory();
   roles.value = readRoles();
-  settingsOpen.value = false;
-  settingsToRoles.value = false;
+  settingsView.value = null;
 });
 
 afterEach(cleanup);

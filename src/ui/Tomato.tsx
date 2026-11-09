@@ -1,5 +1,5 @@
 import { useId } from 'preact/hooks';
-import { ripenColor } from '../domain/ripen';
+import { clampProgress, ripenColor } from '../domain/ripen';
 import type { PhaseKind } from '../domain/timer';
 
 export interface TomatoProps {
@@ -15,7 +15,7 @@ const HEIGHT = 19;
 export function Tomato({ kind, status, progress }: TomatoProps) {
   const clipId = useId();
   const filling = kind === 'focus' && status !== 'idle';
-  const p = Math.min(1, Math.max(0, Number.isFinite(progress) ? progress : 0));
+  const p = clampProgress(progress);
   const state = kind !== 'focus' ? 'break' : status;
 
   return (
