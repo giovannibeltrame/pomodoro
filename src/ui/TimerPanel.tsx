@@ -95,8 +95,10 @@ export function TimerPanel() {
   return (
     <section class="flex flex-col items-center gap-6 py-6" aria-label="Timer">
       <Tomato kind={state.kind} status={state.status} progress={progress} />
-      <div class="font-mono text-xs font-medium tracking-[0.02em] text-on-surface-variant">{phaseLabel(state)}</div>
-      <div class="font-mono text-[72px] leading-none font-medium tabular-nums" aria-live="off">
+      <div class="font-mono text-[11px] leading-[14px] tracking-[0.04em] text-outline uppercase">
+        {phaseLabel(state)}
+      </div>
+      <div class="font-mono text-[72px] leading-[72px] font-normal tracking-[-0.03em] tabular-nums" aria-live="off">
         {formatClock(remaining)}
       </div>
       <div class="flex items-center gap-3">

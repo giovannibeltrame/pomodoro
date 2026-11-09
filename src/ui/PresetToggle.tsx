@@ -12,7 +12,7 @@ export function PresetToggle() {
     <div
       role="group"
       aria-label="Preset"
-      class={`flex rounded border border-outline-variant p-0.5 ${locked ? 'opacity-50' : ''}`}
+      class={`flex items-center gap-1 rounded-md border border-outline-variant bg-background p-1 ${locked ? 'opacity-50' : ''}`}
     >
       {OPTIONS.map(({ value, label }) => {
         const selected = settings.value.preset === value;
@@ -23,8 +23,8 @@ export function PresetToggle() {
             aria-pressed={selected}
             disabled={locked}
             onClick={() => selectPreset(value)}
-            class={`rounded-sm px-3 py-1 font-mono text-xs ${
-              selected ? 'bg-surface-container-high text-on-surface' : 'text-on-surface-variant'
+            class={`rounded px-3 py-1 font-mono text-xs leading-4 tracking-[0.02em] ${
+              selected ? 'border-b-2 border-primary bg-surface-container-low font-medium text-primary' : 'text-outline'
             } ${locked ? 'cursor-not-allowed' : 'hover:text-on-surface'}`}
           >
             {label}

@@ -193,7 +193,7 @@ export function TodayList() {
   const records = todayRecords.value;
   return (
     <section class="flex flex-col gap-2">
-      <h2 class="font-mono text-xs font-medium tracking-[0.02em] text-on-surface">Today</h2>
+      <h2 class="text-base leading-6 font-medium text-on-surface">Today</h2>
       <p class="font-mono text-xs text-on-surface-variant">{totals(records)}</p>
       <hr class="border-outline-variant" />
       {records.length === 0 ? (

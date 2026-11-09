@@ -17,11 +17,12 @@ export function App() {
         data-active={onBreak}
         aria-hidden="true"
       />
-      <header class="relative flex h-14 items-center justify-between border-b border-outline-variant px-8">
-        <div class="font-mono text-xs font-medium tracking-[0.02em]">
-          QUADRANTIC <span class="text-outline">POMODORO</span>
-        </div>
+      <header class="relative flex items-center justify-between border-b border-outline-variant bg-surface-container-low px-8 py-3">
         <div class="flex items-center gap-3">
+          <span class="text-base leading-6 font-medium tracking-widest uppercase">QUADRANTIC</span>
+          <span class="pt-0.5 font-mono text-[11px] leading-[14px] tracking-wider text-outline">POMODORO</span>
+        </div>
+        <div class="flex items-center gap-6">
           <div data-slot="preset-toggle">
             <PresetToggle />
           </div>
@@ -33,19 +34,20 @@ export function App() {
             onClick={() => {
               settingsOpen.value = true;
             }}
-            class="flex h-8 w-8 items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-high"
+            class="flex items-center justify-center rounded p-1 text-on-surface-variant hover:text-on-surface"
           >
             <svg
-              width="16"
-              height="16"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               stroke-width="1.5"
+              stroke-linejoin="round"
               aria-hidden="true"
             >
               <circle cx="12" cy="12" r="3" />
-              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" />
+              <path d="M10.3 3h3.4l.5 2.4 1.9.8 2.1-1.3 2.4 2.4-1.3 2.1.8 1.9 2.4.5v3.4l-2.4.5-.8 1.9 1.3 2.1-2.4 2.4-2.1-1.3-1.9.8-.5 2.4h-3.4l-.5-2.4-1.9-.8-2.1 1.3-2.4-2.4 1.3-2.1-.8-1.9L3 13.7v-3.4l2.4-.5.8-1.9-1.3-2.1 2.4-2.4 2.1 1.3 1.9-.8z" />
             </svg>
           </button>
         </div>
