@@ -1,8 +1,8 @@
-import { act, render, screen } from '@testing-library/preact';
+import { act, render, screen, within } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, expect, test } from 'vitest';
+import { beforeEach, expect, test, vi } from 'vitest';
 import { initialState, type TimerState } from '../domain/timer';
-import { readSettings, writeTimer } from '../state/storage';
+import { readSettings, writeSettings, writeTimer, type Settings } from '../state/storage';
 import { dispatch, intention, quadrant, roleId, roles, settings, settingsView, timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
 import { TimerPanel } from './TimerPanel';
@@ -102,7 +102,8 @@ test('controls are locked with a lock icon while running or paused', async () =>
       dispatch({ type: 'start', classification: { quadrant: 1, roleId: 'r1', intention: 'x' } });
       if (status === 'paused') dispatch({ type: 'pause' });
     });
-    expect(screen.getAllByTestId('lock')).toHaveLength(2);
+    expect(screen.getAllByTestId('lock')).toHaveLength(3);
+    within(screen.getByRole('group', { name: 'Quadrant' }).parentElement!).getByTestId('lock');
     expect(role().disabled).toBe(true);
     expect((screen.getByPlaceholderText('What will you work on?') as HTMLInputElement).disabled).toBe(true);
     expect((screen.getByRole('button', { name: /Q1/ }) as HTMLButtonElement).disabled).toBe(true);
@@ -142,4 +143,25 @@ test('a completed focus block stores lastClassification', () => {
   dispatch({ type: 'tick' }, t0 + 25 * 60_000);
   expect(readSettings().lastClassification).toEqual({ quadrant: 4, roleId: 'r2' });
   expect(settings.value.lastClassification).toEqual({ quadrant: 4, roleId: 'r2' });
+});
+
+async function loadFresh(lastClassification?: Settings['lastClassification']) {
+  localStorage.clear();
+  if (lastClassification) writeSettings({ lastClassification });
+  vi.resetModules();
+  const { ClassificationControls: Fresh } = await import('./ClassificationControls');
+  const view = render(<Fresh />);
+  const pressed = Array.from(view.container.querySelectorAll('[aria-pressed=true]')).map((b) => b.textContent);
+  const selected = (view.container.querySelector('select') as HTMLSelectElement).value;
+  return { pressed, selected };
+}
+
+test('on first run nothing is preselected', async () => {
+  expect(await loadFresh()).toEqual({ pressed: [], selected: '' });
+});
+
+test('on load the quadrant and role come from settings.lastClassification', async () => {
+  const result = await loadFresh({ quadrant: 3, roleId: 'manager' });
+  expect(result.pressed).toEqual([expect.stringMatching(/^Q3 Delegate/)]);
+  expect(result.selected).toBe('manager');
 });

@@ -321,6 +321,6 @@ performance.getEntriesByType('resource').map((r) => r.name)
 ```
 
 Every URL must start with `http://localhost:4199/`. Expect one script, one stylesheet, three `.woff2` fonts, the alarm
-worker and `favicon.ico`; the page itself is a navigation entry, not listed. Requests made from inside the worker go to the
+worker and `favicon.svg`, which Chrome may list twice; the page itself is a navigation entry, not listed. Requests made from inside the worker go to the
 worker's own timeline and do not show here; `src/state/alarm.worker.ts` makes none. The network-request tool reports
 nothing if it was first called after the load, so prefer the list above.

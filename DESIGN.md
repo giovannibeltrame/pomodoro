@@ -129,12 +129,13 @@ Focus is neutral. Breaks get a faint green tint on the canvas (`#10b981` at 4–
   - Running focus: fills from the bottom, proportional to elapsed time, and the fill ripens from green to red as the block runs. The fill is one solid color interpolated along the ripening scale: 0% `#4ade80` (green), ~40% `#a3c94a` (yellow-green), ~60% `#f59e0b` (amber), 85–100% `#ef4444` (red). The fill never uses the quadrant color; the quadrant shows only on the selected quadrant card.
   - Paused: same fill at 50% opacity.
   - Break: static and muted.
-- **Phase label**: `FOCUS · Block 1 of 4` (or `BREAK`, `LONG BREAK`), above the timer.
+- **Phase label**: `FOCUS · Block 1 of 4`, or `BREAK · After block 1 of 4` and `LONG BREAK · After block 4 of 4` naming the block just completed, above the timer.
 - **Quadrant cards**: four in one row (Q1 Do, Q2 Schedule, Q3 Delegate, Q4 Eliminate). Each has a colored `Qn` label, a dot and a muted descriptor.
   - Selected: 1px border in the quadrant color plus a 6% tint.
   - A muted hint "Choose a quadrant and role to start" sits right-aligned on the label row while nothing is selected.
 - **Role select**: placeholder "Select a role"; the options end with "Manage roles…".
 - **Intention input**: single line, placeholder "What will you work on?".
+- **Locked classification**: while a focus block runs or is paused, the quadrant cards, the role select and the intention input are disabled and each shows a muted lock icon at its right edge, at 50% opacity: inside the field for the role and the intention, on the label row for the cards. The role and intention fields dim to 50%. The selected card keeps its border and tint at full opacity; the other cards dim to 45%.
 - **Today panel**: secondary, small text.
   - Heading "Today", a mono totals line `4 blocks · 3h20 focus`, then a divider.
   - Rows, oldest first:
