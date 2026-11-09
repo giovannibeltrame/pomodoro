@@ -38,7 +38,25 @@ export const selection = computed<Classification | null>(() => {
   const text = intention.value.trim();
   return text ? { quadrant: quadrant.value, roleId: id, intention: text } : { quadrant: quadrant.value, roleId: id };
 });
-export const todayRecords = computed(() => todayPhases(phases.value, Date.now()));
+export const now = signal(Date.now());
+export const todayRecords = computed(() => todayPhases(phases.value, now.value));
+
+export function startDayWatch(): () => void {
+  let id: ReturnType<typeof setTimeout>;
+  const arm = () => {
+    const current = new Date();
+    const next = new Date(current.getFullYear(), current.getMonth(), current.getDate() + 1).getTime();
+    id = setTimeout(
+      () => {
+        now.value = Date.now();
+        arm();
+      },
+      Math.max(1, next - current.getTime()),
+    );
+  };
+  arm();
+  return () => clearTimeout(id);
+}
 
 function commit(state: TimerState, records: PhaseRecord[]): void {
   writeTimer(state);

@@ -2,6 +2,7 @@ import { timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
 import { PresetToggle } from './PresetToggle';
 import { TimerPanel } from './TimerPanel';
+import { TodayList } from './TodayList';
 
 export function App() {
   const onBreak = timer.value.kind !== 'focus';
@@ -51,7 +52,9 @@ export function App() {
         <aside
           aria-label="Today"
           class="w-[300px] shrink-0 border-l border-outline-variant bg-surface-container-low p-5"
-        />
+        >
+          <TodayList />
+        </aside>
       </div>
     </div>
   );
