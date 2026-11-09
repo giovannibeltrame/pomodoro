@@ -1,6 +1,6 @@
-import { act, cleanup, render, screen } from '@testing-library/preact';
+import { act, render, screen } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, expect, test } from 'vitest';
+import { beforeEach, expect, test } from 'vitest';
 import { initialState } from '../domain/timer';
 import { readSettings, readTimer, writeTimer } from '../state/storage';
 import { settings, timer } from '../state/signals';
@@ -11,8 +11,6 @@ beforeEach(() => {
   settings.value = readSettings();
   timer.value = initialState('classic');
 });
-
-afterEach(cleanup);
 
 const button = (name: string) => screen.getByRole('button', { name }) as HTMLButtonElement;
 

@@ -1,6 +1,6 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/preact';
+import { act, fireEvent, render, screen } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, expect, test } from 'vitest';
+import { beforeEach, expect, test } from 'vitest';
 import { initialState, type TimerState } from '../domain/timer';
 import { writeTimer } from '../state/storage';
 import { quadrant, roleId, roles, timer } from '../state/signals';
@@ -28,8 +28,6 @@ beforeEach(() => {
   select(classification);
   setState({});
 });
-
-afterEach(cleanup);
 
 const names = () => screen.getAllByRole('button').map((b) => b.textContent);
 

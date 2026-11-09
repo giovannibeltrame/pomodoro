@@ -1,6 +1,6 @@
-import { act, cleanup, render, screen } from '@testing-library/preact';
+import { act, render, screen } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, expect, test } from 'vitest';
+import { beforeEach, expect, test } from 'vitest';
 import { initialState, type TimerState } from '../domain/timer';
 import { readSettings, writeTimer } from '../state/storage';
 import { dispatch, intention, quadrant, roleId, roles, settings, settingsView, timer } from '../state/signals';
@@ -39,8 +39,6 @@ beforeEach(() => {
   settings.value = readSettings();
   setState({});
 });
-
-afterEach(cleanup);
 
 test('Start needs a quadrant and a role, and the hint shows meanwhile', async () => {
   const user = userEvent.setup();

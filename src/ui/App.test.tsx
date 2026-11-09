@@ -1,5 +1,5 @@
-import { act, cleanup, render, screen } from '@testing-library/preact';
-import { afterEach, beforeEach, expect, test } from 'vitest';
+import { act, render, screen } from '@testing-library/preact';
+import { beforeEach, expect, test } from 'vitest';
 import { timer } from '../state/signals';
 import { App } from './App';
 
@@ -8,8 +8,6 @@ const initial = timer.value;
 beforeEach(() => {
   timer.value = initial;
 });
-
-afterEach(cleanup);
 
 test('renders the shell: top bar, center column and Today panel', () => {
   render(<App />);

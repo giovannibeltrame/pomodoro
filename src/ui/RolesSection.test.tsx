@@ -1,5 +1,5 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/preact';
-import { afterEach, beforeEach, expect, test } from 'vitest';
+import { act, fireEvent, render, screen, within } from '@testing-library/preact';
+import { beforeEach, expect, test } from 'vitest';
 import { roles, settingsView } from '../state/signals';
 import { readRoles, resetMemory } from '../state/storage';
 import { App } from './App';
@@ -11,8 +11,6 @@ beforeEach(() => {
   roles.value = readRoles();
   settingsView.value = null;
 });
-
-afterEach(cleanup);
 
 function names(): string[] {
   const list = screen.getByRole('region', { name: 'Roles' }).querySelector('ul');

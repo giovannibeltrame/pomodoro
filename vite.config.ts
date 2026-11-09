@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [preact(), tailwindcss()],
   test: {
     environment: 'jsdom',
-    env: { TZ: 'Europe/Rome' },
+    env: { TZ: 'Europe/Rome', PTL_SKIP_AUTO_CLEANUP: 'true' },
     setupFiles: ['src/test/setup.ts'],
   },
 });

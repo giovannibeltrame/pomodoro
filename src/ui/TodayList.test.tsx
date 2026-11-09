@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, within } from '@testing-library/preact';
+import { act, render, screen, within } from '@testing-library/preact';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import type { PhaseRecord } from '../domain/timer';
@@ -37,7 +37,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  cleanup();
   vi.useRealTimers();
 });
 

@@ -1,8 +1,6 @@
 import { cleanup, render } from '@testing-library/preact';
-import { afterEach, expect, test } from 'vitest';
+import { expect, test } from 'vitest';
 import { Tomato, type TomatoProps } from './Tomato';
-
-afterEach(cleanup);
 
 function draw(props: TomatoProps) {
   const { container } = render(<Tomato {...props} />);
