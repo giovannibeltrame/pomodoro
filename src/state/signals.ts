@@ -12,8 +12,13 @@ import {
 import { todayPhases } from '../domain/today';
 import { announcePhaseEnd, primeFeedback } from './feedback';
 import {
+  addRole,
+  archiveRole,
   deletePhase,
   KEYS,
+  renameRole,
+  reorderRoles,
+  restoreRole,
   readPhases,
   readRoles,
   readSettings,
@@ -102,8 +107,51 @@ export function updateSettings(patch: Partial<Settings>): void {
   settings.value = writeSettings(patch);
 }
 
+export const settingsToRoles = signal(false);
+
+export function openRoles(): void {
+  settingsToRoles.value = true;
+  settingsOpen.value = true;
+}
+
 export function closeSettings(): void {
   settingsOpen.value = false;
+  settingsToRoles.value = false;
+}
+
+export function roleNameError(name: string, exceptId?: string): string | null {
+  const trimmed = name.trim();
+  if (trimmed === '') return 'Name is required';
+  const key = trimmed.toLowerCase();
+  const taken = roles.value.some((r) => r.id !== exceptId && r.name.trim().toLowerCase() === key);
+  return taken ? 'Name already in use' : null;
+}
+
+export function createRole(name: string): boolean {
+  if (roleNameError(name) !== null) return false;
+  roles.value = addRole(name.trim());
+  return true;
+}
+
+export function changeRoleName(id: string, name: string): boolean {
+  if (roleNameError(name, id) !== null) return false;
+  roles.value = renameRole(id, name.trim());
+  return true;
+}
+
+export function setRoleArchived(id: string, archived: boolean): void {
+  roles.value = archived ? archiveRole(id) : restoreRole(id);
+}
+
+export function moveRole(id: string, toIndex: number): void {
+  const ids = activeRoles.value.map((r) => r.id);
+  const from = ids.indexOf(id);
+  if (from === -1) return;
+  const to = Math.max(0, Math.min(ids.length - 1, toIndex));
+  if (to === from) return;
+  ids.splice(from, 1);
+  ids.splice(to, 0, id);
+  roles.value = reorderRoles(ids);
 }
 
 export function selectPreset(preset: Preset): void {

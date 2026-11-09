@@ -1,5 +1,5 @@
 import type { Quadrant } from '../domain/timer';
-import { activeRoles, intention, quadrant, roleId, selection, settingsOpen, timer } from '../state/signals';
+import { activeRoles, intention, openRoles, quadrant, roleId, selection, timer } from '../state/signals';
 
 const MANAGE = '__manage__';
 
@@ -93,7 +93,7 @@ export function ClassificationControls() {
             const value = event.currentTarget.value;
             if (value === MANAGE) {
               event.currentTarget.value = shownRole;
-              settingsOpen.value = true;
+              openRoles();
               return;
             }
             roleId.value = value;

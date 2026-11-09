@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { closeSettings, settings, updateSettings } from '../state/signals';
 import type { Settings } from '../state/storage';
+import { RolesSection } from './RolesSection';
 
 const THEMES: { value: Settings['theme']; label: string }[] = [
   { value: 'system', label: 'System' },
@@ -74,7 +75,7 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
-        class="relative flex h-full w-[360px] flex-col gap-6 border-l border-outline-variant bg-surface-container-low p-6"
+        class="relative flex h-full w-[360px] flex-col gap-6 overflow-y-auto border-l border-outline-variant bg-surface-container-low p-6"
       >
         <div class="flex items-center justify-between">
           <h2 class="text-base font-medium text-on-surface">Settings</h2>
@@ -131,6 +132,7 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
             onChange={(notifications) => updateSettings({ notifications })}
           />
         </section>
+        <RolesSection />
       </div>
     </div>
   );
