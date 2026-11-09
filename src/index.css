@@ -1,1 +1,54 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/geist';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import './ui/theme.css';
+
+html {
+  min-width: 1024px;
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  font-size: 16px;
+}
+
+body {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.break-tint {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+.break-tint[data-active='true'] {
+  opacity: 0.05;
+}
+
+.tomato-fill {
+  transition:
+    transform 250ms linear,
+    fill 250ms linear;
+}
+
+@keyframes today-row-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.today-row {
+  animation: today-row-in 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .break-tint,
+  .tomato-fill {
+    transition: none;
+  }
+
+  .today-row {
+    animation: none;
+  }
+}
