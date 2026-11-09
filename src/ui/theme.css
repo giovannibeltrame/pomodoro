@@ -19,6 +19,7 @@
   --q3: #f59e0b;
   --q4: #71717a;
   --break-tint: #10b981;
+  --break-label: #10b981;
 }
 
 [data-theme='light'] {
@@ -42,6 +43,7 @@
   --q3: #d97706;
   --q4: #71717a;
   --break-tint: #10b981;
+  --break-label: #059669;
 }
 
 @theme inline {
@@ -64,6 +66,7 @@
   --color-q3: var(--q3);
   --color-q4: var(--q4);
   --color-break-tint: var(--break-tint);
+  --color-break-label: var(--break-label);
 }
 
 @theme {

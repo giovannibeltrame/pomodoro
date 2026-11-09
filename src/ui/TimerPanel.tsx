@@ -68,7 +68,7 @@ function PhaseLabel({ state }: { state: TimerState }) {
   const completed = state.kind === 'break' ? state.position - 1 : state.position;
   return (
     <>
-      <span class="font-medium text-break-tint">{phaseLabel(state)}</span>
+      <span class="font-medium text-break-label">{phaseLabel(state)}</span>
       {` · AFTER BLOCK ${completed} OF ${PRESETS[state.preset].blocksPerCycle}`}
     </>
   );
@@ -77,7 +77,7 @@ function PhaseLabel({ state }: { state: TimerState }) {
 const primary =
   'rounded bg-primary px-6 py-2 font-mono text-xs leading-4 font-medium tracking-wider text-on-primary uppercase select-none disabled:cursor-not-allowed disabled:border disabled:border-outline-variant disabled:bg-surface-container-low disabled:text-outline';
 const secondary =
-  'ml-4 font-mono text-xs leading-4 font-medium text-outline transition-colors duration-150 hover:text-on-surface';
+  'ml-4 font-mono text-xs leading-4 font-medium tracking-[0.02em] text-outline transition-colors duration-150 hover:text-on-surface';
 
 export function TimerPanel() {
   const state = timer.value;
