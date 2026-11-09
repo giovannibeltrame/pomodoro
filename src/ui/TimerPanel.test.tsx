@@ -3,10 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test } from 'vitest';
 import { initialState, type TimerState } from '../domain/timer';
 import { writeTimer } from '../state/storage';
-import { selection, timer } from '../state/signals';
+import { quadrant, roleId, roles, timer } from '../state/signals';
 import { TimerPanel } from './TimerPanel';
 
 const classification = { quadrant: 2 as const, roleId: 'r1' };
+
+function select(value: typeof classification | null): void {
+  quadrant.value = value?.quadrant ?? null;
+  roleId.value = value?.roleId ?? null;
+}
 
 function setState(patch: Partial<TimerState>): void {
   const state = { ...initialState('classic'), ...patch };
@@ -19,7 +24,8 @@ const paused: Partial<TimerState> = { status: 'paused', start: Date.now(), pause
 
 beforeEach(() => {
   localStorage.clear();
-  selection.value = classification;
+  roles.value = [{ id: 'r1', name: 'Builder', archived: false, order: 0 }];
+  select(classification);
   setState({});
 });
 
@@ -36,7 +42,7 @@ test('idle focus shows the label, 25:00 and Start', () => {
 });
 
 test('Start is disabled without a selection', () => {
-  selection.value = null;
+  select(null);
   render(<TimerPanel />);
   expect((screen.getByRole('button', { name: 'Start' }) as HTMLButtonElement).disabled).toBe(true);
 });
@@ -107,7 +113,7 @@ test('Space starts, pauses and resumes', async () => {
 });
 
 test('Space does nothing when Start is disabled', async () => {
-  selection.value = null;
+  select(null);
   render(<TimerPanel />);
   await act(() => void fireEvent.keyDown(document.body, { code: 'Space', key: ' ' }));
   expect(timer.value.status).toBe('idle');

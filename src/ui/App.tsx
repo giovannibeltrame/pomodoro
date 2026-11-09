@@ -1,4 +1,5 @@
 import { timer } from '../state/signals';
+import { ClassificationControls } from './ClassificationControls';
 import { TimerPanel } from './TimerPanel';
 
 export function App() {
@@ -39,7 +40,10 @@ export function App() {
       </header>
       <div class="relative flex flex-1">
         <main aria-label="Quadrantic Pomodoro" class="flex-1 px-8 py-8">
-          <TimerPanel />
+          <div class="flex flex-col items-center">
+            <TimerPanel />
+            <ClassificationControls />
+          </div>
         </main>
         <aside
           aria-label="Today"

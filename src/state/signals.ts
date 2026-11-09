@@ -4,6 +4,7 @@ import {
   restore,
   type Classification,
   type PhaseRecord,
+  type Quadrant,
   type TimerEvent,
   type TimerState,
 } from '../domain/timer';
@@ -15,6 +16,7 @@ import {
   readSettings,
   readTimer,
   recordPhase,
+  writeSettings,
   writeTimer,
   type Role,
   type Settings,
@@ -22,9 +24,19 @@ import {
 
 export const settings = signal<Settings>(readSettings());
 export const timer = signal<TimerState>(readTimer(settings.value.preset));
-export const selection = signal<Classification | null>(settings.value.lastClassification ?? null);
 export const phases = signal<PhaseRecord[]>(readPhases());
 export const roles = signal<Role[]>(readRoles());
+export const quadrant = signal<Quadrant | null>(settings.value.lastClassification?.quadrant ?? null);
+export const roleId = signal<string | null>(settings.value.lastClassification?.roleId ?? null);
+export const intention = signal('');
+export const settingsOpen = signal(false);
+export const activeRoles = computed(() => roles.value.filter((r) => !r.archived).sort((a, b) => a.order - b.order));
+export const selection = computed<Classification | null>(() => {
+  const id = roleId.value;
+  if (quadrant.value === null || id === null || !activeRoles.value.some((r) => r.id === id)) return null;
+  const text = intention.value.trim();
+  return text ? { quadrant: quadrant.value, roleId: id, intention: text } : { quadrant: quadrant.value, roleId: id };
+});
 export const todayRecords = computed(() => todayPhases(phases.value, Date.now()));
 
 function commit(state: TimerState, records: PhaseRecord[]): void {
@@ -34,11 +46,16 @@ function commit(state: TimerState, records: PhaseRecord[]): void {
   let next = phases.value;
   for (const record of records) next = recordPhase(record);
   phases.value = next;
+  const last = records.findLast((r) => r.kind === 'focus' && r.quadrant && r.roleId);
+  if (last?.quadrant && last.roleId) {
+    settings.value = writeSettings({ lastClassification: { quadrant: last.quadrant, roleId: last.roleId } });
+  }
 }
 
 export function dispatch(event: TimerEvent, now: number = Date.now()): void {
   const current = readTimer(settings.value.preset);
   const result = reduce(current, event, now);
+  if (event.type === 'start' && result.state.status === 'running') intention.value = '';
   if (result.state === current && result.records.length === 0) {
     timer.value = current;
     return;
