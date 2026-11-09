@@ -30,6 +30,17 @@ test('the gear opens the drawer and focus moves to the close button', async () =
   expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close settings' }));
 });
 
+test('focusing the close button does not scroll the drawer, so Manage roles can scroll to Roles', async () => {
+  const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+  await open();
+  const closeCall = focus.mock.instances.findIndex(
+    (el) => (el as HTMLElement).getAttribute('aria-label') === 'Close settings',
+  );
+  expect(closeCall).toBeGreaterThanOrEqual(0);
+  expect(focus.mock.calls[closeCall]?.[0]).toEqual({ preventScroll: true });
+  focus.mockRestore();
+});
+
 test('Escape, the close button and the backdrop close it and focus returns to the gear', async () => {
   const gear = await open();
   await act(() => {

@@ -53,7 +53,7 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    closeRef.current?.focus();
+    closeRef.current?.focus({ preventScroll: true });
     const onKey = (event: KeyboardEvent): void => {
       if (event.key === 'Escape') closeSettings();
     };

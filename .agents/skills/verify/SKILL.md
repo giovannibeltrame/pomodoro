@@ -70,7 +70,7 @@ Seed a running Focus with `start: now - 25 * M + 4000`, `segmentStart` the same,
 worker fires: `phases` gains one record, and the timer is an idle Break (or Long break) with the cycle position advanced.
 Wait 7 s before reading.
 
-### Start, pause, resume with Space [needs US-010, US-011]
+### Start, pause, resume with Space [works]
 
 Select a quadrant and a role, press Space (focus not in an input, select, textarea or button): the timer runs. Space
 again pauses, and again resumes. Check `timer.status` in `quadrantic:v1:timer` after each press, and that no other key
@@ -83,18 +83,23 @@ From the third tab, write a running Focus ending in 4 s (`start: now - 25 * M + 
 `localStorage.setItem`. That fires `storage` in both app tabs. After 7 s, `phases` holds exactly one record for that
 `start`.
 
-### Theme [needs US-009]
+### Theme [works]
 
-Set `settings.theme` to `light` or `dark` and reload: `document.documentElement.dataset.theme` equals it. With `system`,
-emulate `prefers-color-scheme` and check `data-theme` changes without a reload. Run every UI check in both themes.
+Set `settings.theme` to `light` or `dark` and reload: `document.documentElement.dataset.theme` equals it. The settings
+drawer's Light and Dark buttons change it at once. With `system`, emulate `prefers-color-scheme` and check `data-theme`
+changes without a reload. Chrome cannot emulate it from the tools, so load the app into a same-origin iframe (as in
+Blocked storage) whose `matchMedia` is replaced before the page script runs with a fake `MediaQueryList` that records
+`change` listeners; call them with `{ matches: true }` and read `data-theme` in the iframe. Run every UI check in both
+themes.
 
-### Sound [needs US-016, US-017]
+### Sound [works]
 
+Run it in the same iframe harness as Blocked storage, stubbing `AudioContext` on the iframe window before the app loads.
 Before the phase ends, wrap `window.AudioContext` with a counter and `OscillatorNode.prototype.start` too, then let a
 phase end in an app tab. With `sound: true` the counts rise by one in the tab that fires; with `sound: false` they stay
 at zero.
 
-### Notification [needs US-016, US-017]
+### Notification [works]
 
 Before the phase ends, replace `window.Notification` with a stub that records its constructor calls and has
 `permission: 'granted'`. With `notifications: true`, a phase end records one call; with `false`, none.
@@ -135,7 +140,8 @@ Every URL must start with `http://localhost:4173/`. The list at US-007: the page
 worker and `favicon.ico`. The network-request tool reports nothing if it was first called after the load, so prefer the
 list above.
 
-## State of the UI at US-007
+## State of the UI
 
-`App` renders an empty `<main aria-label="Quadrantic Pomodoro">`: there is no text, no controls and no `data-theme`, so
-everything above is checked through `localStorage` and the page's JS context until US-009 to US-017 land.
+The full UI exists (US-009 to US-018). Drive it with real clicks and keys where a script cannot, for example the role
+drag handle (`left_click_drag`) and Alt+↑/↓. Rename inputs in the Roles section are always rendered, so find the Add role
+input as the last `input` in the dialog after clicking Add role.
