@@ -8,9 +8,9 @@ export interface TomatoProps {
   progress: number;
 }
 
-const BODY = 'M80 50 C 120 36 148 66 146 106 C 144 142 114 164 80 164 C 46 164 16 142 14 106 C 12 66 40 36 80 50 Z';
-const TOP = 46;
-const HEIGHT = 118;
+const BODY = 'M16 10c-6.8 0-11 4.5-11 11.2C5 26.5 9.5 29 16 29s11-2.5 11-7.8C27 14.5 22.8 10 16 10z';
+const TOP = 10;
+const HEIGHT = 19;
 
 export function Tomato({ kind, status, progress }: TomatoProps) {
   const clipId = useId();
@@ -20,12 +20,11 @@ export function Tomato({ kind, status, progress }: TomatoProps) {
 
   return (
     <svg
-      class="text-on-surface-variant"
       data-slot="tomato"
       data-state={state}
-      width="160"
+      width="180"
       height="180"
-      viewBox="0 0 160 180"
+      viewBox="0 0 32 32"
       fill="none"
       role="img"
       aria-label="Focus progress"
@@ -42,7 +41,7 @@ export function Tomato({ kind, status, progress }: TomatoProps) {
             class="tomato-fill"
             x="0"
             y={TOP}
-            width="160"
+            width="32"
             height={HEIGHT}
             fill={ripenColor(p)}
             opacity={status === 'paused' ? 0.5 : 1}
@@ -50,20 +49,20 @@ export function Tomato({ kind, status, progress }: TomatoProps) {
           />
         </g>
       )}
-      <path
-        d={BODY}
-        stroke="currentColor"
+      <g
+        stroke="var(--tomato-stroke)"
         stroke-width="1.5"
+        stroke-linecap="round"
         stroke-linejoin="round"
         opacity={state === 'break' ? 0.6 : 1}
-      />
-      <path d="M80 50 L80 30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-      <path
-        d="M80 38 C 92 18 114 18 124 28 C 112 40 94 42 80 38 Z"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linejoin="round"
-      />
+      >
+        <path d="M16 4v4" />
+        <path d="M16 8c-2.5-3-6-2.5-7.5-1.5 1 2 2.5 3.5 5.5 3.5" />
+        <path d="M16 8c2.5-3 6-2.5 7.5-1.5-1 2-2.5 3.5-5.5 3.5" />
+        <path d="M16 8l-2 3" />
+        <path d="M16 8l2 3" />
+        <path d={BODY} />
+      </g>
     </svg>
   );
 }

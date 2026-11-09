@@ -14,9 +14,10 @@ function draw(props: TomatoProps) {
 test('is a 180px inline SVG with a 1.5px stroke', () => {
   const { svg } = draw({ kind: 'focus', status: 'idle', progress: 0 });
   expect(svg.getAttribute('height')).toBe('180');
-  const strokes = Array.from(svg.querySelectorAll('path[stroke]'));
-  expect(strokes.length).toBe(3);
-  for (const path of strokes) expect(path.getAttribute('stroke-width')).toBe('1.5');
+  expect(svg.getAttribute('width')).toBe('180');
+  const outline = svg.querySelector('g[stroke-width]') as SVGGElement;
+  expect(outline.getAttribute('stroke-width')).toBe('1.5');
+  expect(outline.querySelectorAll('path').length).toBe(6);
 });
 
 test('idle focus has no fill', () => {
@@ -29,7 +30,7 @@ test('running focus fills in proportion and ripens', () => {
   const { svg, fill } = draw({ kind: 'focus', status: 'running', progress: 0.5 });
   expect(svg.getAttribute('data-state')).toBe('running');
   expect(fill?.getAttribute('opacity')).toBe('1');
-  expect((fill as SVGElement).style.transform).toBe('translateY(59px)');
+  expect((fill as SVGElement).style.transform).toBe('translateY(9.5px)');
   expect(fill?.getAttribute('fill')).toBe('#ccb42b');
 });
 
