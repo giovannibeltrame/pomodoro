@@ -5,8 +5,7 @@ description: Run the Quadrantic Pomodoro app in Chrome and drive the timer, Toda
 
 # Verify Quadrantic Pomodoro
 
-Every flow below was run in Chrome against the commit that last changed this file, except steps marked
-**[not driven]**. Chrome is the supported browser; the iframe harnesses rely on its `document.open()` behaviour. Any
+Every flow below was run in Chrome against the commit that last changed this file. Chrome is the supported browser; the iframe harnesses rely on its `document.open()` behaviour. Any
 tool that opens tabs, clicks, types and runs JavaScript in a page works; Claude in Chrome is the one in use.
 
 ## Launch and stop
@@ -87,9 +86,41 @@ location.reload();
 
 ### Reload resume
 
-Seed the running timer above and reload. `read('timer').status` stays `running` and `start` is unchanged. A timer whose
-end passed while no tab was open is closed on reload with the same record as Phase end, but with no chime and no
-notification; unit tests cover it **[not driven]**.
+Seed the running timer above and reload. `read('timer').status` stays `running` and `start` is unchanged.
+
+A timer whose end passed while no tab was open is closed on load with the same record as Phase end, but with no chime
+and no notification. The stubs must exist before the app loads, so use an iframe. With no app tab open, on a non-app
+tab:
+
+```js
+const M = 60000, S = Date.now() - 40 * M;
+const set = (k, d) => localStorage.setItem('quadrantic:v1:' + k, JSON.stringify({ v: 1, data: d }));
+set('settings', { theme: 'dark', sound: true, notifications: true, preset: 'classic' });
+set('phases', []);
+set('timer', {
+  preset: 'classic', kind: 'focus', status: 'running', position: 2, start: S, activeMs: 0, segmentStart: S,
+  classification: { quadrant: 2, roleId: 'builder' },
+});
+const f = document.createElement('iframe');
+document.body.append(f);
+const w = f.contentWindow, snd = { ctors: 0, starts: 0 }, notes = [];
+const A = w.AudioContext;
+w.AudioContext = class extends A { constructor(...a) { super(...a); snd.ctors++; } };
+const start = w.OscillatorNode.prototype.start;
+w.OscillatorNode.prototype.start = function (...a) { snd.starts++; return start.apply(this, a); };
+w.Notification = class {
+  static permission = 'granted';
+  static requestPermission = async () => 'granted';
+  constructor(title, options) { notes.push([title, options?.body]); }
+};
+const html = await (await fetch('/')).text();
+f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
+await until(() => read('timer').status === 'idle');
+```
+
+Pass: `phases` holds one Focus record ending at `S + 25 * M`, the timer is an idle Break at position 3, and `snd`
+and `notes` stay empty. As a control, write a running Break ending in 10 s to `timer` from the same tab: when it
+closes through the alarm in the iframe, `starts` rises by 2 and `notes` gains one entry.
 
 ### Phase end
 
@@ -104,8 +135,19 @@ or notification.
 ### Start, pause, resume with Space
 
 Select a quadrant and a role, press Space: the timer runs. Space again pauses, and again resumes. Check
-`read('timer').status` after each press. Space does nothing with focus in an input, select, textarea, button or
-`contenteditable`, while a dialog is open, or with Ctrl, Meta or Alt held; unit tests cover these **[not driven]**.
+`read('timer').status` after each press.
+
+With the timer idle and Start enabled, Space must leave it idle:
+
+- with focus in the intention input (the space goes into the input), on the role select (Shift+Tab from the input),
+  and on a quadrant button;
+- with the settings drawer open and focus on the dialog itself: click its plain text, not a control, or Space presses
+  the focused button;
+- with Ctrl, Meta or Alt held. Real presses of these can trigger the OS, so dispatch them on `document.body` as
+  `KeyboardEvent('keydown', { code: 'Space', key: ' ', bubbles: true, cancelable: true, ctrlKey: true })`, and the
+  same for `metaKey` and `altKey`. A plain dispatched Space then starts the timer, the control.
+
+The handler also skips a textarea and a `contenteditable`, which the app does not have.
 
 ### Reset, Skip, End break
 
@@ -147,7 +189,38 @@ Manager moves to Builder's place.
 
 ### Day rollover
 
-At local midnight the Today list drops yesterday's rows without a reload. Unit tests cover it **[not driven]**.
+At local midnight the Today list drops yesterday's rows without a reload. Load the app into an iframe whose clock reads
+10 s before midnight. With no app tab open, on a non-app tab:
+
+```js
+const M = 60000, RealDate = Date;
+const midnight = new RealDate();
+midnight.setHours(24, 0, 0, 0);
+const off = midnight.getTime() - 10000 - RealDate.now();
+const fakeNow = RealDate.now() + off;
+const set = (k, d) => localStorage.setItem('quadrantic:v1:' + k, JSON.stringify({ v: 1, data: d }));
+set('timer', {
+  preset: 'classic', kind: 'focus', status: 'idle', position: 1, start: null, activeMs: 0, segmentStart: null,
+  classification: null,
+});
+set('phases', [
+  { start: fakeNow - 30 * M, end: fakeNow - 5 * M, kind: 'focus', activeMs: 25 * M, quadrant: 1, roleId: 'builder' },
+]);
+const f = document.createElement('iframe');
+document.body.append(f);
+const w = f.contentWindow, WD = w.Date;
+w.Date = class extends WD {
+  constructor(...a) { if (a.length) super(...a); else super(WD.now() + off); }
+  static now() { return WD.now() + off; }
+};
+const html = await (await fetch('/')).text();
+f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
+const rows = () => f.contentDocument.querySelectorAll('[aria-label=Today] li').length;
+await until(() => rows() === 1);
+await until(() => rows() === 0, 20000);
+```
+
+Pass: the Today list shows the row, then empties at the fake midnight, and `read('phases')` still holds the record.
 
 ### Two-tab sync
 
