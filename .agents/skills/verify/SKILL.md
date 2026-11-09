@@ -11,6 +11,10 @@ tool that opens tabs, clicks, types and runs JavaScript in a page works; Claude 
 
 ## Launch and stop
 
+Storage is per origin, and the port is part of it. The skill uses only ports 5199 and 4199, so it never reads, seeds or
+clears the data of someone using the app on Vite's default ports, 5173 and 4173. Never run these steps against another
+port.
+
 Run with the Bash tool's `run_in_background` option, without `&` or redirects:
 
 ```sh
@@ -20,8 +24,8 @@ mise exec -- pnpm dev --port 5199 --strictPort
 Open `http://localhost:5199`. Stop it with TaskStop on the background task id, then check the port is free:
 `ss -ltn 'sport = :5199'` lists no socket.
 
-For the build: `mise exec -- pnpm build`, then `mise exec -- pnpm preview --port 4173 --strictPort` the same way, and open
-`http://localhost:4173`. Stop it the same way. Close every tab you opened.
+For the build: `mise exec -- pnpm build`, then `mise exec -- pnpm preview --port 4199 --strictPort` the same way, and open
+`http://localhost:4199`. Stop it the same way. Close every tab you opened.
 
 A non-app tab on the same origin hosts the harnesses and cross-tab writes. On the dev server use
 `http://localhost:5199/src/domain/timer.ts`. Preview serves the app for any unknown path, so there use the built script,
@@ -243,7 +247,7 @@ On `pnpm preview`, load the page, run a focus→break cycle, then in the page:
 performance.getEntriesByType('resource').map((r) => r.name)
 ```
 
-Every URL must start with `http://localhost:4173/`. Expect one script, one stylesheet, three `.woff2` fonts, the alarm
+Every URL must start with `http://localhost:4199/`. Expect one script, one stylesheet, three `.woff2` fonts, the alarm
 worker and `favicon.ico`; the page itself is a navigation entry, not listed. Requests made from inside the worker go to the
 worker's own timeline and do not show here; `src/state/alarm.worker.ts` makes none. The network-request tool reports
 nothing if it was first called after the load, so prefer the list above.
