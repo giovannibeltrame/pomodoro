@@ -116,7 +116,7 @@ export function TimerPanel() {
   const progress = state.status === 'idle' ? 0 : 1 - remaining / total;
 
   return (
-    <section class="flex flex-col items-center pb-6" aria-label="Timer">
+    <section class="flex flex-col items-center" aria-label="Timer">
       <Tomato kind={state.kind} status={state.status} progress={progress} />
       <div class="mt-1 font-mono text-[11px] leading-[14px] tracking-wider text-outline uppercase">
         <PhaseLabel state={state} />

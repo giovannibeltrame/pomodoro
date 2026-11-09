@@ -51,7 +51,7 @@ function Chevron() {
 const label = 'font-mono text-[11px] leading-[14px] uppercase tracking-wider text-outline';
 
 const field =
-  'h-10 w-full appearance-none rounded border border-outline-variant bg-surface-container px-4 text-[13px] leading-5 text-on-surface placeholder:text-outline disabled:cursor-not-allowed';
+  'w-full appearance-none rounded border border-outline-variant bg-surface-container px-4 py-2.5 text-[13px] leading-5 placeholder:text-outline enabled:hover:border-tomato-stroke focus:outline-none focus-visible:ring-1 focus-visible:ring-outline disabled:cursor-not-allowed';
 
 function Adornment({ locked }: { locked: boolean }) {
   return (
@@ -77,7 +77,7 @@ export function ClassificationControls() {
         <div class="flex items-center justify-between">
           <span class={label}>Quadrant</span>
           {!locked && selection.value === null && (
-            <span class="text-xs text-outline">Choose a quadrant and role to start</span>
+            <span class="text-xs leading-[18px] text-outline">Choose a quadrant and role to start</span>
           )}
         </div>
         <div class="grid grid-cols-4 gap-3" role="group" aria-label="Quadrant">
@@ -91,7 +91,7 @@ export function ClassificationControls() {
                 aria-pressed={selected}
                 disabled={locked}
                 onClick={() => (quadrant.value = q.id)}
-                class={`flex h-[76px] flex-col justify-between rounded-lg border bg-surface-container p-3 text-left disabled:cursor-default ${dimmed ? 'opacity-45' : ''}`}
+                class={`flex h-[76px] flex-col justify-between rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-default ${dimmed ? 'opacity-45' : ''}`}
                 style={
                   selected
                     ? {
@@ -102,7 +102,7 @@ export function ClassificationControls() {
                 }
               >
                 <span class="flex w-full items-center justify-between">
-                  <span class="font-mono text-xs font-medium" style={{ color: `var(--q${q.id})` }}>
+                  <span class="font-mono text-xs font-medium tracking-[0.02em]" style={{ color: `var(--q${q.id})` }}>
                     {`Q${q.id} ${q.name}`}
                   </span>
                   <span class="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: `var(--q${q.id})` }} />
@@ -118,7 +118,7 @@ export function ClassificationControls() {
         <div class={`relative ${dim}`}>
           <select
             aria-label="Role"
-            class={field}
+            class={`${field} ${shownRole === '' ? 'text-on-surface-variant' : 'text-on-surface'}`}
             disabled={locked}
             value={shownRole}
             onChange={(event) => {
@@ -150,7 +150,7 @@ export function ClassificationControls() {
           <input
             type="text"
             aria-label="Intention"
-            class={field}
+            class={`${field} text-on-surface`}
             placeholder="What will you work on?"
             disabled={locked}
             value={shownIntention}
