@@ -52,6 +52,11 @@ export function ClassificationControls() {
           {!locked && selection.value === null && (
             <span class="text-xs leading-[18px] text-outline">Choose a quadrant and role to start</span>
           )}
+          {locked && (
+            <span class="mr-4 text-outline opacity-50">
+              <Lock />
+            </span>
+          )}
         </div>
         <div class="grid grid-cols-4 gap-3" role="group" aria-label="Quadrant">
           {QUADRANTS.map((q) => {
