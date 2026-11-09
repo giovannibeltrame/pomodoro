@@ -1,5 +1,6 @@
 import { timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
+import { PresetToggle } from './PresetToggle';
 import { TimerPanel } from './TimerPanel';
 
 export function App() {
@@ -17,7 +18,9 @@ export function App() {
           QUADRANTIC <span class="text-outline">POMODORO</span>
         </div>
         <div class="flex items-center gap-3">
-          <div data-slot="preset-toggle" />
+          <div data-slot="preset-toggle">
+            <PresetToggle />
+          </div>
           <button
             type="button"
             aria-label="Settings"

@@ -4,6 +4,7 @@ import {
   restore,
   type Classification,
   type PhaseRecord,
+  type Preset,
   type Quadrant,
   type TimerEvent,
   type TimerState,
@@ -61,6 +62,13 @@ export function dispatch(event: TimerEvent, now: number = Date.now()): void {
     return;
   }
   commit(result.state, result.records);
+}
+
+export function selectPreset(preset: Preset): void {
+  const current = readTimer(settings.value.preset);
+  if (current.status !== 'idle' || preset === settings.value.preset) return;
+  settings.value = writeSettings({ preset });
+  commit(reduce(current, { type: 'setPreset', preset }, Date.now()).state, []);
 }
 
 export function restoreTimer(now: number = Date.now()): void {
