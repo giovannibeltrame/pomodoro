@@ -149,12 +149,10 @@ async function loadFresh(lastClassification?: Settings['lastClassification']) {
   localStorage.clear();
   if (lastClassification) writeSettings({ lastClassification });
   vi.resetModules();
-  const tl = await import('@testing-library/preact');
   const { ClassificationControls: Fresh } = await import('./ClassificationControls');
-  const view = tl.render(<Fresh />);
+  const view = render(<Fresh />);
   const pressed = Array.from(view.container.querySelectorAll('[aria-pressed=true]')).map((b) => b.textContent);
   const selected = (view.container.querySelector('select') as HTMLSelectElement).value;
-  tl.cleanup();
   return { pressed, selected };
 }
 
