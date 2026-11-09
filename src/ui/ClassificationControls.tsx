@@ -47,14 +47,14 @@ export function ClassificationControls() {
   return (
     <section class="mt-8 flex w-full max-w-[620px] flex-col gap-5" aria-label="Classification">
       <div class="flex flex-col gap-2">
-        <div class="flex items-center justify-between">
+        <div class="relative flex items-center justify-between">
           <span class={label}>Quadrant</span>
           {!locked && selection.value === null && (
             <span class="text-xs leading-[18px] text-outline">Choose a quadrant and role to start</span>
           )}
           {locked && (
-            <span class={`mr-4 text-outline ${dim}`}>
-              <Lock />
+            <span class={dim}>
+              <Adornment locked />
             </span>
           )}
         </div>
