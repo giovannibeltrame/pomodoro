@@ -138,6 +138,26 @@ test('Space is ignored inside input, select, textarea and button', async () => {
   }
 });
 
+test('Space is ignored while a modal dialog is open, wherever focus is', async () => {
+  render(
+    <div>
+      <TimerPanel />
+      <dialog open aria-label="Settings">
+        <details>
+          <summary>Archived</summary>
+        </details>
+        <ul>
+          <li tabIndex={0}>Builder</li>
+        </ul>
+      </dialog>
+    </div>,
+  );
+  for (const target of [screen.getByText('Archived'), screen.getByText('Builder'), document.body]) {
+    await act(() => void fireEvent.keyDown(target, { code: 'Space', key: ' ' }));
+    expect(timer.value.status).toBe('idle');
+  }
+});
+
 test('other keys do nothing', async () => {
   render(<TimerPanel />);
   await act(() => void fireEvent.keyDown(document.body, { code: 'Enter', key: 'Enter' }));

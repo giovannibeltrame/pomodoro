@@ -110,6 +110,16 @@ test('controls are locked with a lock icon while running or paused', async () =>
   }
 });
 
+test('a running block keeps showing its role after that role is archived', async () => {
+  render(<App />);
+  await act(() => {
+    dispatch({ type: 'start', classification: { quadrant: 1, roleId: 'r1' } });
+    roles.value = roles.value.map((r) => (r.id === 'r1' ? { ...r, archived: true } : r));
+  });
+  expect(role().value).toBe('r1');
+  expect(role().selectedOptions[0]?.textContent).toBe('Builder');
+});
+
 test('controls are hidden during breaks', async () => {
   render(<App />);
   await act(() => setState({ kind: 'break' }));

@@ -1,5 +1,5 @@
 import { QUADRANTS } from '../domain/timer';
-import { activeRoles, intention, openRoles, quadrant, roleId, selection, timer } from '../state/signals';
+import { activeRoles, intention, openRoles, quadrant, roleId, roles, selection, timer } from '../state/signals';
 import { strokeIcon } from './icons';
 import { sectionLabel as label } from './styles';
 
@@ -41,6 +41,7 @@ export function ClassificationControls() {
   const shownQuadrant = lockedValue ? lockedValue.quadrant : quadrant.value;
   const shownRole = lockedValue ? lockedValue.roleId : (activeRoles.value.find((r) => r.id === roleId.value)?.id ?? '');
   const shownIntention = lockedValue ? (lockedValue.intention ?? '') : intention.value;
+  const archivedLockedRole = lockedValue && roles.value.find((r) => r.archived && r.id === lockedValue.roleId);
   const dim = locked ? 'opacity-50' : '';
 
   return (
@@ -111,6 +112,7 @@ export function ClassificationControls() {
                 {r.name}
               </option>
             ))}
+            {archivedLockedRole && <option value={archivedLockedRole.id}>{archivedLockedRole.name}</option>}
             <option value={MANAGE}>Manage roles…</option>
           </select>
           <Adornment locked={locked} />

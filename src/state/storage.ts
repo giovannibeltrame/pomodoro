@@ -165,10 +165,9 @@ function isTimerState(value: unknown): value is TimerState {
   );
 }
 
-const isArrayOf =
-  <T>(test: (v: unknown) => v is T) =>
-  (value: unknown): value is T[] =>
-    Array.isArray(value) && value.every(test);
+function loadList<T>(key: Key, test: (value: unknown) => value is T): T[] | undefined {
+  return load(key, (data): data is unknown[] => Array.isArray(data))?.filter(test);
+}
 
 const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
@@ -187,7 +186,7 @@ function seedRoles(): Role[] {
 }
 
 export function readPhases(): PhaseRecord[] {
-  return load(KEYS.phases, isArrayOf(isPhaseRecord)) ?? [];
+  return loadList(KEYS.phases, isPhaseRecord) ?? [];
 }
 
 export function recordPhase(record: PhaseRecord): PhaseRecord[] {
@@ -216,7 +215,7 @@ function sorted(roles: Role[]): Role[] {
 }
 
 export function readRoles(): Role[] {
-  const stored = load(KEYS.roles, isArrayOf(isRole));
+  const stored = loadList(KEYS.roles, isRole);
   if (stored) return sorted(stored);
   const seeded = seedRoles();
   save(KEYS.roles, seeded);

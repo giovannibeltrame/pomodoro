@@ -1,7 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initialState, PRESETS, reduce } from '../domain/timer';
 import { startAlarm, type AlarmWorker } from './alarm';
-import { dispatch, handleStorage, phases, restoreTimer, roles, settings, startSync, timer } from './signals';
+import {
+  dispatch,
+  handleStorage,
+  intention,
+  phases,
+  quadrant,
+  restoreTimer,
+  roleId,
+  roles,
+  settings,
+  startSync,
+  timer,
+} from './signals';
 import { KEYS, readPhases, readRoles, readSettings, resetMemory, writeSettings, writeTimer } from './storage';
 
 const classification = { quadrant: 2 as const, roleId: 'builder' };
@@ -112,6 +124,24 @@ describe('phase end in several tabs', () => {
     dispatch({ type: 'start', classification }, T0);
     dispatch({ type: 'tick' }, T0 + PRESETS.classic.focus);
     expect(phases.value).toHaveLength(1);
+  });
+
+  it('preselects the classification of a block that ended while the app was closed', () => {
+    dispatch({ type: 'start', classification }, T0);
+    quadrant.value = 1;
+    roleId.value = 'manager';
+    restoreTimer(T0 + PRESETS.classic.focus + 60_000);
+    expect(quadrant.value).toBe(classification.quadrant);
+    expect(roleId.value).toBe(classification.roleId);
+  });
+});
+
+describe('start', () => {
+  it('keeps the typed intention when another tab already started the timer', () => {
+    writeTimer(reduce(initialState('classic'), { type: 'start', classification }, T0).state);
+    intention.value = 'Draft the ADR';
+    dispatch({ type: 'start', classification }, T0 + 1000);
+    expect(intention.value).toBe('Draft the ADR');
   });
 });
 

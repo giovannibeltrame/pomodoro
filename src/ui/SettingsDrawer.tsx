@@ -57,6 +57,7 @@ function Toggle({
 
 export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLElement | null } }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const pressedInside = useRef(false);
 
   useLayoutEffect(() => {
     const dialog = ref.current;
@@ -79,8 +80,11 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
         event.preventDefault();
         closeSettings();
       }}
+      onMouseDown={(event) => {
+        pressedInside.current = event.target !== event.currentTarget;
+      }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) closeSettings();
+        if (event.target === event.currentTarget && !pressedInside.current) closeSettings();
       }}
       class="m-0 ml-auto h-full max-h-none w-[400px] max-w-none border-0 border-l border-menu-border bg-menu-bg p-0 text-on-surface backdrop:bg-scrim"
     >

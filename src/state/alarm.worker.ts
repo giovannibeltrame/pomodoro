@@ -1,5 +1,7 @@
 export type AlarmCommand = { type: 'schedule'; at: number } | { type: 'cancel' };
 
+const RECHECK_MS = 1000;
+
 let handle: ReturnType<typeof setTimeout> | undefined;
 
 function cancel(): void {
@@ -18,7 +20,7 @@ function schedule(at: number): void {
       }
       self.postMessage({ type: 'fire', at });
     },
-    Math.max(0, at - Date.now()),
+    Math.min(RECHECK_MS, Math.max(0, at - Date.now())),
   );
 }
 

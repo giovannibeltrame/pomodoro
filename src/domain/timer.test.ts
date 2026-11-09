@@ -240,6 +240,24 @@ describe('tick', () => {
     const brkDone = run(brk, { type: 'tick' }, T0 + 31 * MIN);
     expect(brkDone.records).toEqual([{ start: T0 + 26 * MIN, end: T0 + 31 * MIN, kind: 'break', activeMs: 5 * MIN }]);
   });
+
+  it.each([['reset'], ['pause'], ['endEarly']] as const)(
+    'completes a phase past its scheduled end on %s that arrives before the tick',
+    (type) => {
+      const running = startFocus(initialState('classic'));
+      const late = run(running, { type }, T0 + 30 * MIN);
+      expect(late.records).toEqual([run(running, { type: 'tick' }, T0 + 30 * MIN).records[0]]);
+      expect(late.records[0]).toMatchObject({ end: T0 + 25 * MIN, activeMs: 25 * MIN });
+      expect(late.state).toMatchObject({ kind: 'break', status: 'idle' });
+
+      const brk = run(late.state, { type: 'start' }, T0 + 31 * MIN).state;
+      const lateBreak = run(brk, { type }, T0 + 40 * MIN);
+      expect(lateBreak.records).toEqual([
+        { start: T0 + 31 * MIN, end: T0 + 36 * MIN, kind: 'break', activeMs: 5 * MIN },
+      ]);
+      expect(lateBreak.state).toMatchObject({ kind: 'focus', status: 'idle' });
+    },
+  );
 });
 
 describe('sequencing', () => {

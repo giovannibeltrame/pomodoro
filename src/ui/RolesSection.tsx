@@ -68,14 +68,17 @@ function ActiveRow({
       tabIndex={0}
       draggable
       aria-label={role.name}
-      onDragStart={() => onDragStart(role.id)}
+      onDragStart={(event) => {
+        event.dataTransfer?.setData('text/plain', role.id);
+        onDragStart(role.id);
+      }}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
         onDropOn(index);
       }}
       onKeyDown={(event) => {
-        if (!event.altKey) return;
+        if (!event.altKey || event.target instanceof HTMLInputElement) return;
         if (event.key === 'ArrowUp') {
           event.preventDefault();
           moveRole(role.id, index - 1);
@@ -245,6 +248,9 @@ export function RolesSection() {
       <ul
         ref={listRef}
         class="flex flex-col"
+        onDragEnd={() => {
+          dragId.current = null;
+        }}
         onFocusIn={(event) => {
           const row = (event.target as HTMLElement).closest<HTMLElement>('[data-role-id]');
           focusId.current = row?.dataset.roleId ?? null;

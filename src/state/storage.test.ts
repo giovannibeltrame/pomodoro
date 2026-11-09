@@ -90,6 +90,13 @@ describe('phases', () => {
     expect(readPhases()).toEqual([{ ...focus, quadrant: 3, roleId: 'learner', intention: 'read' }]);
   });
 
+  it('keeps the valid records when one stored record is malformed', () => {
+    localStorage.setItem(KEYS.phases, JSON.stringify({ v: 1, data: [focus, { ...focus, start: 2000, kind: 'nap' }] }));
+    expect(readPhases()).toEqual([focus]);
+    recordPhase({ ...focus, start: 5000, end: 6000 });
+    expect(readPhases().map((p) => p.start)).toEqual([1000, 5000]);
+  });
+
   it('deletes by start', () => {
     recordPhase(focus);
     recordPhase({ ...focus, start: 5000, end: 6000 });
@@ -107,6 +114,12 @@ describe('roles', () => {
     ]);
     archiveRole('manager');
     expect(readRoles().find((r) => r.id === 'manager')?.archived).toBe(true);
+  });
+
+  it('keeps the valid roles when one stored role is malformed', () => {
+    const coach = { id: 'coach', name: 'Coach', archived: false, order: 0 };
+    localStorage.setItem(KEYS.roles, JSON.stringify({ v: 1, data: [coach, { id: 'x', name: 7 }] }));
+    expect(readRoles()).toEqual([coach]);
   });
 
   it('does not reseed an existing empty list', () => {

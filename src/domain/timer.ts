@@ -134,6 +134,13 @@ export function restore(stored: TimerState, now: number): ReduceResult {
 
 export function reduce(state: TimerState, event: TimerEvent, now: number): ReduceResult {
   const unchanged: ReduceResult = { state, records: [] };
+  const end = scheduledEnd(state);
+  if (end !== null && now >= end) {
+    return {
+      state: nextAfterCompletion(state),
+      records: [makeRecord(state, end, durationMs(state.preset, state.kind))],
+    };
+  }
 
   switch (event.type) {
     case 'start': {
@@ -190,14 +197,8 @@ export function reduce(state: TimerState, event: TimerEvent, now: number): Reduc
         records: [makeRecord(state, now, activeSoFar(state, now))],
       };
     }
-    case 'tick': {
-      const end = scheduledEnd(state);
-      if (end === null || now < end) return unchanged;
-      return {
-        state: nextAfterCompletion(state),
-        records: [makeRecord(state, end, durationMs(state.preset, state.kind))],
-      };
-    }
+    case 'tick':
+      return unchanged;
     case 'setPreset': {
       if (state.status !== 'idle') return unchanged;
       return { state: initialState(event.preset), records: [] };

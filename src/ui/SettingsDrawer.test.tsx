@@ -67,6 +67,20 @@ test('a click inside the panel does not close it', async () => {
   expect(screen.getByRole('dialog')).toBeTruthy();
 });
 
+test('a press inside the panel released over the backdrop does not close it', async () => {
+  await open();
+  await act(() => {
+    fireEvent.mouseDown(screen.getByRole('heading', { name: 'Settings' }));
+    fireEvent.click(screen.getByRole('dialog'));
+  });
+  expect(screen.getByRole('dialog')).toBeTruthy();
+  await act(() => {
+    fireEvent.mouseDown(screen.getByRole('dialog'));
+    fireEvent.click(screen.getByRole('dialog'));
+  });
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
+
 test('the theme control applies immediately and persists', async () => {
   await open();
   await act(() => {

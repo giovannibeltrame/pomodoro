@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/preact';
-import { beforeEach, expect, test } from 'vitest';
+import { beforeEach, expect, test, vi } from 'vitest';
 import { roles, settingsView } from '../state/signals';
 import { readRoles, resetMemory } from '../state/storage';
 import { App } from './App';
@@ -58,6 +58,36 @@ test('drag and drop reorders', async () => {
     fireEvent.drop(screen.getByRole('listitem', { name: 'Builder' }));
   });
   expect(names()).toEqual(['Learner', 'Builder', 'Manager']);
+});
+
+test('drag start puts the role id on the data transfer, which Firefox needs to start a drag', async () => {
+  render(<RolesSection />);
+  const setData = vi.fn();
+  await act(() => {
+    fireEvent.dragStart(screen.getByRole('listitem', { name: 'Learner' }), { dataTransfer: { setData } });
+  });
+  expect(setData).toHaveBeenCalledWith('text/plain', 'learner');
+});
+
+test('a drop after a drag that ended elsewhere does not move the earlier role', async () => {
+  render(<RolesSection />);
+  await act(() => {
+    fireEvent.dragStart(screen.getByRole('listitem', { name: 'Learner' }));
+  });
+  await act(() => {
+    fireEvent.dragEnd(screen.getByRole('listitem', { name: 'Learner' }));
+  });
+  await act(() => {
+    fireEvent.drop(screen.getByRole('listitem', { name: 'Builder' }));
+  });
+  expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
+});
+
+test('Alt+arrow keys inside the rename input do not reorder', async () => {
+  render(<RolesSection />);
+  const input = await startRename('Builder');
+  await press(input, { key: 'ArrowDown', altKey: true });
+  expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
 });
 
 test('archive moves a role to the Archived group and restore appends it last', async () => {

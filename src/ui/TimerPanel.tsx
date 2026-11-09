@@ -86,6 +86,7 @@ export function TimerPanel() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.code !== 'Space' || event.repeat || event.defaultPrevented) return;
       if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (document.querySelector('dialog[open]')) return;
       const target = event.target;
       if (target instanceof HTMLElement && target.closest('input, select, textarea, button, [contenteditable]')) return;
       event.preventDefault();

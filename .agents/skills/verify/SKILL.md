@@ -37,7 +37,7 @@ set('roles', [
 ]);
 set('timer', {
   preset: 'classic', kind: 'focus', status: 'running', position: 2,
-  start: now - 6 * M, activeMs: 0, segmentStart: now - 6 * M, pausedAt: null,
+  start: now - 6 * M, activeMs: 0, segmentStart: now - 6 * M,
   classification: { quadrant: 2, roleId: 'builder', intention: 'Draft the ADR' },
 });
 set('phases', [

@@ -1,5 +1,6 @@
 import { computed, signal } from '@preact/signals';
 import {
+  MINUTE,
   reduce,
   restore,
   type Classification,
@@ -54,13 +55,8 @@ export function startDayWatch(): () => void {
   let id: ReturnType<typeof setTimeout>;
   const arm = () => {
     const current = Date.now();
-    id = setTimeout(
-      () => {
-        now.value = Date.now();
-        arm();
-      },
-      Math.max(1, nextStartOfDay(current) - current),
-    );
+    if (nextStartOfDay(current) !== nextStartOfDay(now.value)) now.value = current;
+    id = setTimeout(arm, Math.max(1, Math.min(MINUTE, nextStartOfDay(current) - current)));
   };
   arm();
   return () => clearTimeout(id);
@@ -76,6 +72,8 @@ function commit(state: TimerState, records: PhaseRecord[]): void {
   const last = records.findLast((r) => r.kind === 'focus' && r.quadrant && r.roleId);
   if (last?.quadrant && last.roleId) {
     settings.value = writeSettings({ lastClassification: { quadrant: last.quadrant, roleId: last.roleId } });
+    quadrant.value = last.quadrant;
+    roleId.value = last.roleId;
   }
 }
 
@@ -83,7 +81,7 @@ export function dispatch(event: TimerEvent, now: number = Date.now()): void {
   const current = readTimer(settings.value.preset);
   const result = reduce(current, event, now);
   if (event.type === 'start') primeFeedback(settings.value);
-  if (event.type === 'start' && result.state.status === 'running') intention.value = '';
+  if (event.type === 'start' && current.status === 'idle' && result.state.status === 'running') intention.value = '';
   if (result.state === current && result.records.length === 0) {
     timer.value = current;
     return;

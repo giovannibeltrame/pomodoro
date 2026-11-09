@@ -105,6 +105,21 @@ test('the list rerenders when the local day changes', async () => {
   expect(screen.getByText('No blocks yet today. Start your first focus block.')).toBeTruthy();
 });
 
+test('the list rerenders within a minute when the day changed during a system sleep', async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(at(23, 0));
+  phases.value = [focus];
+  const stop = startDayWatch();
+  render(<TodayList />);
+  expect(screen.getAllByRole('listitem')).toHaveLength(1);
+  vi.setSystemTime(at(8, 0, 9));
+  await act(() => {
+    vi.advanceTimersByTime(60_000);
+  });
+  stop();
+  expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+});
+
 test('break rows have no actions menu', () => {
   seed(pause);
   render(<TodayList />);
