@@ -24,7 +24,7 @@ command = ".ralph-tui/bin/worker"
 defaultFlags = [
   "claude", "--permission-prompts", "none", "--permission-mode", "acceptEdits", "--chrome",
   "--allowedTools", "Bash(gh issue view *)", "Bash(mise exec -- pnpm exec prettier *)",
-  "Bash(mise exec -- pnpm exec eslint *)", "Bash(mise exec -- pnpm dev *)", "Bash(mise exec -- pnpm preview *)",
+  "Bash(mise exec -- pnpm dev *)", "Bash(mise exec -- pnpm preview *)",
   "mcp__claude-in-chrome__*",
 ]
 
