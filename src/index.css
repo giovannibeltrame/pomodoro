@@ -1,1 +1,29 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/geist';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import './ui/theme.css';
+
+html {
+  min-width: 1024px;
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.break-tint {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+.break-tint[data-active='true'] {
+  opacity: 0.05;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .break-tint {
+    transition: none;
+  }
+}

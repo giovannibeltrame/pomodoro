@@ -1,0 +1,71 @@
+[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #0f0f10;
+  --surface: #0f0f10;
+  --surface-container-lowest: #0b0b0c;
+  --surface-container-low: #161617;
+  --surface-container: #161617;
+  --surface-container-high: #1d1d1f;
+  --surface-container-highest: #242426;
+  --on-surface: #ededee;
+  --on-surface-variant: #a1a1a6;
+  --outline: #6b6b70;
+  --outline-variant: #2a2a2d;
+  --primary: #ededee;
+  --on-primary: #0f0f10;
+  --q1: #f87171;
+  --q2: #818cf8;
+  --q3: #f59e0b;
+  --q4: #71717a;
+  --break-tint: #10b981;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --background: #fafafa;
+  --surface: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #ffffff;
+  --surface-container: #ffffff;
+  --surface-container-high: #ffffff;
+  --surface-container-highest: #f4f4f5;
+  --on-surface: #18181b;
+  --on-surface-variant: #52525b;
+  --outline: #a1a1aa;
+  --outline-variant: #e4e4e7;
+  --primary: #18181b;
+  --on-primary: #fafafa;
+  --q1: #ef4444;
+  --q2: #6366f1;
+  --q3: #d97706;
+  --q4: #71717a;
+  --break-tint: #10b981;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-q1: var(--q1);
+  --color-q2: var(--q2);
+  --color-q3: var(--q3);
+  --color-q4: var(--q4);
+  --color-break-tint: var(--break-tint);
+}
+
+@theme {
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+}
