@@ -17,8 +17,8 @@ export function App() {
         data-active={onBreak}
         aria-hidden="true"
       />
-      <header class="relative flex items-center justify-between border-b border-outline-variant bg-surface-container-low px-8 py-3">
-        <div class="flex items-center gap-3">
+      <header class="relative flex items-center justify-between border-b border-outline-variant bg-surface-container-low px-8">
+        <div class="flex h-[60px] items-center gap-3">
           <span class="text-base leading-6 font-medium tracking-widest uppercase">QUADRANTIC</span>
           <span class="pt-0.5 font-mono text-[11px] leading-[14px] tracking-wider text-outline">POMODORO</span>
         </div>
