@@ -51,10 +51,33 @@ function start(): void {
   dispatch({ type: 'start' });
 }
 
+function PhaseLabel({ state }: { state: TimerState }) {
+  if (state.kind === 'focus') {
+    return (
+      <>
+        {phaseLabel(state)}
+        {state.status === 'paused' && (
+          <>
+            {' · '}
+            <span class="opacity-50">PAUSED</span>
+          </>
+        )}
+      </>
+    );
+  }
+  const completed = state.kind === 'break' ? state.position - 1 : state.position;
+  return (
+    <>
+      <span class="font-medium text-break-tint">{phaseLabel(state)}</span>
+      {` · AFTER BLOCK ${completed} OF ${PRESETS[state.preset].blocksPerCycle}`}
+    </>
+  );
+}
+
 const primary =
-  'h-10 rounded bg-primary px-6 text-sm font-medium text-on-primary disabled:cursor-not-allowed disabled:opacity-40';
+  'rounded bg-primary px-6 py-2 font-mono text-xs leading-4 font-medium tracking-wider text-on-primary uppercase select-none disabled:cursor-not-allowed disabled:border disabled:border-outline-variant disabled:bg-surface-container-low disabled:text-outline';
 const secondary =
-  'h-10 rounded border border-outline-variant px-6 text-sm font-medium text-on-surface hover:bg-surface-container-high';
+  'ml-4 font-mono text-xs leading-4 font-medium text-outline transition-colors duration-150 hover:text-on-surface';
 
 export function TimerPanel() {
   const state = timer.value;
@@ -93,15 +116,18 @@ export function TimerPanel() {
   const progress = state.status === 'idle' ? 0 : 1 - remaining / total;
 
   return (
-    <section class="flex flex-col items-center gap-6 py-6" aria-label="Timer">
+    <section class="flex flex-col items-center py-6" aria-label="Timer">
       <Tomato kind={state.kind} status={state.status} progress={progress} />
-      <div class="font-mono text-[11px] leading-[14px] tracking-[0.04em] text-outline uppercase">
-        {phaseLabel(state)}
+      <div class="mt-1 font-mono text-[11px] leading-[14px] tracking-wider text-outline uppercase">
+        <PhaseLabel state={state} />
       </div>
-      <div class="font-mono text-[72px] leading-[72px] font-normal tracking-[-0.03em] tabular-nums" aria-live="off">
+      <div
+        class={`mt-2 mb-6 font-mono text-[72px] leading-[72px] font-normal tracking-[-0.03em] tabular-nums ${state.status === 'paused' ? 'opacity-50' : ''}`}
+        aria-live="off"
+      >
         {formatClock(remaining)}
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center">
         {state.status === 'idle' && (
           <button type="button" class={primary} disabled={!canStart(state)} onClick={start}>
             Start
@@ -123,12 +149,12 @@ export function TimerPanel() {
           </button>
         )}
         {!isFocus && state.status === 'idle' && (
-          <button type="button" class={secondary} onClick={() => dispatch({ type: 'skip' })}>
+          <button type="button" class={`${secondary} uppercase`} onClick={() => dispatch({ type: 'skip' })}>
             Skip
           </button>
         )}
         {!isFocus && state.status !== 'idle' && (
-          <button type="button" class={secondary} onClick={() => dispatch({ type: 'endEarly' })}>
+          <button type="button" class={`${secondary} uppercase`} onClick={() => dispatch({ type: 'endEarly' })}>
             End break
           </button>
         )}
