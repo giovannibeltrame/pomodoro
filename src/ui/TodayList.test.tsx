@@ -1,7 +1,9 @@
 import { act, cleanup, render, screen, within } from '@testing-library/preact';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import type { PhaseRecord } from '../domain/timer';
 import { now, phases, roles } from '../state/signals';
+import { readPhases, recordPhase, resetMemory } from '../state/storage';
 import { TodayList } from './TodayList';
 
 const at = (h: number, m: number, day = 8) => new Date(2026, 10, day, h, m).getTime();
@@ -18,7 +20,14 @@ const focus: PhaseRecord = {
 const pause: PhaseRecord = { start: at(10, 30), end: at(10, 40), kind: 'break', activeMs: 10 * 60_000 };
 const long: PhaseRecord = { start: at(10, 40), end: at(10, 55), kind: 'longBreak', activeMs: 15 * 60_000 };
 
+function seed(...records: PhaseRecord[]): void {
+  for (const record of records) recordPhase(record);
+  phases.value = readPhases();
+}
+
 beforeEach(() => {
+  localStorage.clear();
+  resetMemory();
   now.value = at(12, 0);
   phases.value = [];
   roles.value = [
@@ -93,4 +102,86 @@ test('the list rerenders when the local day changes', async () => {
   });
   expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   expect(screen.getByText('No blocks yet today. Start your first focus block.')).toBeTruthy();
+});
+
+test('break rows have no actions menu', () => {
+  seed(pause);
+  render(<TodayList />);
+  expect(screen.queryByRole('button', { name: 'Block actions' })).toBeNull();
+});
+
+test('the menu opens with Edit and Delete, and closes on Escape and on an outside click', async () => {
+  const user = userEvent.setup();
+  seed(focus);
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeTruthy();
+  expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeTruthy();
+  await user.keyboard('{Escape}');
+  expect(screen.queryByRole('menu')).toBeNull();
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(document.body);
+  expect(screen.queryByRole('menu')).toBeNull();
+});
+
+test('editing saves quadrant, role and intention and keeps the times', async () => {
+  const user = userEvent.setup();
+  roles.value = [...roles.value, { id: 'writer', name: 'Writer', archived: false, order: 2 }];
+  seed(focus);
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+  await user.click(screen.getByRole('button', { name: 'Q4' }));
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Role' }), 'writer');
+  const input = screen.getByRole('textbox', { name: 'Intention' });
+  await user.clear(input);
+  await user.type(input, 'Fixed');
+  await user.click(screen.getByRole('button', { name: 'Save' }));
+  expect(readPhases()).toEqual([{ ...focus, quadrant: 4, roleId: 'writer', intention: 'Fixed' }]);
+  expect(screen.getByText('"Fixed"')).toBeTruthy();
+  expect(screen.getByText('Writer')).toBeTruthy();
+  expect(screen.queryByTestId('edit-form')).toBeNull();
+});
+
+test('cancel leaves the record unchanged', async () => {
+  const user = userEvent.setup();
+  seed(focus);
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+  await user.click(screen.getByRole('button', { name: 'Q1' }));
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(readPhases()).toEqual([focus]);
+  expect(screen.queryByTestId('edit-form')).toBeNull();
+});
+
+test('the role list has active roles plus the row role even if archived', async () => {
+  const user = userEvent.setup();
+  roles.value = [...roles.value, { id: 'other', name: 'Other', archived: true, order: 2 }];
+  seed({ ...focus, roleId: 'old' });
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+  const names = within(screen.getByRole('combobox', { name: 'Role' }))
+    .getAllByRole('option')
+    .map((o) => o.textContent);
+  expect(names).toEqual(['Builder', 'Retired']);
+});
+
+test('delete asks inline, never window.confirm, and removes the record', async () => {
+  const user = userEvent.setup();
+  const confirm = vi.spyOn(window, 'confirm');
+  seed(focus, pause);
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+  expect(screen.getByText('Delete this block?')).toBeTruthy();
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(readPhases()).toHaveLength(2);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+  await user.click(screen.getByRole('button', { name: 'Delete' }));
+  expect(readPhases()).toEqual([pause]);
+  expect(confirm).not.toHaveBeenCalled();
+  expect(screen.getAllByRole('listitem')).toHaveLength(1);
 });

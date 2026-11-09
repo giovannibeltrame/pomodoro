@@ -11,14 +11,17 @@ import {
 } from '../domain/timer';
 import { todayPhases } from '../domain/today';
 import {
+  deletePhase,
   KEYS,
   readPhases,
   readRoles,
   readSettings,
   readTimer,
   recordPhase,
+  updatePhase,
   writeSettings,
   writeTimer,
+  type PhaseEdit,
   type Role,
   type Settings,
 } from './storage';
@@ -80,6 +83,14 @@ export function dispatch(event: TimerEvent, now: number = Date.now()): void {
     return;
   }
   commit(result.state, result.records);
+}
+
+export function editPhase(start: number, edit: PhaseEdit): void {
+  phases.value = updatePhase(start, edit);
+}
+
+export function removePhase(start: number): void {
+  phases.value = deletePhase(start);
 }
 
 export function selectPreset(preset: Preset): void {
