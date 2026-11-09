@@ -61,12 +61,26 @@ function ActiveRow({
           moveRole(role.id, index + 1);
         }
       }}
-      class="flex flex-col gap-1 rounded border border-outline-variant px-2 py-1"
+      class="flex flex-col border-b border-outline-variant/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-outline"
     >
-      <div class="flex items-center gap-2">
-        <span aria-hidden="true" class="cursor-grab select-none font-mono text-on-surface-variant">
-          ⋮⋮
-        </span>
+      <div class="flex h-10 items-center gap-2.5">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-4 w-4 shrink-0 cursor-grab text-outline"
+        >
+          <circle cx="9" cy="5" r="1" />
+          <circle cx="9" cy="12" r="1" />
+          <circle cx="9" cy="19" r="1" />
+          <circle cx="15" cy="5" r="1" />
+          <circle cx="15" cy="12" r="1" />
+          <circle cx="15" cy="19" r="1" />
+        </svg>
         <input
           key={role.name}
           type="text"
@@ -84,16 +98,55 @@ function ActiveRow({
               setError(null);
             }
           }}
-          class="min-w-0 flex-1 bg-transparent text-sm text-on-surface outline-none"
+          class="min-w-0 flex-1 bg-transparent text-[13px] leading-5 text-on-surface outline-none"
         />
-        <button
-          type="button"
-          aria-label={`Archive ${role.name}`}
-          onClick={() => setRoleArchived(role.id, true)}
-          class="rounded px-2 py-0.5 font-mono text-xs text-on-surface-variant hover:bg-surface-container-high"
-        >
-          Archive
-        </button>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label={`Edit ${role.name}`}
+            onClick={(event) => {
+              const input = event.currentTarget.closest('li')?.querySelector('input');
+              input?.focus();
+              input?.select();
+            }}
+            class="text-outline transition-colors duration-150 hover:text-on-surface"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-3.5 w-3.5"
+            >
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            aria-label={`Archive ${role.name}`}
+            onClick={() => setRoleArchived(role.id, true)}
+            class="text-outline transition-colors duration-150 hover:text-on-surface"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-3.5 w-3.5"
+            >
+              <polyline points="21 8 21 21 3 21 3 8" />
+              <rect x="1" y="3" width="22" height="5" />
+              <line x1="10" y1="12" x2="14" y2="12" />
+            </svg>
+          </button>
+        </div>
       </div>
       {error ? (
         <span role="alert" class="font-mono text-xs text-on-surface-variant">
@@ -123,8 +176,8 @@ function AddRow({ onDone }: { onDone: () => void }) {
   };
 
   return (
-    <li class="flex flex-col gap-1 rounded border border-outline-variant px-2 py-1">
-      <div class="flex items-center gap-2">
+    <li class="flex flex-col border-b border-outline-variant/60">
+      <div class="flex h-10 items-center gap-2">
         <input
           ref={ref}
           type="text"
@@ -140,19 +193,19 @@ function AddRow({ onDone }: { onDone: () => void }) {
               onDone();
             }
           }}
-          class="min-w-0 flex-1 bg-transparent text-sm text-on-surface outline-none"
+          class="min-w-0 flex-1 bg-transparent text-[13px] leading-5 text-on-surface outline-none placeholder:text-outline"
         />
         <button
           type="button"
           onClick={() => submit(ref.current?.value ?? '')}
-          class="rounded px-2 py-0.5 font-mono text-xs text-on-surface-variant hover:bg-surface-container-high"
+          class="font-mono text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
         >
           Save
         </button>
         <button
           type="button"
           onClick={onDone}
-          class="rounded px-2 py-0.5 font-mono text-xs text-on-surface-variant hover:bg-surface-container-high"
+          class="font-mono text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
         >
           Cancel
         </button>
@@ -189,21 +242,11 @@ export function RolesSection() {
   }, [order]);
 
   return (
-    <section ref={sectionRef} aria-label="Roles" class="flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <h3 class="font-mono text-xs uppercase tracking-[0.02em] text-on-surface-variant">Roles</h3>
-        <button
-          type="button"
-          onClick={() => setAdding(true)}
-          disabled={adding}
-          class="rounded px-2 py-0.5 font-mono text-xs text-on-surface-variant hover:bg-surface-container-high disabled:opacity-50"
-        >
-          Add role
-        </button>
-      </div>
+    <section ref={sectionRef} aria-label="Roles" class="flex flex-col gap-3 pt-5">
+      <h3 class="font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline">Roles</h3>
       <ul
         ref={listRef}
-        class="flex flex-col gap-1"
+        class="flex flex-col"
         onFocusIn={(event) => {
           const row = (event.target as HTMLElement).closest<HTMLElement>('[data-role-id]');
           focusId.current = row?.dataset.roleId ?? null;
@@ -226,20 +269,29 @@ export function RolesSection() {
         ))}
         {adding ? <AddRow onDone={() => setAdding(false)} /> : null}
       </ul>
+      <button
+        type="button"
+        aria-label="Add role"
+        onClick={() => setAdding(true)}
+        disabled={adding}
+        class="mt-1 flex h-9 w-full items-center justify-center rounded-[4px] border border-outline-variant text-xs text-on-surface-variant transition-colors duration-150 hover:border-tomato-stroke hover:text-on-surface disabled:opacity-50"
+      >
+        + Add role
+      </button>
       {archived.length > 0 ? (
-        <details class="rounded border border-outline-variant px-2 py-1">
-          <summary class="cursor-pointer font-mono text-xs text-on-surface-variant">
+        <details class="mt-3">
+          <summary class="cursor-pointer font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline hover:text-on-surface-variant">
             Archived ({archived.length})
           </summary>
-          <ul class="mt-1 flex flex-col gap-1">
+          <ul class="mt-2 flex flex-col">
             {archived.map((role) => (
-              <li key={role.id} class="flex items-center justify-between gap-2">
-                <span class="min-w-0 truncate text-sm text-on-surface-variant">{role.name}</span>
+              <li key={role.id} class="flex h-9 items-center justify-between gap-2 px-1">
+                <span class="min-w-0 truncate text-[13px] leading-5 text-outline">{role.name}</span>
                 <button
                   type="button"
                   aria-label={`Restore ${role.name}`}
                   onClick={() => setRoleArchived(role.id, false)}
-                  class="rounded px-2 py-0.5 font-mono text-xs text-on-surface-variant hover:bg-surface-container-high"
+                  class="text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
                 >
                   Restore
                 </button>

@@ -15,37 +15,42 @@ function notificationsBlocked(): boolean {
 
 function Toggle({
   label,
+  description,
   checked,
   disabled = false,
   hint,
   onChange,
 }: {
   label: string;
+  description: string;
   checked: boolean;
   disabled?: boolean;
   hint?: string;
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div class="flex items-center justify-between py-3">
-      <div class="flex flex-col">
-        <span class="text-sm text-on-surface">{label}</span>
-        {hint ? <span class="font-mono text-xs text-on-surface-variant">{hint}</span> : null}
+    <section class="flex flex-col gap-2.5 border-b border-outline-variant py-5">
+      <h3 class="font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline">{label}</h3>
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex flex-col">
+          <span class="text-[13px] leading-5 text-on-surface">{description}</span>
+          {hint ? <span class="font-mono text-[11px] text-outline">{hint}</span> : null}
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-label={label}
+          aria-checked={checked}
+          disabled={disabled}
+          onClick={() => onChange(!checked)}
+          class={`flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors duration-150 ${
+            checked ? 'justify-end bg-primary' : 'justify-start bg-outline-variant'
+          } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        >
+          <span class={`h-5 w-5 rounded-full shadow-sm ${checked ? 'bg-background' : 'bg-outline'}`} />
+        </button>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-label={label}
-        aria-checked={checked}
-        disabled={disabled}
-        onClick={() => onChange(!checked)}
-        class={`flex h-6 w-10 items-center rounded-full border border-outline-variant p-0.5 ${
-          checked ? 'justify-end bg-surface-container-high' : 'justify-start'
-        } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
-      >
-        <span class={`h-4 w-4 rounded-full ${checked ? 'bg-on-surface' : 'bg-outline'}`} />
-      </button>
-    </div>
+    </section>
   );
 }
 
@@ -70,38 +75,43 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
 
   return (
     <div class="fixed inset-0 z-20 flex justify-end">
-      <div class="absolute inset-0 bg-black/40" data-testid="drawer-backdrop" onClick={closeSettings} />
+      <div class="absolute inset-0 bg-black/50" data-testid="drawer-backdrop" onClick={closeSettings} />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
-        class="relative flex h-full w-[360px] flex-col gap-6 overflow-y-auto border-l border-outline-variant bg-surface-container-low p-6"
+        class="relative flex h-full w-[400px] flex-col overflow-y-auto border-l border-tomato-stroke bg-surface-container-high p-6"
       >
-        <div class="flex items-center justify-between">
-          <h2 class="text-base font-medium text-on-surface">Settings</h2>
+        <div class="flex items-center justify-between border-b border-outline-variant pb-5">
+          <h2 class="text-base font-medium leading-6 text-on-surface">Settings</h2>
           <button
             ref={closeRef}
             type="button"
             aria-label="Close settings"
             onClick={closeSettings}
-            class="flex h-8 w-8 items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-high"
+            class="flex items-center justify-center rounded-[4px] p-1 text-on-surface-variant transition-colors duration-150 hover:text-on-surface focus:outline-none focus-visible:ring-1 focus-visible:ring-outline"
           >
             <svg
-              width="16"
-              height="16"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              stroke-width="2"
+              stroke-linecap="round"
               aria-hidden="true"
             >
               <path d="M6 6l12 12M18 6 6 18" />
             </svg>
           </button>
         </div>
-        <section class="flex flex-col gap-2">
-          <h3 class="font-mono text-xs uppercase tracking-[0.02em] text-on-surface-variant">Theme</h3>
-          <div role="group" aria-label="Theme" class="flex rounded border border-outline-variant p-0.5">
+        <section class="flex flex-col gap-2.5 border-b border-outline-variant py-5">
+          <h3 class="font-mono text-[11px] uppercase leading-[14px] tracking-wider text-outline">Theme</h3>
+          <div
+            role="group"
+            aria-label="Theme"
+            class="flex w-full items-center gap-1 rounded-md border border-outline-variant bg-background p-1"
+          >
             {THEMES.map(({ value, label }) => {
               const selected = current.theme === value;
               return (
@@ -110,9 +120,9 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
                   type="button"
                   aria-pressed={selected}
                   onClick={() => updateSettings({ theme: value })}
-                  class={`flex-1 rounded-sm px-3 py-1 font-mono text-xs ${
+                  class={`flex-1 py-1.5 text-center font-mono text-xs transition-colors duration-150 ${
                     selected
-                      ? 'bg-surface-container-high text-on-surface'
+                      ? 'rounded-[4px] border-b-2 border-primary bg-surface-container-low font-medium text-on-surface'
                       : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
@@ -122,16 +132,20 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
             })}
           </div>
         </section>
-        <section class="flex flex-col">
-          <Toggle label="Sound" checked={current.sound} onChange={(sound) => updateSettings({ sound })} />
-          <Toggle
-            label="Notifications"
-            checked={current.notifications && !blocked}
-            disabled={blocked}
-            hint={blocked ? 'Blocked in browser' : undefined}
-            onChange={(notifications) => updateSettings({ notifications })}
-          />
-        </section>
+        <Toggle
+          label="Sound"
+          description="Play a sound when a phase ends"
+          checked={current.sound}
+          onChange={(sound) => updateSettings({ sound })}
+        />
+        <Toggle
+          label="Notifications"
+          description="Browser notification when a phase ends"
+          checked={current.notifications && !blocked}
+          disabled={blocked}
+          hint={blocked ? 'Blocked in browser' : undefined}
+          onChange={(notifications) => updateSettings({ notifications })}
+        />
         <RolesSection />
       </div>
     </div>
