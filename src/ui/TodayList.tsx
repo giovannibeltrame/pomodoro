@@ -1,35 +1,16 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import { QUADRANTS, type PhaseRecord, type Quadrant } from '../domain/timer';
 import { clock, entries, phaseLength, totals, type Entry } from '../domain/today';
 import { activeRoles, editPhase, removePhase, roles, todayRecords } from '../state/signals';
 import type { PhaseEdit } from '../state/storage';
-import { EditIcon, strokeIcon } from './icons';
+import { DeleteIcon, EditIcon } from './icons';
+import { RowMenu } from './RowMenu';
 
 type Mode = 'view' | 'menu' | 'edit' | 'confirm';
 
 const field =
   'h-8 w-full rounded border border-outline-variant bg-surface-container px-2 text-xs text-on-surface placeholder:text-outline';
 const action = 'rounded border border-outline-variant px-2 py-1 text-xs text-on-surface hover:bg-surface-container';
-
-function DeleteIcon() {
-  return (
-    <svg width={14} height={14} {...strokeIcon}>
-      <path d="M3 6h18" />
-      <path d="M8 6V4h8v2" />
-      <path d="M19 6l-1 14H6L5 6" />
-    </svg>
-  );
-}
-
-function MoreIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <circle cx="5" cy="12" r="1.8" />
-      <circle cx="12" cy="12" r="1.8" />
-      <circle cx="19" cy="12" r="1.8" />
-    </svg>
-  );
-}
 
 function EditForm({ record, onDone }: { record: PhaseRecord; onDone: () => void }) {
   const [q, setQ] = useState<Quadrant | undefined>(record.quadrant);
@@ -114,78 +95,45 @@ function Separator() {
   return <span class="shrink-0 text-outline">·</span>;
 }
 
+function Intention({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-expanded={expanded}
+      title={text}
+      onClick={() => setExpanded(!expanded)}
+      class={`text-left text-xs leading-[18px] break-words text-on-surface ${expanded ? '' : 'line-clamp-2'}`}
+    >
+      {text}
+    </button>
+  );
+}
+
 function FocusRow({ entry }: { entry: Entry }) {
   const { record, rest } = entry;
   const [mode, setMode] = useState<Mode>('view');
-  const ref = useRef<HTMLLIElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const open = mode === 'menu';
-
-  useEffect(() => {
-    if (!open) return;
-    menuRef.current?.scrollIntoView?.({ block: 'nearest' });
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMode('view');
-    };
-    const onPointer = (event: MouseEvent) => {
-      if (!ref.current?.contains(event.target as Node)) setMode('view');
-    };
-    document.addEventListener('keydown', onKey);
-    document.addEventListener('mousedown', onPointer);
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.removeEventListener('mousedown', onPointer);
-    };
-  }, [open]);
-
   const browsing = mode === 'view' || open;
   const length = phaseLength(record);
   const role = roles.value.find((r) => r.id === record.roleId);
   const menu = (
-    <span class="relative -my-[3px] ml-auto flex shrink-0">
-      <button
-        type="button"
-        aria-label="Block actions"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setMode(open ? 'view' : 'menu')}
-        class={`flex items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
-      >
-        <MoreIcon />
-      </button>
-      {open && (
-        <div
-          ref={menuRef}
-          role="menu"
-          class="absolute top-full right-0 z-20 mt-1 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
-        >
-          <button
-            type="button"
-            role="menuitem"
-            class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-on-surface transition-colors hover:bg-outline-variant"
-            onClick={() => setMode('edit')}
-          >
-            <EditIcon width={14} height={14} />
-            <span>Edit</span>
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-q1 transition-colors hover:bg-outline-variant"
-            onClick={() => setMode('confirm')}
-          >
-            <DeleteIcon />
-            <span>Delete</span>
-          </button>
-        </div>
-      )}
-    </span>
+    <RowMenu
+      class="-my-[3px] ml-auto"
+      label="Block actions"
+      open={open}
+      onOpenChange={(next) => setMode(next ? 'menu' : 'view')}
+      revealOnHover
+      items={[
+        { label: 'Edit', icon: <EditIcon />, onSelect: () => setMode('edit') },
+        { label: 'Delete', icon: <DeleteIcon />, onSelect: () => setMode('confirm'), danger: true },
+      ]}
+    />
   );
   return (
     <li
       class={`today-row group -mx-2 flex gap-3 rounded px-2 py-2.5 ${browsing ? 'hover:bg-surface-container-high' : ''} ${open ? 'bg-surface-container-high' : ''}`}
       data-kind="focus"
-      ref={ref}
     >
       <Time record={record} />
       <div class="flex min-w-0 flex-1 flex-col gap-1">
@@ -216,11 +164,7 @@ function FocusRow({ entry }: { entry: Entry }) {
               )}
               {menu}
             </div>
-            {record.intention && (
-              <span class="line-clamp-2 text-xs leading-[18px] break-words text-on-surface" title={record.intention}>
-                {record.intention}
-              </span>
-            )}
+            {record.intention && <Intention text={record.intention} />}
           </>
         ) : (
           <>

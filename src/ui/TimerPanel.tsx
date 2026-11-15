@@ -115,7 +115,7 @@ export function TimerPanel() {
         <PhaseLabel state={state} />
       </div>
       <div
-        class={`mt-2 mb-6 font-mono text-[72px] leading-[72px] font-normal tracking-[-0.03em] tabular-nums ${state.status === 'paused' ? 'opacity-50' : ''}`}
+        class={`mt-2 mb-4 font-mono text-[56px] leading-[56px] sm:mb-6 sm:text-[72px] sm:leading-[72px] font-normal tracking-[-0.03em] tabular-nums ${state.status === 'paused' ? 'opacity-50' : ''}`}
         aria-live="off"
       >
         {formatClock(seconds)}

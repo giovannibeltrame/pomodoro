@@ -1,7 +1,7 @@
-import { useLayoutEffect, useRef } from 'preact/hooks';
 import { closeSettings, settings, updateSettings } from '../state/signals';
 import type { Settings } from '../state/storage';
 import { RolesSection } from './RolesSection';
+import { CloseButton, Sheet } from './Sheet';
 import { sectionLabel } from './styles';
 
 const THEMES: { value: Settings['theme']; label: string }[] = [
@@ -56,60 +56,20 @@ function Toggle({
 }
 
 export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLElement | null } }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const pressedInside = useRef(false);
-
-  useLayoutEffect(() => {
-    const dialog = ref.current;
-    dialog?.showModal();
-    const target = returnFocus;
-    return () => {
-      dialog?.close();
-      target.current?.focus();
-    };
-  }, [returnFocus]);
-
   const blocked = notificationsBlocked();
   const current = settings.value;
 
   return (
-    <dialog
-      ref={ref}
-      aria-label="Settings"
-      onCancel={(event) => {
-        event.preventDefault();
-        closeSettings();
-      }}
-      onMouseDown={(event) => {
-        pressedInside.current = event.target !== event.currentTarget;
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget && !pressedInside.current) closeSettings();
-      }}
-      class="m-0 ml-auto h-full max-h-none w-[400px] max-w-none border-0 border-l border-menu-border bg-menu-bg p-0 text-on-surface backdrop:bg-scrim"
+    <Sheet
+      label="Settings"
+      returnFocus={returnFocus}
+      onClose={closeSettings}
+      class="m-0 ml-auto h-full w-full border-l border-menu-border bg-menu-bg sm:w-[400px]"
     >
       <div class="flex h-full flex-col overflow-y-auto p-6">
         <div class="flex items-center justify-between border-b border-outline-variant pb-5">
           <h2 class="text-base font-medium leading-6 text-on-surface">Settings</h2>
-          <button
-            type="button"
-            aria-label="Close settings"
-            onClick={closeSettings}
-            class={`flex items-center justify-center rounded-[4px] p-1 text-on-surface-variant transition-colors duration-150 hover:text-on-surface focus:outline-none focus-visible:ring-1 focus-visible:ring-outline`}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
-          </button>
+          <CloseButton label="Close settings" onClose={closeSettings} />
         </div>
         <section class="flex flex-col gap-2.5 border-b border-outline-variant py-5">
           <h3 class={sectionLabel}>Theme</h3>
@@ -154,6 +114,6 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
         />
         <RolesSection />
       </div>
-    </dialog>
+    </Sheet>
   );
 }

@@ -79,7 +79,7 @@ spacing:
 
 ## Product
 
-Quadrantic Pomodoro is a single-page **desktop-only** web app (min width 1024px). There are no tablet or mobile layouts.
+Quadrantic Pomodoro is a single-page web app that works from a 360px-wide phone to a desktop, by touch or mouse.
 
 One main screen:
 - top bar: wordmark "QUADRANTIC" + muted "POMODORO", a `Classic | Deep` segmented toggle, a settings gear;
@@ -87,6 +87,19 @@ One main screen:
 - right panel (340px): the "Today" list, which scrolls on its own.
 
 Settings opens as a drawer over the main screen.
+
+## Layout
+
+The breakpoints follow the Material 3 window size classes: they depend on the window, not on the device.
+
+- **Below 600px** (phones in portrait): one column. The top bar hides "POMODORO". The tomato is 96px and the timer 56px. The quadrant cards wrap two to a row, 48px tall, without descriptors. Today opens as a bottom sheet, 80% of the screen tall. The settings drawer is full width.
+- **600px to 1023px** (tablets, split windows): one column at desktop sizes. Today opens as a 340px side sheet from the right.
+- **From 1024px**: the Today panel is docked on the right, and the Today button is hidden. An open Today sheet closes when the window reaches this width.
+- **Below 480px tall** (phones in landscape): the tomato is 64px and the main column scrolls if it still overflows.
+
+Below 1024px a list icon in the top bar, left of the gear, opens the Today sheet. The sheet has a close button, and Escape or a tap on the scrim closes it.
+
+On touch screens (`pointer: coarse`), every control has a hit area of at least 44×44px, and hover-only reveals stay visible.
 
 There is **no** quadrant matrix, **no** 2x2 grid, **no** task lists, **no** checkboxes, **no** charts, **no** history, **no** footer, **no** status indicators.
 
@@ -139,12 +152,12 @@ Focus is neutral. Breaks get a faint green tint on the canvas (`#10b981` at 4–
 - **Today panel**: secondary, small text.
   - Heading "Today", a mono totals line `4 blocks · 3h20`, then a divider. Only the rows below it scroll.
   - Rows, newest first, each led by its start time in a muted mono column:
-    - Focus: `09:40  Focus 50m · Builder · [Q2]`, where `[Q2]` is a colored chip; the intention below, up to two lines, in full on hover; then the break that followed it, muted: `+ Break 10m`.
+    - Focus: `09:40  Focus 50m · Builder · [Q2]`, where `[Q2]` is a colored chip; the intention below, up to two lines, in full on hover or after a tap; then the break that followed it, muted: `+ Break 10m`.
     - A break with no focus block before it (muted): `10:30  Break 10m`.
-  - Focus rows show a `⋯` menu on hover (Edit, Delete).
+  - Focus rows show a `⋯` menu on hover (Edit, Delete); on a screen without hover it is always visible.
   - Empty state: "No blocks yet today. Start your first focus block."
 - **Settings drawer** (right side), sections:
   - Theme: System / Light / Dark.
   - Sound toggle.
   - Notifications toggle (may show "Blocked in browser").
-  - Roles: list with drag handle, rename, archive; "Add role"; collapsed "Archived" group with restore.
+  - Roles: list with drag handle and a `⋯` menu per row (Edit, Archive, Move up, Move down; Move up and Move down are disabled at the ends); "Add role"; collapsed "Archived" group with restore.

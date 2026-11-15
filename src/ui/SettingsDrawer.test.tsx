@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { settings, settingsView } from '../state/signals';
 import { readSettings } from '../state/storage';
 import { App } from './App';
+import { classes } from '../test/classes';
 
 beforeEach(() => {
   localStorage.clear();
@@ -114,4 +115,11 @@ test('notifications are disabled and read "Blocked in browser" when permission i
   const toggle = screen.getByRole('switch', { name: 'Notifications' }) as HTMLButtonElement;
   expect(toggle.disabled).toBe(true);
   expect(screen.getByText('Blocked in browser')).toBeTruthy();
+});
+
+test('the drawer is full width on a phone and 400px from 600px', async () => {
+  await open();
+  expect(classes(screen.getByRole('dialog', { name: 'Settings' }))).toEqual(
+    expect.arrayContaining(['w-full', 'sm:w-[400px]']),
+  );
 });

@@ -10,5 +10,6 @@ export default defineConfig({
     environment: 'jsdom',
     env: { PTL_SKIP_AUTO_CLEANUP: 'true' },
     setupFiles: ['src/test/setup.ts'],
+    css: { include: [/theme\.css/] },
   },
 });

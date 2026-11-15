@@ -1,6 +1,7 @@
 import { cleanup, render } from '@testing-library/preact';
 import { expect, test } from 'vitest';
 import { Tomato, type TomatoProps } from './Tomato';
+import { classes } from '../test/classes';
 
 function draw(props: TomatoProps) {
   const { container } = render(<Tomato {...props} />);
@@ -9,10 +10,8 @@ function draw(props: TomatoProps) {
   return { svg, fill };
 }
 
-test('is a 180px inline SVG with a 1.5px stroke', () => {
+test('is an inline SVG with a 1.5px stroke', () => {
   const { svg } = draw({ kind: 'focus', status: 'idle', progress: 0 });
-  expect(svg.getAttribute('height')).toBe('180');
-  expect(svg.getAttribute('width')).toBe('180');
   const outline = svg.querySelector('g[stroke-width]') as SVGGElement;
   expect(outline.getAttribute('stroke-width')).toBe('1.5');
   expect(outline.querySelectorAll('path').length).toBe(6);
@@ -53,4 +52,9 @@ test('breaks are static with no fill', () => {
       cleanup();
     }
   }
+});
+
+test('is 180px from 600px wide, 96px on a phone and 64px on a short screen', () => {
+  const { svg } = draw({ kind: 'focus', status: 'idle', progress: 0 });
+  expect(classes(svg)).toEqual(expect.arrayContaining(['size-24', 'sm:size-[180px]', 'short:size-16']));
 });

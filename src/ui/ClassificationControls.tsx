@@ -45,7 +45,7 @@ export function ClassificationControls() {
   const dim = locked ? 'opacity-50' : '';
 
   return (
-    <section class="mt-8 flex w-full max-w-[620px] flex-col gap-5" aria-label="Classification">
+    <section class="mt-6 flex w-full max-w-[620px] flex-col gap-4 sm:mt-8 sm:gap-5" aria-label="Classification">
       <div class="flex flex-col gap-2">
         <div class="relative flex items-center justify-between">
           <span class={label}>Quadrant</span>
@@ -58,7 +58,7 @@ export function ClassificationControls() {
             </span>
           )}
         </div>
-        <div class="grid grid-cols-4 gap-3" role="group" aria-label="Quadrant">
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="group" aria-label="Quadrant">
           {QUADRANTS.map((q) => {
             const selected = shownQuadrant === q.id;
             const dimmed = locked && !selected;
@@ -69,7 +69,7 @@ export function ClassificationControls() {
                 aria-pressed={selected}
                 disabled={locked}
                 onClick={() => (quadrant.value = q.id)}
-                class={`flex h-[76px] flex-col justify-between rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-not-allowed ${dimmed ? 'opacity-45' : ''}`}
+                class={`flex h-12 flex-col justify-between sm:h-[76px] rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-not-allowed ${dimmed ? 'opacity-45' : ''}`}
                 style={
                   selected
                     ? {
@@ -85,7 +85,7 @@ export function ClassificationControls() {
                   </span>
                   <span class="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: `var(--q${q.id})` }} />
                 </span>
-                <span class="text-xs leading-tight text-outline">{q.descriptor}</span>
+                <span class="hidden text-xs leading-tight text-outline sm:block">{q.descriptor}</span>
               </button>
             );
           })}
