@@ -109,6 +109,10 @@ test('controls are locked with a lock icon while running or paused', async () =>
     expect((screen.getByRole('button', { name: /Q1/ }) as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByPlaceholderText('What will you work on?') as HTMLInputElement).value).toBe('x');
   }
+  for (const name of [/Q1/, /Q2/, /Q3/, /Q4/]) {
+    expect(screen.getByRole('button', { name }).className).toContain('disabled:cursor-not-allowed');
+  }
+  expect(role().className).toContain('disabled:cursor-not-allowed');
 });
 
 test('a running block keeps showing its role after that role is archived', async () => {

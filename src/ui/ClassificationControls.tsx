@@ -69,7 +69,7 @@ export function ClassificationControls() {
                 aria-pressed={selected}
                 disabled={locked}
                 onClick={() => (quadrant.value = q.id)}
-                class={`flex h-[76px] flex-col justify-between rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-default ${dimmed ? 'opacity-45' : ''}`}
+                class={`flex h-[76px] flex-col justify-between rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-not-allowed ${dimmed ? 'opacity-45' : ''}`}
                 style={
                   selected
                     ? {
