@@ -1,6 +1,7 @@
 import { computed, signal } from '@preact/signals';
 import {
   MINUTE,
+  newDay,
   reduce,
   restore,
   type Classification,
@@ -10,7 +11,7 @@ import {
   type TimerEvent,
   type TimerState,
 } from '../domain/timer';
-import { nextStartOfDay, todayPhases } from '../domain/today';
+import { isNewDay, nextStartOfDay, todayPhases } from '../domain/today';
 import { announcePhaseEnd, primeFeedback } from './feedback';
 import {
   addRole,
@@ -55,7 +56,10 @@ export function startDayWatch(): () => void {
   let id: ReturnType<typeof setTimeout>;
   const arm = () => {
     const current = Date.now();
-    if (nextStartOfDay(current) !== nextStartOfDay(now.value)) now.value = current;
+    if (nextStartOfDay(current) !== nextStartOfDay(now.value)) {
+      now.value = current;
+      enterNewDay(readTimer(settings.value.preset), current);
+    }
     id = setTimeout(arm, Math.max(1, Math.min(MINUTE, nextStartOfDay(current) - current)));
   };
   arm();
@@ -87,6 +91,7 @@ export function dispatch(event: TimerEvent, now: number = Date.now()): void {
     return;
   }
   commit(result.state, result.records);
+  enterNewDay(result.state, now);
   if (event.type === 'tick' && result.records.length > 0) {
     announcePhaseEnd(current.kind, result.state.kind, settings.value);
   }
@@ -158,11 +163,17 @@ export function selectPreset(preset: Preset): void {
   commit(reduce(current, { type: 'setPreset', preset }, Date.now()).state, []);
 }
 
+function enterNewDay(state: TimerState, now: number): void {
+  if (!isNewDay(phases.value, now)) return;
+  const next = newDay(state);
+  if (next !== state) commit(next, []);
+}
+
 export function restoreTimer(now: number = Date.now()): void {
   const stored = readTimer(settings.value.preset);
   const result = restore(stored, now);
-  if (result.state === stored && result.records.length === 0) return;
-  commit(result.state, result.records);
+  if (result.state !== stored || result.records.length > 0) commit(result.state, result.records);
+  enterNewDay(result.state, now);
 }
 
 function reloadKey(key: string): void {

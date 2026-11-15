@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatRow, todayPhases, totals } from './today';
+import { formatRow, isNewDay, todayPhases, totals } from './today';
 import type { PhaseKind, PhaseRecord } from './timer';
 
 const MIN = 60_000;
@@ -88,5 +88,26 @@ describe('formatRow', () => {
   it('shows at least 1m', () => {
     expect(formatRow(rec(at(9, 0), 10_000, 'break'), 0)).toContain('Break 1m');
     expect(formatRow(rec(at(9, 0), 0, 'break'), 0)).toContain('Break 1m');
+  });
+});
+
+describe('isNewDay', () => {
+  const now = at(9, 0);
+
+  it('is true when there are no records', () => {
+    expect(isNewDay([], now)).toBe(true);
+  });
+
+  it('is false when the latest record starts today, even if older ones do not', () => {
+    expect(isNewDay([rec(at(15, 10, 14), MIN), rec(at(8, 0), MIN)], now)).toBe(false);
+  });
+
+  it('is true when the latest record starts yesterday', () => {
+    expect(isNewDay([rec(at(8, 0, 13), MIN), rec(at(17, 0, 14), MIN)], now)).toBe(true);
+  });
+
+  it('treats a record starting at local midnight as today and one a millisecond earlier as yesterday', () => {
+    expect(isNewDay([rec(at(0, 0), MIN)], now)).toBe(false);
+    expect(isNewDay([rec(at(0, 0) - 1, MIN)], now)).toBe(true);
   });
 });

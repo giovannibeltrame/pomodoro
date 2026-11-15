@@ -25,6 +25,11 @@ export function todayPhases(records: readonly PhaseRecord[], now: number): Phase
   return records.filter((r) => r.start >= from && r.start < to).sort((a, b) => a.start - b.start);
 }
 
+export function isNewDay(records: readonly PhaseRecord[], now: number): boolean {
+  const from = startOfDay(now);
+  return records.every((r) => r.start < from);
+}
+
 export function totals(records: readonly PhaseRecord[]): string {
   const focus = records.filter((r) => r.kind === 'focus');
   const total = Math.round(focus.reduce((sum, r) => sum + r.activeMs, 0) / MINUTE);

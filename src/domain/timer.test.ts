@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   initialState,
+  newDay,
   reduce,
   remainingMs,
   restore,
@@ -402,5 +403,25 @@ describe('restore', () => {
     const { state, records } = restore(started, T0 + 900 * MIN);
     expect(records).toEqual([{ start: T0 + 200 * MIN, end: T0 + 215 * MIN, kind: 'longBreak', activeMs: 15 * MIN }]);
     expect(state).toMatchObject({ kind: 'focus', status: 'idle', position: 1 });
+  });
+});
+
+describe('newDay', () => {
+  it('moves an idle timer to block 1 of a focus, whatever it was at', () => {
+    expect(newDay({ ...initialState('classic'), kind: 'focus', position: 2 })).toEqual(initialState('classic'));
+    expect(newDay({ ...initialState('classic'), kind: 'break', position: 2 })).toEqual(initialState('classic'));
+    expect(newDay({ ...initialState('deep'), kind: 'longBreak', position: 2 })).toEqual(initialState('deep'));
+  });
+
+  it('returns the same state when an idle timer is already at block 1', () => {
+    const s = initialState('deep');
+    expect(newDay(s)).toBe(s);
+  });
+
+  it('leaves a running or paused phase alone', () => {
+    const running = startFocus(initialState('classic'));
+    expect(newDay(running)).toBe(running);
+    const paused = run(running, { type: 'pause' }, T0 + MIN).state;
+    expect(newDay(paused)).toBe(paused);
   });
 });
