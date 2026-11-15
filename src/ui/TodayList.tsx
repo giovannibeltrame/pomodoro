@@ -101,7 +101,20 @@ function Time({ record }: { record: PhaseRecord }) {
   return <span class={`w-9 shrink-0 ${meta}`}>{clock(record.start)}</span>;
 }
 
-function Row({ entry }: { entry: Entry }) {
+function BreakRow({ record }: { record: PhaseRecord }) {
+  return (
+    <li class="today-row flex gap-3 py-2.5" data-kind={record.kind}>
+      <Time record={record} />
+      <span class={meta}>{phaseLength(record)}</span>
+    </li>
+  );
+}
+
+function Separator() {
+  return <span class="shrink-0 text-outline">·</span>;
+}
+
+function FocusRow({ entry }: { entry: Entry }) {
   const { record, rest } = entry;
   const [mode, setMode] = useState<Mode>('view');
   const ref = useRef<HTMLLIElement>(null);
@@ -123,94 +136,25 @@ function Row({ entry }: { entry: Entry }) {
     };
   }, [open]);
 
+  const browsing = mode === 'view' || open;
   const length = phaseLength(record);
-  if (record.kind !== 'focus') {
-    return (
-      <li class="today-row flex gap-3 py-2.5" data-kind={record.kind}>
-        <Time record={record} />
-        <span class={meta}>{length}</span>
-      </li>
-    );
-  }
-  if (mode === 'edit' || mode === 'confirm') {
-    return (
-      <li class="today-row flex gap-3 py-2.5" data-kind="focus" ref={ref}>
-        <Time record={record} />
-        <div class="flex min-w-0 flex-1 flex-col gap-1">
-          <span class={meta}>{length}</span>
-          {mode === 'edit' ? (
-            <EditForm record={record} onDone={() => setMode('view')} />
-          ) : (
-            <>
-              <span class="text-xs text-on-surface">Delete this block?</span>
-              <div class="flex gap-2">
-                <button type="button" class={action} onClick={() => removePhase(record.start)}>
-                  Delete
-                </button>
-                <button type="button" class={action} onClick={() => setMode('view')}>
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </li>
-    );
-  }
   const role = roles.value.find((r) => r.id === record.roleId);
-  return (
-    <li
-      class={`today-row group relative -mx-2 flex gap-3 rounded px-2 py-2.5 hover:bg-surface-container-high ${open ? 'bg-surface-container-high' : ''}`}
-      data-kind="focus"
-      ref={ref}
-    >
-      <Time record={record} />
-      <div class="flex min-w-0 flex-1 flex-col gap-1">
-        <div class="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-xs leading-[18px]">
-          <span class={`shrink-0 ${meta}`}>{length}</span>
-          {role && (
-            <>
-              <span class="shrink-0 text-outline">·</span>
-              <span class="truncate text-on-surface-variant">{role.name}</span>
-            </>
-          )}
-          {record.quadrant && (
-            <>
-              <span class="shrink-0 text-outline">·</span>
-              <span
-                class="shrink-0 rounded px-1.5 py-0.5 font-mono text-[11px] leading-[14px] font-medium"
-                data-testid="chip"
-                style={{
-                  color: `var(--q${record.quadrant})`,
-                  backgroundColor: `color-mix(in srgb, var(--q${record.quadrant}) var(--chip-tint), transparent)`,
-                }}
-              >
-                {`Q${record.quadrant}`}
-              </span>
-            </>
-          )}
-          <button
-            type="button"
-            aria-label="Block actions"
-            aria-haspopup="menu"
-            aria-expanded={open}
-            onClick={() => setMode(open ? 'view' : 'menu')}
-            class={`-my-[3px] ml-auto flex shrink-0 items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <MoreIcon />
-          </button>
-        </div>
-        {record.intention && (
-          <span class="line-clamp-2 text-xs leading-[18px] break-words text-on-surface" title={record.intention}>
-            {record.intention}
-          </span>
-        )}
-        {rest && <span class={meta}>{`+ ${phaseLength(rest)}`}</span>}
-      </div>
+  const menu = (
+    <span class="relative -my-[3px] ml-auto flex shrink-0">
+      <button
+        type="button"
+        aria-label="Block actions"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setMode(open ? 'view' : 'menu')}
+        class={`flex items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface focus:opacity-100 group-hover:opacity-100 ${open ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <MoreIcon />
+      </button>
       {open && (
         <div
           role="menu"
-          class="absolute right-2 top-8 z-20 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
+          class="absolute top-full right-0 z-20 mt-1 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
         >
           <button
             type="button"
@@ -232,6 +176,71 @@ function Row({ entry }: { entry: Entry }) {
           </button>
         </div>
       )}
+    </span>
+  );
+  return (
+    <li
+      class={`today-row group -mx-2 flex gap-3 rounded px-2 py-2.5 ${browsing ? 'hover:bg-surface-container-high' : ''} ${open ? 'bg-surface-container-high' : ''}`}
+      data-kind="focus"
+      ref={ref}
+    >
+      <Time record={record} />
+      <div class="flex min-w-0 flex-1 flex-col gap-1">
+        {browsing ? (
+          <>
+            <div class="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-xs leading-[18px]">
+              <span class={`shrink-0 ${meta}`}>{length}</span>
+              {role && (
+                <>
+                  <Separator />
+                  <span class="truncate text-on-surface-variant">{role.name}</span>
+                </>
+              )}
+              {record.quadrant && (
+                <>
+                  <Separator />
+                  <span
+                    class="shrink-0 rounded px-1.5 py-0.5 font-mono text-[11px] leading-[14px] font-medium"
+                    data-testid="chip"
+                    style={{
+                      color: `var(--q${record.quadrant})`,
+                      backgroundColor: `color-mix(in srgb, var(--q${record.quadrant}) var(--chip-tint), transparent)`,
+                    }}
+                  >
+                    {`Q${record.quadrant}`}
+                  </span>
+                </>
+              )}
+              {menu}
+            </div>
+            {record.intention && (
+              <span class="line-clamp-2 text-xs leading-[18px] break-words text-on-surface" title={record.intention}>
+                {record.intention}
+              </span>
+            )}
+            {rest && <span class={meta}>{`+ ${phaseLength(rest)}`}</span>}
+          </>
+        ) : (
+          <>
+            <span class={meta}>{length}</span>
+            {mode === 'edit' ? (
+              <EditForm record={record} onDone={() => setMode('view')} />
+            ) : (
+              <>
+                <span class="text-xs text-on-surface">Delete this block?</span>
+                <div class="flex gap-2">
+                  <button type="button" class={action} onClick={() => removePhase(record.start)}>
+                    Delete
+                  </button>
+                  <button type="button" class={action} onClick={() => setMode('view')}>
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
     </li>
   );
 }
@@ -247,9 +256,13 @@ export function TodayList() {
         <p class="text-xs text-on-surface-variant">No blocks yet today. Start your first focus block.</p>
       ) : (
         <ol class="-mx-2 flex min-h-0 flex-col divide-y divide-outline-variant/60 overflow-y-auto px-2">
-          {entries(records).map((entry) => (
-            <Row key={entry.record.start} entry={entry} />
-          ))}
+          {entries(records).map((entry) =>
+            entry.record.kind === 'focus' ? (
+              <FocusRow key={entry.record.start} entry={entry} />
+            ) : (
+              <BreakRow key={entry.record.start} record={entry.record} />
+            ),
+          )}
         </ol>
       )}
     </section>

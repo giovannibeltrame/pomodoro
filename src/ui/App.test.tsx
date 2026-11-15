@@ -19,8 +19,8 @@ test('renders the shell: top bar, center column and Today panel', () => {
 });
 
 test('the shell fills the viewport and the main column scrolls on its own', () => {
-  render(<App />);
-  expect(screen.getByRole('main').parentElement!.parentElement!.className).toContain('h-screen');
+  const { container } = render(<App />);
+  expect((container.firstElementChild as HTMLElement).className).toContain('h-screen');
   expect(screen.getByRole('main').className).toContain('overflow-y-auto');
 });
 
