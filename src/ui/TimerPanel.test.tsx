@@ -111,6 +111,16 @@ test('+5 min and +10 min extend a paused break', async () => {
   expect(timer.value.extraMs).toBe(15 * 60_000);
 });
 
+test('+5 min extends a running break and keeps it running', async () => {
+  const user = userEvent.setup();
+  render(<TimerPanel />);
+  await act(() => setState({ kind: 'break', position: 2, ...running }));
+  await user.click(screen.getByRole('button', { name: '+5 min' }));
+  expect(timer.value.status).toBe('running');
+  expect(timer.value.extraMs).toBe(5 * 60_000);
+  expect(screen.getByText(/^(09:5\d|10:00)$/)).toBeTruthy();
+});
+
 test('Space starts, pauses and resumes', async () => {
   render(<TimerPanel />);
   const press = () => act(() => void fireEvent.keyDown(document.body, { code: 'Space', key: ' ' }));

@@ -146,22 +146,22 @@ export function TimerPanel() {
             Skip
           </button>
         )}
-        {!isFocus &&
-          state.status !== 'idle' &&
-          EXTENSIONS.map((minutes) => (
-            <button
-              key={minutes}
-              type="button"
-              class={`${secondary} uppercase`}
-              onClick={() => dispatch({ type: 'extend', ms: minutes * MINUTE })}
-            >
-              +{minutes} min
-            </button>
-          ))}
         {!isFocus && state.status !== 'idle' && (
-          <button type="button" class={`${secondary} uppercase`} onClick={() => dispatch({ type: 'endEarly' })}>
-            End break
-          </button>
+          <>
+            {EXTENSIONS.map((minutes) => (
+              <button
+                key={minutes}
+                type="button"
+                class={`${secondary} uppercase`}
+                onClick={() => dispatch({ type: 'extend', ms: minutes * MINUTE })}
+              >
+                +{minutes} min
+              </button>
+            ))}
+            <button type="button" class={`${secondary} uppercase`} onClick={() => dispatch({ type: 'endEarly' })}>
+              End break
+            </button>
+          </>
         )}
       </div>
     </section>
