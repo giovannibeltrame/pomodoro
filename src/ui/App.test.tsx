@@ -15,7 +15,13 @@ test('renders the shell: top bar, center column and Today panel', () => {
   expect(screen.getByText('POMODORO')).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Settings' })).toBeTruthy();
   expect(screen.getByRole('main', { name: 'Quadrantic Pomodoro' })).toBeTruthy();
-  expect(screen.getByRole('complementary', { name: 'Today' }).className).toContain('w-[300px]');
+  expect(screen.getByRole('complementary', { name: 'Today' }).className).toContain('w-[340px]');
+});
+
+test('the shell fills the viewport and the main column scrolls on its own', () => {
+  render(<App />);
+  expect(screen.getByRole('main').parentElement!.parentElement!.className).toContain('h-screen');
+  expect(screen.getByRole('main').className).toContain('overflow-y-auto');
 });
 
 test('the break tint is active only outside Focus', async () => {

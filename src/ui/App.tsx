@@ -13,7 +13,7 @@ const onBreak = computed(() => timer.value.kind !== 'focus');
 export function App() {
   const gearRef = useRef<HTMLButtonElement>(null);
   return (
-    <div class="relative flex min-h-screen flex-col bg-background text-on-surface">
+    <div class="relative flex h-screen flex-col bg-background text-on-surface">
       <div
         class="break-tint pointer-events-none absolute inset-0 bg-break-tint"
         data-testid="break-tint"
@@ -39,8 +39,8 @@ export function App() {
           </button>
         </div>
       </header>
-      <div class="relative flex flex-1">
-        <main aria-label="Quadrantic Pomodoro" class="flex-1 px-8 py-8">
+      <div class="relative flex min-h-0 flex-1">
+        <main aria-label="Quadrantic Pomodoro" class="flex-1 overflow-y-auto px-8 py-8">
           <div class="flex flex-col items-center">
             <TimerPanel />
             <ClassificationControls />
@@ -48,7 +48,7 @@ export function App() {
         </main>
         <aside
           aria-label="Today"
-          class="w-[300px] shrink-0 border-l border-outline-variant bg-surface-container-low p-6"
+          class="flex w-[340px] shrink-0 flex-col border-l border-outline-variant bg-surface-container-low p-6"
         >
           <TodayList />
         </aside>

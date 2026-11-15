@@ -168,6 +168,11 @@ On a Focus row, open Block actions, then Edit: change the quadrant, role and int
 `start` in `read('phases')` changes. Block actions, Delete, then Delete again removes it; Cancel keeps it. Break rows
 have no actions.
 
+Rows are newest first and start with the block's start time. A break folds into the focus row before it as a muted
+`+ Break 5m` line; a break with no focus before it is its own row, so `li` counts entries, not records. Seed 20 focus
+records with long intentions: the list scrolls while the heading and totals stay put, and an intention shows two
+lines, with the full text in its `title`.
+
 ### Roles
 
 In Settings, Add role, type a name, press Enter: `read('roles')` gains it. A duplicate name, ignoring case, shows
