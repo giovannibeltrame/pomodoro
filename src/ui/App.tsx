@@ -8,11 +8,9 @@ import { TimerPanel } from './TimerPanel';
 import { TodayList } from './TodayList';
 import { TodaySheet } from './TodaySheet';
 import { SettingsIcon, TodayIcon } from './icons';
+import { iconButton } from './styles';
 
 const onBreak = computed(() => timer.value.kind !== 'focus');
-
-const iconButton =
-  'touch-target flex items-center justify-center rounded p-1 text-on-surface-variant hover:text-on-surface';
 
 export function App() {
   const gearRef = useRef<HTMLButtonElement>(null);
@@ -42,7 +40,7 @@ export function App() {
             aria-label="Today"
             aria-haspopup="dialog"
             onClick={() => setTodayOpen(true)}
-            class={`${iconButton} lg:hidden`}
+            class={`${iconButton} p-1 lg:hidden`}
           >
             <TodayIcon />
           </button>
@@ -52,7 +50,7 @@ export function App() {
             aria-label="Settings"
             aria-haspopup="dialog"
             onClick={openSettings}
-            class={iconButton}
+            class={`${iconButton} p-1`}
           >
             <SettingsIcon width="18" height="18" />
           </button>

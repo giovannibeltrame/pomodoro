@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { settings, settingsView } from '../state/signals';
 import { readSettings } from '../state/storage';
 import { App } from './App';
+import { classes } from '../test/classes';
 
 beforeEach(() => {
   localStorage.clear();
@@ -118,6 +119,7 @@ test('notifications are disabled and read "Blocked in browser" when permission i
 
 test('the drawer is full width on a phone and 400px from 600px', async () => {
   await open();
-  const tokens = (screen.getByRole('dialog', { name: 'Settings' }).getAttribute('class') ?? '').split(/\s+/);
-  expect(tokens).toEqual(expect.arrayContaining(['w-full', 'sm:w-[400px]']));
+  expect(classes(screen.getByRole('dialog', { name: 'Settings' }))).toEqual(
+    expect.arrayContaining(['w-full', 'sm:w-[400px]']),
+  );
 });

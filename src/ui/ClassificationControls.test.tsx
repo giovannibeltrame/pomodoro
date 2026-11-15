@@ -6,6 +6,7 @@ import { readSettings, writeSettings, writeTimer, type Settings } from '../state
 import { dispatch, intention, quadrant, roleId, roles, settings, settingsView, timer } from '../state/signals';
 import { ClassificationControls } from './ClassificationControls';
 import { TimerPanel } from './TimerPanel';
+import { classes } from '../test/classes';
 
 const builder = { id: 'r1', name: 'Builder', archived: false, order: 0 };
 const manager = { id: 'r2', name: 'Manager', archived: false, order: 1 };
@@ -172,10 +173,9 @@ test('on load the quadrant and role come from settings.lastClassification', asyn
 
 test('on a phone the quadrant cards form a compact 2x2 grid without descriptors', () => {
   render(<App />);
-  const tokens = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
   const group = screen.getByRole('group', { name: 'Quadrant' });
-  expect(tokens(group)).toEqual(expect.arrayContaining(['grid-cols-2', 'sm:grid-cols-4']));
+  expect(classes(group)).toEqual(expect.arrayContaining(['grid-cols-2', 'sm:grid-cols-4']));
   const card = within(group).getAllByRole('button')[0] as HTMLElement;
-  expect(tokens(card)).toEqual(expect.arrayContaining(['h-12', 'sm:h-[76px]']));
-  expect(tokens(within(card).getByText('Urgent · Important'))).toEqual(expect.arrayContaining(['hidden', 'sm:block']));
+  expect(classes(card)).toEqual(expect.arrayContaining(['h-12', 'sm:h-[76px]']));
+  expect(classes(within(card).getByText('Urgent · Important'))).toEqual(expect.arrayContaining(['hidden', 'sm:block']));
 });

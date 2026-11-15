@@ -88,6 +88,7 @@
 
 @theme {
   --breakpoint-sm: 37.5rem;
+  --breakpoint-lg: 64rem;
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --radius: 0.25rem;
@@ -97,11 +98,15 @@
 @custom-variant short (@media (max-height: 30rem));
 @custom-variant can-hover (@media (hover: hover));
 
-@utility touch-target {
+@layer base {
   @media (pointer: coarse) {
-    position: relative;
+    button,
+    summary {
+      position: relative;
+    }
 
-    &::before {
+    button::before,
+    summary::before {
       content: '';
       position: absolute;
       top: 50%;
@@ -109,6 +114,11 @@
       width: max(100%, 2.75rem);
       height: max(100%, 2.75rem);
       translate: -50% -50%;
+    }
+
+    input,
+    select {
+      min-height: 2.75rem;
     }
   }
 }

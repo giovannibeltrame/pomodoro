@@ -5,6 +5,7 @@ import type { PhaseRecord } from '../domain/timer';
 import { now, phases, roles, startDayWatch } from '../state/signals';
 import { readPhases, recordPhase, resetMemory } from '../state/storage';
 import { TodayList } from './TodayList';
+import { classes } from '../test/classes';
 
 const at = (h: number, m: number, day = 8) => new Date(2026, 10, day, h, m).getTime();
 
@@ -258,7 +259,7 @@ test('delete asks inline, never window.confirm, and removes the record', async (
 test('the block menu button hides until hover only where the screen can hover', () => {
   seed(focus);
   render(<TodayList />);
-  const tokens = (screen.getByRole('button', { name: 'Block actions' }).getAttribute('class') ?? '').split(/\s+/);
+  const tokens = classes(screen.getByRole('button', { name: 'Block actions' }));
   expect(tokens).toContain('can-hover:opacity-0');
   expect(tokens).not.toContain('opacity-0');
 });

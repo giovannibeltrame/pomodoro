@@ -1,6 +1,7 @@
-import type { ComponentChildren } from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
+import type { ComponentChildren, RefObject } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { MoreIcon } from './icons';
+import { iconButton } from './styles';
 
 export interface RowMenuItem {
   label: string;
@@ -13,32 +14,44 @@ export interface RowMenuItem {
 export interface RowMenuProps {
   label: string;
   items: RowMenuItem[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  triggerRef?: RefObject<HTMLButtonElement | null>;
   revealOnHover?: boolean;
+  class?: string;
 }
 
 const reveal = 'can-hover:opacity-0 can-hover:group-hover:opacity-100 focus:opacity-100';
 
-export function RowMenu({ label, items, open, onOpenChange, revealOnHover = false }: RowMenuProps) {
+export function RowMenu({
+  label,
+  items,
+  open: controlled,
+  onOpenChange,
+  triggerRef,
+  revealOnHover = false,
+  class: className = '',
+}: RowMenuProps) {
+  const [own, setOwn] = useState(false);
+  const open = controlled ?? own;
+  const setOpen = useRef<(open: boolean) => void>(setOwn);
+  setOpen.current = onOpenChange ?? setOwn;
   const ref = useRef<HTMLSpanElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const ownTrigger = useRef<HTMLButtonElement>(null);
+  const trigger = triggerRef ?? ownTrigger;
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (open) menuRef.current?.scrollIntoView?.({ block: 'nearest' });
-  }, [open]);
-
-  useEffect(() => {
     if (!open) return;
+    menuRef.current?.scrollIntoView?.({ block: 'nearest' });
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       event.preventDefault();
-      onOpenChange(false);
-      triggerRef.current?.focus();
+      setOpen.current(false);
+      trigger.current?.focus();
     };
     const onPointer = (event: MouseEvent) => {
-      if (!ref.current?.contains(event.target as Node)) onOpenChange(false);
+      if (!ref.current?.contains(event.target as Node)) setOpen.current(false);
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('mousedown', onPointer);
@@ -46,24 +59,24 @@ export function RowMenu({ label, items, open, onOpenChange, revealOnHover = fals
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('mousedown', onPointer);
     };
-  }, [open, onOpenChange]);
+  }, [open, trigger]);
 
   const select = (item: RowMenuItem): void => {
-    onOpenChange(false);
-    triggerRef.current?.focus();
+    setOpen.current(false);
+    trigger.current?.focus();
     item.onSelect();
   };
 
   return (
-    <span ref={ref} class="relative flex shrink-0">
+    <span ref={ref} class={`relative flex shrink-0 ${className}`}>
       <button
-        ref={triggerRef}
+        ref={trigger}
         type="button"
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => onOpenChange(!open)}
-        class={`touch-target flex items-center justify-center rounded p-0.5 text-on-surface-variant hover:text-on-surface ${revealOnHover && !open ? reveal : ''}`}
+        onClick={() => setOpen.current(!open)}
+        class={`${iconButton} p-0.5 ${revealOnHover && !open ? reveal : ''}`}
       >
         <MoreIcon />
       </button>
@@ -80,7 +93,7 @@ export function RowMenu({ label, items, open, onOpenChange, revealOnHover = fals
               role="menuitem"
               disabled={item.disabled}
               onClick={() => select(item)}
-              class={`touch-target flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors pointer-coarse:py-3 enabled:hover:bg-outline-variant disabled:cursor-not-allowed disabled:opacity-50 ${item.danger ? 'text-q1' : 'text-on-surface'}`}
+              class={`flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors pointer-coarse:py-3 enabled:hover:bg-outline-variant disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-3.5 ${item.danger ? 'text-q1' : 'text-on-surface'}`}
             >
               {item.icon}
               <span>{item.label}</span>

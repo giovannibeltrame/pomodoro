@@ -3,25 +3,14 @@ import { QUADRANTS, type PhaseRecord, type Quadrant } from '../domain/timer';
 import { clock, entries, phaseLength, totals, type Entry } from '../domain/today';
 import { activeRoles, editPhase, removePhase, roles, todayRecords } from '../state/signals';
 import type { PhaseEdit } from '../state/storage';
-import { EditIcon, strokeIcon } from './icons';
+import { DeleteIcon, EditIcon } from './icons';
 import { RowMenu } from './RowMenu';
 
 type Mode = 'view' | 'menu' | 'edit' | 'confirm';
 
 const field =
-  'pointer-coarse:min-h-11 h-8 w-full rounded border border-outline-variant bg-surface-container px-2 text-xs text-on-surface placeholder:text-outline';
-const action =
-  'pointer-coarse:min-h-11 rounded border border-outline-variant px-2 py-1 text-xs text-on-surface hover:bg-surface-container';
-
-function DeleteIcon() {
-  return (
-    <svg width={14} height={14} {...strokeIcon}>
-      <path d="M3 6h18" />
-      <path d="M8 6V4h8v2" />
-      <path d="M19 6l-1 14H6L5 6" />
-    </svg>
-  );
-}
+  'h-8 w-full rounded border border-outline-variant bg-surface-container px-2 text-xs text-on-surface placeholder:text-outline';
+const action = 'rounded border border-outline-variant px-2 py-1 text-xs text-on-surface hover:bg-surface-container';
 
 function EditForm({ record, onDone }: { record: PhaseRecord; onDone: () => void }) {
   const [q, setQ] = useState<Quadrant | undefined>(record.quadrant);
@@ -44,7 +33,7 @@ function EditForm({ record, onDone }: { record: PhaseRecord; onDone: () => void 
             type="button"
             aria-pressed={q === n}
             onClick={() => setQ(n)}
-            class="flex-1 rounded border px-1 py-1 font-mono text-xs pointer-coarse:min-h-11"
+            class="flex-1 rounded border px-1 py-1 font-mono text-xs"
             style={
               q === n
                 ? { borderColor: `var(--q${n})`, color: `var(--q${n})` }
@@ -114,7 +103,7 @@ function Intention({ text }: { text: string }) {
       aria-expanded={expanded}
       title={text}
       onClick={() => setExpanded(!expanded)}
-      class={`touch-target text-left text-xs leading-[18px] break-words text-on-surface ${expanded ? '' : 'line-clamp-2'}`}
+      class={`text-left text-xs leading-[18px] break-words text-on-surface ${expanded ? '' : 'line-clamp-2'}`}
     >
       {text}
     </button>
@@ -129,18 +118,17 @@ function FocusRow({ entry }: { entry: Entry }) {
   const length = phaseLength(record);
   const role = roles.value.find((r) => r.id === record.roleId);
   const menu = (
-    <span class="-my-[3px] ml-auto flex shrink-0">
-      <RowMenu
-        label="Block actions"
-        open={open}
-        onOpenChange={(next) => setMode(next ? 'menu' : 'view')}
-        revealOnHover
-        items={[
-          { label: 'Edit', icon: <EditIcon width={14} height={14} />, onSelect: () => setMode('edit') },
-          { label: 'Delete', icon: <DeleteIcon />, onSelect: () => setMode('confirm'), danger: true },
-        ]}
-      />
-    </span>
+    <RowMenu
+      class="-my-[3px] ml-auto"
+      label="Block actions"
+      open={open}
+      onOpenChange={(next) => setMode(next ? 'menu' : 'view')}
+      revealOnHover
+      items={[
+        { label: 'Edit', icon: <EditIcon />, onSelect: () => setMode('edit') },
+        { label: 'Delete', icon: <DeleteIcon />, onSelect: () => setMode('confirm'), danger: true },
+      ]}
+    />
   );
   return (
     <li

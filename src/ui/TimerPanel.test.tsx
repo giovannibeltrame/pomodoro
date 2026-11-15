@@ -5,6 +5,7 @@ import { initialState, type TimerState } from '../domain/timer';
 import { writeTimer } from '../state/storage';
 import { quadrant, roleId, roles, timer } from '../state/signals';
 import { TimerPanel } from './TimerPanel';
+import { classes } from '../test/classes';
 
 const classification = { quadrant: 2 as const, roleId: 'r1' };
 
@@ -188,6 +189,5 @@ test('other keys do nothing', async () => {
 
 test('the clock is 56px on a phone and 72px from 600px', () => {
   render(<TimerPanel />);
-  const tokens = (screen.getByText('25:00').getAttribute('class') ?? '').split(/\s+/);
-  expect(tokens).toEqual(expect.arrayContaining(['text-[56px]', 'sm:text-[72px]']));
+  expect(classes(screen.getByText('25:00'))).toEqual(expect.arrayContaining(['text-[56px]', 'sm:text-[72px]']));
 });

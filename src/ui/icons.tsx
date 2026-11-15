@@ -33,9 +33,11 @@ export function SettingsIcon(props: JSX.IntrinsicSVGElements['svg']) {
   );
 }
 
-export function MoreIcon() {
+type IconProps = JSX.IntrinsicSVGElements['svg'];
+
+export function MoreIcon(props: IconProps) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
       <circle cx="5" cy="12" r="1.8" />
       <circle cx="12" cy="12" r="1.8" />
       <circle cx="19" cy="12" r="1.8" />
@@ -43,27 +45,55 @@ export function MoreIcon() {
   );
 }
 
-export function CloseIcon() {
+export function CloseIcon(props: IconProps) {
   return (
-    <svg width="20" height="20" {...strokeIcon}>
+    <svg width="20" height="20" {...strokeIcon} {...props}>
       <path d="M6 6l12 12M18 6 6 18" />
     </svg>
   );
 }
 
-export function TodayIcon() {
+export function TodayIcon(props: IconProps) {
   return (
-    <svg width="18" height="18" {...strokeIcon}>
+    <svg width="18" height="18" {...strokeIcon} {...props}>
       <path d="M9 6h11M9 12h11M9 18h11" />
       <path d="M4 6h.01M4 12h.01M4 18h.01" />
     </svg>
   );
 }
 
-export function ArrowIcon({ direction }: { direction: 'up' | 'down' }) {
+export function ArrowUpIcon(props: IconProps) {
   return (
-    <svg width={14} height={14} {...strokeIcon} class={direction === 'down' ? 'rotate-180' : ''}>
+    <svg {...strokeIcon} {...props}>
       <path d="M12 19V5M5 12l7-7 7 7" />
+    </svg>
+  );
+}
+
+export function ArrowDownIcon(props: IconProps) {
+  return (
+    <svg {...strokeIcon} {...props}>
+      <path d="M12 5v14M5 12l7 7 7-7" />
+    </svg>
+  );
+}
+
+export function DeleteIcon(props: IconProps) {
+  return (
+    <svg {...strokeIcon} {...props}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+    </svg>
+  );
+}
+
+export function ArchiveIcon(props: IconProps) {
+  return (
+    <svg {...strokeIcon} {...props}>
+      <polyline points="21 8 21 21 3 21 3 8" />
+      <rect x="1" y="3" width="22" height="5" />
+      <line x1="10" y1="12" x2="14" y2="12" />
     </svg>
   );
 }

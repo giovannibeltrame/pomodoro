@@ -23,7 +23,7 @@ function Chevron() {
 }
 
 const field =
-  'pointer-coarse:min-h-11 w-full appearance-none rounded border border-outline-variant bg-surface-container px-4 py-2.5 text-[13px] leading-5 placeholder:text-outline enabled:hover:border-tomato-stroke focus:outline-none focus-visible:ring-1 focus-visible:ring-outline disabled:cursor-not-allowed';
+  'w-full appearance-none rounded border border-outline-variant bg-surface-container px-4 py-2.5 text-[13px] leading-5 placeholder:text-outline enabled:hover:border-tomato-stroke focus:outline-none focus-visible:ring-1 focus-visible:ring-outline disabled:cursor-not-allowed';
 
 function Adornment({ locked }: { locked: boolean }) {
   return (
@@ -69,7 +69,7 @@ export function ClassificationControls() {
                 aria-pressed={selected}
                 disabled={locked}
                 onClick={() => (quadrant.value = q.id)}
-                class={`touch-target flex h-12 flex-col justify-between sm:h-[76px] rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-not-allowed ${dimmed ? 'opacity-45' : ''}`}
+                class={`flex h-12 flex-col justify-between sm:h-[76px] rounded-lg border bg-surface-container p-3 text-left enabled:hover:border-tomato-stroke disabled:cursor-not-allowed ${dimmed ? 'opacity-45' : ''}`}
                 style={
                   selected
                     ? {

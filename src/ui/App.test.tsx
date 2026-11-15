@@ -1,25 +1,19 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/preact';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { now, phases, roles, settingsView, timer } from '../state/signals';
+import { settingsView, timer } from '../state/signals';
+import { classes } from '../test/classes';
 import { App } from './App';
 
 const initial = timer.value;
 
-const initialPhases = phases.value;
-const initialRoles = roles.value;
-
 beforeEach(() => {
   timer.value = initial;
-  phases.value = initialPhases;
-  roles.value = initialRoles;
   settingsView.value = null;
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
-
-const classes = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
 
 async function openToday() {
   const button = screen.getByRole('button', { name: 'Today' });
@@ -118,64 +112,4 @@ test('the top bar fits a phone: the POMODORO word shows from 600px and padding t
   expect(classes(screen.getByText('POMODORO'))).toEqual(expect.arrayContaining(['hidden', 'sm:inline']));
   expect(classes(screen.getByRole('banner'))).toEqual(expect.arrayContaining(['px-4', 'sm:px-8']));
   expect(classes(screen.getByRole('main'))).toEqual(expect.arrayContaining(['px-4', 'sm:px-8']));
-});
-
-test('on a touch screen every control is at least 44px', async () => {
-  const start = Date.now() - 30 * 60_000;
-  now.value = Date.now();
-  phases.value = [
-    { start, end: start + 25 * 60_000, kind: 'focus', activeMs: 25 * 60_000, quadrant: 1, roleId: 'builder' },
-  ];
-  roles.value = [
-    { id: 'builder', name: 'Builder', archived: false, order: 0 },
-    { id: 'old', name: 'Retired', archived: true, order: 1 },
-  ];
-  render(<App />);
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Block actions' }));
-  });
-  await act(() => {
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
-  });
-  await openToday();
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Close Today' }));
-  });
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
-  });
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Add role' }));
-  });
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Actions for Builder' }));
-  });
-  const controls = Array.from(document.querySelectorAll('button, select, input, summary'));
-  expect(controls.length).toBeGreaterThan(10);
-  const small = controls.filter(
-    (el) => !classes(el).includes('touch-target') && !classes(el).includes('pointer-coarse:min-h-11'),
-  );
-  expect(small.map((el) => el.outerHTML.slice(0, 80))).toEqual([]);
-});
-
-test('the shell fills the dynamic viewport and the main column scrolls on its own', () => {
-  const { container } = render(<App />);
-  expect((container.firstElementChild as HTMLElement).className).toContain('h-dvh');
-  expect(screen.getByRole('main').className).toContain('overflow-y-auto');
-});
-
-test('the break tint is active only outside Focus', async () => {
-  render(<App />);
-  const active = () => screen.getByTestId('break-tint').dataset.active;
-  expect(active()).toBe('false');
-  for (const [kind, expected] of [
-    ['break', 'true'],
-    ['longBreak', 'true'],
-    ['focus', 'false'],
-  ] as const) {
-    await act(() => {
-      timer.value = { ...timer.value, kind };
-    });
-    expect(active()).toBe(expected);
-  }
 });

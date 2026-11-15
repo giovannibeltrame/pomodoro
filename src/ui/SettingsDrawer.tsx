@@ -44,7 +44,7 @@ function Toggle({
           aria-checked={checked}
           disabled={disabled}
           onClick={() => onChange(!checked)}
-          class={`touch-target flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors duration-150 ${
+          class={`flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors duration-150 ${
             checked ? 'justify-end bg-primary' : 'justify-start bg-outline-variant'
           } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
@@ -86,7 +86,7 @@ export function SettingsDrawer({ returnFocus }: { returnFocus: { current: HTMLEl
                   type="button"
                   aria-pressed={selected}
                   onClick={() => updateSettings({ theme: value })}
-                  class={`touch-target flex-1 py-1.5 text-center font-mono text-xs transition-colors duration-150 ${
+                  class={`flex-1 py-1.5 text-center font-mono text-xs transition-colors duration-150 ${
                     selected
                       ? 'rounded-[4px] border-b-2 border-primary bg-surface-container-low font-medium text-on-surface'
                       : 'text-on-surface-variant hover:text-on-surface'

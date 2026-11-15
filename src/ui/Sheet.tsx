@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import { CloseIcon } from './icons';
+import { iconButton } from './styles';
 
 export interface SheetProps {
   label: string;
@@ -51,7 +52,7 @@ export function CloseButton({ label, onClose }: { label: string; onClose: () => 
       type="button"
       aria-label={label}
       onClick={onClose}
-      class="touch-target flex items-center justify-center rounded-[4px] p-1 text-on-surface-variant transition-colors duration-150 hover:text-on-surface focus:outline-none focus-visible:ring-1 focus-visible:ring-outline"
+      class={`${iconButton} p-1 transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-outline`}
     >
       <CloseIcon />
     </button>
