@@ -84,7 +84,7 @@ Quadrantic Pomodoro is a single-page **desktop-only** web app (min width 1024px)
 One main screen:
 - top bar: wordmark "QUADRANTIC" + muted "POMODORO", a `Classic | Deep` segmented toggle, a settings gear;
 - center column: tomato progress indicator, phase label, timer, Start/Reset, classification (quadrant cards, role select, intention input);
-- right panel (300px): the "Today" list.
+- right panel (340px): the "Today" list, which scrolls on its own.
 
 Settings opens as a drawer over the main screen.
 
@@ -137,10 +137,10 @@ Focus is neutral. Breaks get a faint green tint on the canvas (`#10b981` at 4–
 - **Intention input**: single line, placeholder "What will you work on?".
 - **Locked classification**: while a focus block runs or is paused, the quadrant cards, the role select and the intention input are disabled and each shows a muted lock icon at its right edge, at 50% opacity: inside the field for the role and the intention, on the label row for the cards. The role and intention fields dim to 50%. The selected card keeps its border and tint at full opacity; the other cards dim to 45%.
 - **Today panel**: secondary, small text.
-  - Heading "Today", a mono totals line `4 blocks · 3h20 focus`, then a divider.
-  - Rows, oldest first:
-    - Focus: `#3 · 09:40–10:30 · Focus 50m · Builder · [Q2] · "intention…"`, where `[Q2]` is a colored chip and the intention is truncated.
-    - Break (muted): `#4 · 10:30–10:40 · Break 10m`.
+  - Heading "Today", a mono totals line `4 blocks · 3h20`, then a divider. Only the rows below it scroll.
+  - Rows, newest first, each led by its start time in a muted mono column:
+    - Focus: `09:40  Focus 50m · Builder · [Q2]`, where `[Q2]` is a colored chip; the intention below, up to two lines, in full on hover; then the break that followed it, muted: `+ Break 10m`.
+    - A break with no focus block before it (muted): `10:30  Break 10m`.
   - Focus rows show a `⋯` menu on hover (Edit, Delete).
   - Empty state: "No blocks yet today. Start your first focus block."
 - **Settings drawer** (right side), sections:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatRow, isNewDay, todayPhases, totals } from './today';
+import { clock, entries, isNewDay, phaseLength, todayPhases, totals } from './today';
 import type { PhaseKind, PhaseRecord } from './timer';
 
 const MIN = 60_000;
@@ -42,52 +42,82 @@ describe('todayPhases', () => {
 
 describe('totals', () => {
   it('reads singular for one block', () => {
-    expect(totals([rec(at(9, 0), 45 * MIN)])).toBe('1 block · 0h45 focus');
+    expect(totals([rec(at(9, 0), 45 * MIN)])).toBe('1 block · 0h45');
   });
 
   it('reads plural and pads minutes', () => {
     expect(totals([rec(at(9, 0), 50 * MIN), rec(at(10, 0), 50 * MIN), rec(at(11, 0), 5 * MIN)])).toBe(
-      '3 blocks · 1h45 focus',
+      '3 blocks · 1h45',
     );
-    expect(totals([rec(at(9, 0), 125 * MIN), rec(at(12, 0), 75 * MIN)])).toBe('2 blocks · 3h20 focus');
+    expect(totals([rec(at(9, 0), 125 * MIN), rec(at(12, 0), 75 * MIN)])).toBe('2 blocks · 3h20');
   });
 
   it('counts only focus records', () => {
     const rows = [rec(at(9, 0), 25 * MIN), rec(at(9, 25), 5 * MIN, 'break'), rec(at(9, 30), 15 * MIN, 'longBreak')];
-    expect(totals(rows)).toBe('1 block · 0h25 focus');
+    expect(totals(rows)).toBe('1 block · 0h25');
   });
 
   it('uses activeMs, not end minus start', () => {
-    expect(totals([rec(at(9, 0), 20 * MIN, 'focus', at(10, 0))])).toBe('1 block · 0h20 focus');
+    expect(totals([rec(at(9, 0), 20 * MIN, 'focus', at(10, 0))])).toBe('1 block · 0h20');
   });
 
   it('reads zero when there are no blocks', () => {
-    expect(totals([])).toBe('0 blocks · 0h00 focus');
+    expect(totals([])).toBe('0 blocks · 0h00');
   });
 });
 
-describe('formatRow', () => {
-  it('formats a focus line', () => {
-    expect(formatRow(rec(at(9, 40), 50 * MIN), 2)).toBe('#3 · 09:40–10:30 · Focus 50m');
-  });
-
-  it('formats a break and a long break', () => {
-    expect(formatRow(rec(at(10, 30), 10 * MIN, 'break'), 3)).toBe('#4 · 10:30–10:40 · Break 10m');
-    expect(formatRow(rec(at(10, 30), 15 * MIN, 'longBreak'), 3)).toBe('#4 · 10:30–10:45 · Long break 15m');
-  });
-
-  it('zero-pads clock times in 24-hour form', () => {
-    expect(formatRow(rec(at(0, 5), 25 * MIN), 0)).toBe('#1 · 00:05–00:30 · Focus 25m');
+describe('phaseLength', () => {
+  it('names the kind and its active minutes', () => {
+    expect(phaseLength(rec(at(9, 40), 50 * MIN))).toBe('Focus 50m');
+    expect(phaseLength(rec(at(10, 30), 10 * MIN, 'break'))).toBe('Break 10m');
+    expect(phaseLength(rec(at(10, 30), 15 * MIN, 'longBreak'))).toBe('Long break 15m');
   });
 
   it('rounds to the nearest minute', () => {
-    expect(formatRow(rec(at(9, 0), 24 * MIN + 29_000), 0)).toContain('Focus 24m');
-    expect(formatRow(rec(at(9, 0), 24 * MIN + 30_000), 0)).toContain('Focus 25m');
+    expect(phaseLength(rec(at(9, 0), 24 * MIN + 29_000))).toBe('Focus 24m');
+    expect(phaseLength(rec(at(9, 0), 24 * MIN + 30_000))).toBe('Focus 25m');
   });
 
   it('shows at least 1m', () => {
-    expect(formatRow(rec(at(9, 0), 10_000, 'break'), 0)).toContain('Break 1m');
-    expect(formatRow(rec(at(9, 0), 0, 'break'), 0)).toContain('Break 1m');
+    expect(phaseLength(rec(at(9, 0), 10_000, 'break'))).toBe('Break 1m');
+    expect(phaseLength(rec(at(9, 0), 0, 'break'))).toBe('Break 1m');
+  });
+});
+
+describe('clock', () => {
+  it('zero-pads 24-hour times', () => {
+    expect(clock(at(0, 5))).toBe('00:05');
+    expect(clock(at(14, 30))).toBe('14:30');
+  });
+});
+
+describe('entries', () => {
+  const focusA = rec(at(9, 0), 25 * MIN);
+  const breakA = rec(at(9, 25), 5 * MIN, 'break');
+  const focusB = rec(at(9, 30), 25 * MIN);
+  const longB = rec(at(9, 55), 15 * MIN, 'longBreak');
+
+  it('folds the break after a focus block into it, newest first', () => {
+    expect(entries([focusA, breakA, focusB, longB])).toEqual([
+      { record: focusB, rest: longB },
+      { record: focusA, rest: breakA },
+    ]);
+  });
+
+  it('keeps a focus block without a break on its own', () => {
+    expect(entries([focusA, focusB, longB])).toEqual([{ record: focusB, rest: longB }, { record: focusA }]);
+  });
+
+  it('keeps a break with no focus block before it on its own', () => {
+    expect(entries([breakA, focusB])).toEqual([{ record: focusB }, { record: breakA }]);
+  });
+
+  it('folds only the first of two breaks in a row', () => {
+    expect(entries([focusA, breakA, longB])).toEqual([{ record: longB }, { record: focusA, rest: breakA }]);
+  });
+
+  it('is empty for no records', () => {
+    expect(entries([])).toEqual([]);
   });
 });
 

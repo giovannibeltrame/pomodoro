@@ -43,30 +43,39 @@ afterEach(() => {
 test('empty day shows the heading, totals and the empty message', () => {
   render(<TodayList />);
   expect(screen.getByRole('heading', { name: 'Today' })).toBeTruthy();
-  expect(screen.getByText('0 blocks · 0h00 focus')).toBeTruthy();
+  expect(screen.getByText('0 blocks · 0h00')).toBeTruthy();
   expect(screen.getByText('No blocks yet today. Start your first focus block.')).toBeTruthy();
 });
 
-test('rows are oldest first and numbered from #1, with role, chip and intention', () => {
+test('rows are newest first, labelled by start time, with the break folded into its block', () => {
+  const second: PhaseRecord = { ...focus, start: at(10, 55), end: at(11, 20), activeMs: 25 * 60_000, quadrant: 1 };
+  phases.value = [second, focus, pause];
+  render(<TodayList />);
+  const rows = screen.getAllByRole('listitem');
+  expect(rows).toHaveLength(2);
+  expect(rows[0]!.textContent).toBe('10:55Focus 25m·Builder·Q1Write the spec');
+  expect(rows[1]!.textContent).toBe('09:40Focus 50m·Builder·Q2Write the spec+ Break 10m');
+  const chip = within(rows[1]!).getByTestId('chip');
+  expect(chip.textContent).toBe('Q2');
+  expect(chip.getAttribute('style')).toContain('var(--q2)');
+  expect(screen.queryByText(/#\d/)).toBeNull();
+  expect(screen.getByText('2 blocks · 1h15')).toBeTruthy();
+});
+
+test('a break with no focus block before it is its own muted row', () => {
   phases.value = [long, focus, pause];
   render(<TodayList />);
   const rows = screen.getAllByRole('listitem');
-  expect(rows).toHaveLength(3);
-  expect(within(rows[0]!).getByText('#1 · 09:40–10:30 · Focus 50m')).toBeTruthy();
-  expect(within(rows[0]!).getByText('Builder')).toBeTruthy();
-  const chip = within(rows[0]!).getByTestId('chip');
-  expect(chip.textContent).toBe('Q2');
-  expect(chip.getAttribute('style')).toContain('var(--q2)');
-  expect(within(rows[0]!).getByText('"Write the spec"')).toBeTruthy();
-  expect(rows[1]!.textContent).toBe('#2 · 10:30–10:40 · Break 10m');
-  expect(rows[2]!.textContent).toBe('#3 · 10:40–10:55 · Long break 15m');
-  expect(screen.getByText('1 block · 0h50 focus')).toBeTruthy();
+  expect(rows).toHaveLength(2);
+  expect(rows[0]!.textContent).toBe('10:40Long break 15m');
+  expect(rows[0]!.dataset.kind).toBe('longBreak');
+  expect(within(rows[0]!).queryByRole('button')).toBeNull();
 });
 
-test('a row without an intention omits the quoted part', () => {
+test('a row without an intention has no intention line', () => {
   phases.value = [{ ...focus, intention: undefined }];
   render(<TodayList />);
-  expect(screen.getByRole('listitem').textContent).not.toContain('"');
+  expect(screen.getByRole('listitem').textContent).toBe('09:40Focus 50m·Builder·Q2');
 });
 
 test('an archived role still shows its name', () => {
@@ -75,13 +84,57 @@ test('an archived role still shows its name', () => {
   expect(screen.getByText('Retired')).toBeTruthy();
 });
 
-test('rows never wrap and the intention truncates', () => {
+test('the intention wraps to two lines and shows in full on hover', () => {
+  const intention = 'Draft the ADR for the storage layer, the sync model and the alarm worker';
+  phases.value = [{ ...focus, intention }];
+  render(<TodayList />);
+  const text = screen.getByText(intention);
+  expect(text.className).toContain('line-clamp-2');
+  expect(text.className).not.toContain('truncate');
+  expect(text.getAttribute('title')).toBe(intention);
+});
+
+test('the list scrolls on its own below the heading and totals', () => {
   phases.value = [focus];
   render(<TodayList />);
-  const row = screen.getByRole('listitem');
-  expect(within(row).getByText('#1 · 09:40–10:30 · Focus 50m').className).toContain('truncate');
-  expect(within(row).getByText('"Write the spec"').className).toContain('truncate');
-  expect(within(row).getByText('Builder').parentElement!.className).toContain('whitespace-nowrap');
+  expect(screen.getByRole('list').className).toContain('overflow-y-auto');
+  expect(screen.getByRole('list').contains(screen.getByRole('heading', { name: 'Today' }))).toBe(false);
+});
+
+test('the list fills the panel so a short list has room for the block menu', () => {
+  phases.value = [focus];
+  render(<TodayList />);
+  expect(screen.getByRole('list').className).toContain('flex-1');
+});
+
+test('opening the block menu scrolls it into view within the list', async () => {
+  const user = userEvent.setup();
+  const original = (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+  const calls: { target: Element; options: unknown }[] = [];
+  Element.prototype.scrollIntoView = function (this: Element, options?: unknown) {
+    calls.push({ target: this, options });
+  };
+  try {
+    seed(focus);
+    render(<TodayList />);
+    await user.click(screen.getByRole('button', { name: 'Block actions' }));
+    expect(calls).toEqual([{ target: screen.getByRole('menu'), options: { block: 'nearest' } }]);
+  } finally {
+    (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = original;
+  }
+});
+
+test('the folded break stays visible while its block is edited or confirmed for delete', async () => {
+  const user = userEvent.setup();
+  seed(focus, pause);
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+  expect(screen.getByText('+ Break 10m')).toBeTruthy();
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+  expect(screen.getByText('+ Break 10m')).toBeTruthy();
 });
 
 test('phases from another day are not listed', () => {
@@ -154,7 +207,7 @@ test('editing saves quadrant, role and intention and keeps the times', async () 
   await user.type(input, 'Fixed');
   await user.click(screen.getByRole('button', { name: 'Save' }));
   expect(readPhases()).toEqual([{ ...focus, quadrant: 4, roleId: 'writer', intention: 'Fixed' }]);
-  expect(screen.getByText('"Fixed"')).toBeTruthy();
+  expect(screen.getByText('Fixed')).toBeTruthy();
   expect(screen.getByText('Writer')).toBeTruthy();
   expect(screen.queryByTestId('edit-form')).toBeNull();
 });
@@ -199,5 +252,5 @@ test('delete asks inline, never window.confirm, and removes the record', async (
   await user.click(screen.getByRole('button', { name: 'Delete' }));
   expect(readPhases()).toEqual([pause]);
   expect(confirm).not.toHaveBeenCalled();
-  expect(screen.getAllByRole('listitem')).toHaveLength(1);
+  expect(screen.getAllByRole('listitem').map((row) => row.textContent)).toEqual(['10:30Break 10m']);
 });

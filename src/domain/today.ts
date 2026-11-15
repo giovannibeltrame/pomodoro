@@ -14,7 +14,7 @@ function minutes(ms: number): number {
   return Math.max(1, Math.round(ms / MINUTE));
 }
 
-function clock(ms: number): string {
+export function clock(ms: number): string {
   const d = new Date(ms);
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
@@ -35,10 +35,24 @@ export function totals(records: readonly PhaseRecord[]): string {
   const total = Math.round(focus.reduce((sum, r) => sum + r.activeMs, 0) / MINUTE);
   const mm = String(total % 60).padStart(2, '0');
   const noun = focus.length === 1 ? 'block' : 'blocks';
-  return `${focus.length} ${noun} · ${Math.floor(total / 60)}h${mm} focus`;
+  return `${focus.length} ${noun} · ${Math.floor(total / 60)}h${mm}`;
 }
 
-export function formatRow(record: PhaseRecord, index: number): string {
-  const label = PHASE_LABEL[record.kind];
-  return `#${index + 1} · ${clock(record.start)}–${clock(record.end)} · ${label} ${minutes(record.activeMs)}m`;
+export function phaseLength(record: PhaseRecord): string {
+  return `${PHASE_LABEL[record.kind]} ${minutes(record.activeMs)}m`;
+}
+
+export interface Entry {
+  record: PhaseRecord;
+  rest?: PhaseRecord;
+}
+
+export function entries(records: readonly PhaseRecord[]): Entry[] {
+  const list: Entry[] = [];
+  for (const record of records) {
+    const last = list.at(-1);
+    if (record.kind !== 'focus' && last?.record.kind === 'focus' && !last.rest) last.rest = record;
+    else list.push({ record });
+  }
+  return list.reverse();
 }
