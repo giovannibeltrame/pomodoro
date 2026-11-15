@@ -12,3 +12,11 @@ startAlarm();
 startDayWatch();
 
 render(<App />, document.getElementById('app')!);
+
+if (import.meta.env.DEV) {
+  void import('./ui/prototype/ThemeLab').then(({ ThemeLab }) => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    render(<ThemeLab />, host);
+  });
+}
