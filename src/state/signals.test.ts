@@ -1,20 +1,37 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { initialState, PRESETS, reduce } from '../domain/timer';
+import { initialState, PRESETS, reduce, type PhaseRecord } from '../domain/timer';
 import { startAlarm, type AlarmWorker } from './alarm';
 import {
   dispatch,
   handleStorage,
   intention,
+  now as nowSignal,
   phases,
   quadrant,
   restoreTimer,
   roleId,
   roles,
   settings,
+  startDayWatch,
   startSync,
   timer,
 } from './signals';
-import { KEYS, readPhases, readRoles, readSettings, resetMemory, writeSettings, writeTimer } from './storage';
+import {
+  KEYS,
+  readPhases,
+  readRoles,
+  readSettings,
+  readTimer,
+  resetMemory,
+  writeSettings,
+  writeTimer,
+} from './storage';
+
+const MIN = 60_000;
+
+function rec(start: number, activeMs: number): PhaseRecord {
+  return { start, end: start + activeMs, kind: 'focus', activeMs };
+}
 
 const classification = { quadrant: 2 as const, roleId: 'builder' };
 const T0 = 1_700_000_000_000;
@@ -133,6 +150,54 @@ describe('phase end in several tabs', () => {
     restoreTimer(T0 + PRESETS.classic.focus + 60_000);
     expect(quadrant.value).toBe(classification.quadrant);
     expect(roleId.value).toBe(classification.roleId);
+  });
+
+  it('starts the block counter at 1 on a new day when the stored timer stopped mid-cycle', () => {
+    const yesterday = new Date(2026, 10, 14, 10).getTime();
+    const now = new Date(2026, 10, 15, 9).getTime();
+    phases.value = [rec(yesterday, 25 * MIN)];
+    writeTimer({ ...initialState('classic'), position: 2 });
+    restoreTimer(now);
+    expect(timer.value).toEqual(initialState('classic'));
+    expect(readTimer('classic')).toEqual(initialState('classic'));
+  });
+
+  it('starts the counter at block 1 when a block begun before midnight ends after it', () => {
+    const started = new Date(2026, 10, 14, 23, 50).getTime();
+    dispatch({ type: 'start', classification }, started);
+    dispatch({ type: 'tick' }, started + PRESETS.classic.focus);
+    expect(timer.value.kind).toBe('focus');
+    expect(timer.value.position).toBe(1);
+  });
+
+  it('keeps the block counter on the same day', () => {
+    const earlier = new Date(2026, 10, 15, 8).getTime();
+    const now = new Date(2026, 10, 15, 9).getTime();
+    phases.value = [rec(earlier, 25 * MIN)];
+    writeTimer({ ...initialState('classic'), position: 2 });
+    restoreTimer(now);
+    expect(readTimer('classic').position).toBe(2);
+  });
+});
+
+describe('day watch', () => {
+  it('resets an idle mid-cycle timer when the day changes while the app stays open', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2026, 10, 14, 23, 59, 30));
+      nowSignal.value = Date.now();
+      phases.value = [rec(new Date(2026, 10, 14, 10).getTime(), 25 * MIN)];
+      writeTimer({ ...initialState('classic'), position: 2 });
+      timer.value = initialState('classic');
+      const stop = startDayWatch();
+      vi.setSystemTime(new Date(2026, 10, 15, 0, 0, 5));
+      vi.advanceTimersByTime(MIN);
+      stop();
+      expect(timer.value).toEqual(initialState('classic'));
+      expect(readTimer('classic')).toEqual(initialState('classic'));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

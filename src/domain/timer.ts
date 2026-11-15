@@ -85,6 +85,11 @@ function idle(preset: Preset, kind: PhaseKind, position: number): TimerState {
   };
 }
 
+export function newDay(state: TimerState): TimerState {
+  if (state.status !== 'idle' || (state.kind === 'focus' && state.position === 1)) return state;
+  return initialState(state.preset);
+}
+
 export function remainingMs(state: TimerState, now: number): number {
   const total = durationMs(state.preset, state.kind);
   if (state.status === 'idle') return total;
