@@ -1,13 +1,17 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/preact';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { settingsView, timer } from '../state/signals';
+import { now, phases, roles, settingsView, timer } from '../state/signals';
 import { classes } from '../test/classes';
 import { App } from './App';
 
 const initial = timer.value;
+const initialPhases = phases.value;
+const initialRoles = roles.value;
 
 beforeEach(() => {
   timer.value = initial;
+  phases.value = initialPhases;
+  roles.value = initialRoles;
   settingsView.value = null;
 });
 
@@ -112,4 +116,59 @@ test('the top bar fits a phone: the POMODORO word shows from 600px and padding t
   expect(classes(screen.getByText('POMODORO'))).toEqual(expect.arrayContaining(['hidden', 'sm:inline']));
   expect(classes(screen.getByRole('banner'))).toEqual(expect.arrayContaining(['px-4', 'sm:px-8']));
   expect(classes(screen.getByRole('main'))).toEqual(expect.arrayContaining(['px-4', 'sm:px-8']));
+});
+
+test('the top bar fits a 360px phone: preset buttons and top bar icons sit closer below 600px', () => {
+  render(<App />);
+  for (const name of ['Classic', 'Deep']) {
+    expect(classes(screen.getByRole('button', { name }))).toEqual(expect.arrayContaining(['px-2', 'sm:px-3']));
+  }
+  const actions = screen.getByRole('button', { name: 'Today' }).parentElement as HTMLElement;
+  expect(classes(actions)).toEqual(expect.arrayContaining(['gap-2', 'sm:gap-6']));
+});
+
+test('an open block menu behind the settings drawer does not swallow Escape', async () => {
+  const start = Date.now() - 30 * 60_000;
+  now.value = Date.now();
+  phases.value = [
+    { start, end: start + 25 * 60_000, kind: 'focus', activeMs: 25 * 60_000, quadrant: 1, roleId: 'builder' },
+  ];
+  render(<App />);
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: 'Block actions' }));
+  });
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+  });
+  expect(screen.getByRole('menu')).toBeTruthy();
+  let notCancelled = false;
+  await act(() => {
+    notCancelled = fireEvent.keyDown(screen.getByRole('dialog', { name: 'Settings' }), {
+      key: 'Escape',
+      cancelable: true,
+    });
+  });
+  expect(notCancelled).toBe(true);
+});
+
+test('the shell fills the dynamic viewport and the main column scrolls on its own', () => {
+  const { container } = render(<App />);
+  expect(classes(container.firstElementChild as HTMLElement)).toContain('h-dvh');
+  expect(classes(screen.getByRole('main'))).toContain('overflow-y-auto');
+});
+
+test('the break tint is active only outside Focus', async () => {
+  render(<App />);
+  const active = () => screen.getByTestId('break-tint').dataset.active;
+  expect(active()).toBe('false');
+  for (const [kind, expected] of [
+    ['break', 'true'],
+    ['longBreak', 'true'],
+    ['focus', 'false'],
+  ] as const) {
+    await act(() => {
+      timer.value = { ...timer.value, kind };
+    });
+    expect(active()).toBe(expected);
+  }
 });

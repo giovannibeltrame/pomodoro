@@ -4,6 +4,7 @@ import { roles, settingsView } from '../state/signals';
 import { readRoles, resetMemory } from '../state/storage';
 import { App } from './App';
 import { RolesSection } from './RolesSection';
+import { classes } from '../test/classes';
 
 beforeEach(() => {
   localStorage.clear();
@@ -303,7 +304,7 @@ test('Move up and Move down reorder the role, persist and are disabled at the en
   expect((screen.getByRole('menuitem', { name: 'Move down' }) as HTMLButtonElement).disabled).toBe(false);
   await act(() => {
     const trigger = screen.getByRole('button', { name: 'Actions for Learner' });
-    fireEvent.mouseDown(trigger);
+    fireEvent.pointerDown(trigger);
     fireEvent.click(trigger);
   });
   expect((screen.getByRole('menuitem', { name: 'Move up' }) as HTMLButtonElement).disabled).toBe(false);
@@ -314,6 +315,33 @@ test('after a move the focus stays on the moved row menu button', async () => {
   render(<RolesSection />);
   await choose('Builder', 'Move down');
   expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Actions for Builder' }));
+  await choose('Builder', 'Move up');
+  expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Actions for Builder' }));
+});
+
+test('a pointer press outside the role menu closes it', async () => {
+  render(<RolesSection />);
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: 'Actions for Builder' }));
+  });
+  await act(() => {
+    fireEvent.pointerDown(screen.getByRole('heading', { name: 'Roles' }));
+  });
+  expect(screen.queryByRole('menu')).toBeNull();
+});
+
+test('a role row grows to fit a 44px touch input while renaming or adding', async () => {
+  render(<RolesSection />);
+  const input = await startRename('Builder');
+  expect(classes(input.parentElement as HTMLElement)).toEqual(expect.arrayContaining(['min-h-10']));
+  expect(classes(input.parentElement as HTMLElement)).not.toContain('h-10');
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: 'Add role' }));
+  });
+  const add = screen.getByRole('textbox', { name: 'New role name' });
+  expect(classes(add.parentElement as HTMLElement)).toEqual(expect.arrayContaining(['min-h-10']));
+  expect(classes(add.parentElement as HTMLElement)).not.toContain('h-10');
 });
 
 test('Escape closes the role menu without closing the drawer and returns focus to its button', async () => {

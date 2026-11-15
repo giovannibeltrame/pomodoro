@@ -46,18 +46,20 @@ export function RowMenu({
     menuRef.current?.scrollIntoView?.({ block: 'nearest' });
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
+      const modal = document.querySelector('dialog[open]');
+      if (modal && !modal.contains(ref.current)) return;
       event.preventDefault();
       setOpen.current(false);
       trigger.current?.focus();
     };
-    const onPointer = (event: MouseEvent) => {
+    const onPointer = (event: Event) => {
       if (!ref.current?.contains(event.target as Node)) setOpen.current(false);
     };
     document.addEventListener('keydown', onKey);
-    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('pointerdown', onPointer);
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('pointerdown', onPointer);
     };
   }, [open, trigger]);
 

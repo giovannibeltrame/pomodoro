@@ -92,7 +92,7 @@ Settings opens as a drawer over the main screen.
 
 The breakpoints follow the Material 3 window size classes: they depend on the window, not on the device.
 
-- **Below 600px** (phones in portrait): one column. The top bar hides "POMODORO". The tomato is 96px and the timer 56px. The quadrant cards form a 2×2 grid, 48px tall, without descriptors. Today opens as a bottom sheet, 80% of the screen tall. The settings drawer is full width.
+- **Below 600px** (phones in portrait): one column. The top bar hides "POMODORO". The tomato is 96px and the timer 56px. The quadrant cards wrap two to a row, 48px tall, without descriptors. Today opens as a bottom sheet, 80% of the screen tall. The settings drawer is full width.
 - **600px to 1023px** (tablets, split windows): one column at desktop sizes. Today opens as a 340px side sheet from the right.
 - **From 1024px**: the Today panel is docked on the right, and the Today button is hidden. An open Today sheet closes when the window reaches this width.
 - **Below 480px tall** (phones in landscape): the tomato is 64px and the main column scrolls if it still overflows.

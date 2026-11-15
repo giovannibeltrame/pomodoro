@@ -92,7 +92,7 @@ function ActiveRow({
       }}
       class="flex flex-col border-b border-outline-variant/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-outline"
     >
-      <div class="flex h-10 items-center gap-2.5">
+      <div class="flex min-h-10 items-center gap-2.5">
         <svg {...strokeIcon} class="h-4 w-4 shrink-0 cursor-grab text-outline">
           <circle cx="9" cy="5" r="1" />
           <circle cx="9" cy="12" r="1" />
@@ -182,7 +182,7 @@ function AddRow({ onDone }: { onDone: () => void }) {
 
   return (
     <li class="flex flex-col border-b border-outline-variant/60">
-      <div class="flex h-10 items-center gap-2">
+      <div class="flex min-h-10 items-center gap-2">
         <input
           ref={ref}
           type="text"
@@ -233,6 +233,7 @@ export function RolesSection() {
   const archived = roles.value.filter((r) => r.archived);
   const order = active.map((r) => r.id).join(',');
   const focusId = useRef<string | null>(null);
+  const focused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (settingsView.value === 'roles') sectionRef.current?.scrollIntoView?.({ block: 'start' });
@@ -243,7 +244,9 @@ export function RolesSection() {
     if (id === null) return;
     const rows = Array.from(listRef.current?.querySelectorAll<HTMLElement>('[data-role-id]') ?? []);
     const row = rows.find((r) => r.dataset.roleId === id);
-    if (row && document.activeElement !== row && !row.contains(document.activeElement)) row.focus();
+    if (!row || document.activeElement === row || row.contains(document.activeElement)) return;
+    const last = focused.current;
+    (last && row.contains(last) ? last : row).focus();
   }, [order]);
 
   return (
@@ -256,8 +259,10 @@ export function RolesSection() {
           dragId.current = null;
         }}
         onFocusIn={(event) => {
-          const row = (event.target as HTMLElement).closest<HTMLElement>('[data-role-id]');
+          const target = event.target as HTMLElement;
+          const row = target.closest<HTMLElement>('[data-role-id]');
           focusId.current = row?.dataset.roleId ?? null;
+          focused.current = target;
         }}
       >
         {active.map((role, index) => (

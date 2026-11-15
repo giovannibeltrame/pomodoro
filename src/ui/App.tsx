@@ -32,7 +32,7 @@ export function App() {
             POMODORO
           </span>
         </div>
-        <div class="flex items-center gap-3 sm:gap-6">
+        <div class="flex items-center gap-2 sm:gap-6">
           <PresetToggle />
           <button
             ref={todayRef}

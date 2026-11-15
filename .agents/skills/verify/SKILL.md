@@ -176,10 +176,11 @@ lines, with the full text in its `title`.
 ### Roles
 
 In Settings, Add role, type a name, press Enter: `read('roles')` gains it. A duplicate name, ignoring case, shows
-"Name already in use". Rename with the pencil (`Edit <name>`, then the `Rename <name>` input); Archive moves a role
-under Archived and Restore brings it back last. Alt+↑/↓ with focus on a row moves it. A role row shows its plain name;
-the rename input exists only after the pencil is clicked, so find the Add role input as the last `input` in the dialog
-after clicking Add role.
+"Name already in use". Each row's `Actions for <name>` menu holds Edit, Archive, Move up and Move down. Edit shows the
+`Rename <name>` input; Archive moves a role under Archived and Restore brings it back last; Move up and Move down
+reorder it and are disabled at the ends. Alt+↑/↓ with focus on a row moves it. A role row shows its plain name; the
+rename input exists only after Edit is chosen, so find the Add role input as the last `input` in the dialog after
+clicking Add role.
 
 Rows reorder by native drag and drop, which `left_click_drag` did not trigger. Dispatch the events instead:
 
