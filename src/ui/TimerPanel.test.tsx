@@ -185,3 +185,9 @@ test('other keys do nothing', async () => {
   await act(() => void fireEvent.keyDown(document.body, { code: 'Enter', key: 'Enter' }));
   expect(timer.value.status).toBe('idle');
 });
+
+test('the clock is 56px on a phone and 72px from 600px', () => {
+  render(<TimerPanel />);
+  const tokens = (screen.getByText('25:00').getAttribute('class') ?? '').split(/\s+/);
+  expect(tokens).toEqual(expect.arrayContaining(['text-[56px]', 'sm:text-[72px]']));
+});

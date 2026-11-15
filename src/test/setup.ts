@@ -8,4 +8,12 @@ HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
   this.removeAttribute('open');
 };
 
+window.matchMedia ??= (query: string) =>
+  ({
+    media: query,
+    matches: false,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }) as unknown as MediaQueryList;
+
 afterEach(() => act(cleanup));

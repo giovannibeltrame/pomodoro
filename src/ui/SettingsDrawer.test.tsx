@@ -115,3 +115,9 @@ test('notifications are disabled and read "Blocked in browser" when permission i
   expect(toggle.disabled).toBe(true);
   expect(screen.getByText('Blocked in browser')).toBeTruthy();
 });
+
+test('the drawer is full width on a phone and 400px from 600px', async () => {
+  await open();
+  const tokens = (screen.getByRole('dialog', { name: 'Settings' }).getAttribute('class') ?? '').split(/\s+/);
+  expect(tokens).toEqual(expect.arrayContaining(['w-full', 'sm:w-[400px]']));
+});

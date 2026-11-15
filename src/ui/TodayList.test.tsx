@@ -254,3 +254,25 @@ test('delete asks inline, never window.confirm, and removes the record', async (
   expect(confirm).not.toHaveBeenCalled();
   expect(screen.getAllByRole('listitem').map((row) => row.textContent)).toEqual(['10:30Break 10m']);
 });
+
+test('the block menu button hides until hover only where the screen can hover', () => {
+  seed(focus);
+  render(<TodayList />);
+  const tokens = (screen.getByRole('button', { name: 'Block actions' }).getAttribute('class') ?? '').split(/\s+/);
+  expect(tokens).toContain('can-hover:opacity-0');
+  expect(tokens).not.toContain('opacity-0');
+});
+
+test('a tap on a long intention shows it in full, and another tap folds it back', async () => {
+  const user = userEvent.setup();
+  const intention = 'Draft the ADR for the storage layer, the sync model and the alarm worker';
+  seed({ ...focus, intention });
+  render(<TodayList />);
+  const text = screen.getByRole('button', { name: intention });
+  expect(text.getAttribute('aria-expanded')).toBe('false');
+  await user.click(text);
+  expect(text.getAttribute('aria-expanded')).toBe('true');
+  expect(text.className).not.toContain('line-clamp-2');
+  await user.click(text);
+  expect(text.className).toContain('line-clamp-2');
+});

@@ -1,7 +1,7 @@
 # Quadrantic Pomodoro
 
-A desktop web app that runs Pomodoro cycles and tags each focus block with an Eisenhower quadrant and a role; all data
-stays in the browser. See the [README](README.md).
+A web app for phone, tablet and desktop that runs Pomodoro cycles and tags each focus block with an Eisenhower
+quadrant and a role; all data stays in the browser. See the [README](README.md).
 
 Stack ([ADR 0001](docs/adr/0001-frontend-stack.md)): Preact 11 with `@preact/signals`, strict TypeScript 6, Vite 8,
 Tailwind 4, Vitest 5 with Testing Library, ESLint 10, Prettier (`package.json`); Node 26 LTS and pnpm 12 (`mise.toml`).

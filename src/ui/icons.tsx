@@ -32,3 +32,38 @@ export function SettingsIcon(props: JSX.IntrinsicSVGElements['svg']) {
     </svg>
   );
 }
+
+export function MoreIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="19" cy="12" r="1.8" />
+    </svg>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <svg width="20" height="20" {...strokeIcon}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+export function TodayIcon() {
+  return (
+    <svg width="18" height="18" {...strokeIcon}>
+      <path d="M9 6h11M9 12h11M9 18h11" />
+      <path d="M4 6h.01M4 12h.01M4 18h.01" />
+    </svg>
+  );
+}
+
+export function ArrowIcon({ direction }: { direction: 'up' | 'down' }) {
+  return (
+    <svg width={14} height={14} {...strokeIcon} class={direction === 'down' ? 'rotate-180' : ''}>
+      <path d="M12 19V5M5 12l7-7 7 7" />
+    </svg>
+  );
+}

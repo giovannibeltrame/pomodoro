@@ -67,9 +67,9 @@ function PhaseLabel({ state }: { state: TimerState }) {
 }
 
 const primary =
-  'rounded bg-primary px-6 py-2 font-mono text-xs leading-4 font-medium tracking-wider text-on-primary uppercase select-none disabled:cursor-not-allowed disabled:border disabled:border-outline-variant disabled:bg-surface-container-low disabled:text-outline';
+  'touch-target rounded bg-primary px-6 py-2 font-mono text-xs leading-4 font-medium tracking-wider text-on-primary uppercase select-none disabled:cursor-not-allowed disabled:border disabled:border-outline-variant disabled:bg-surface-container-low disabled:text-outline';
 const secondary =
-  'ml-4 font-mono text-xs leading-4 font-medium tracking-[0.02em] text-outline transition-colors duration-150 hover:text-on-surface';
+  'touch-target ml-4 font-mono text-xs leading-4 font-medium tracking-[0.02em] text-outline transition-colors duration-150 hover:text-on-surface';
 
 export function TimerPanel() {
   const state = timer.value;
@@ -115,7 +115,7 @@ export function TimerPanel() {
         <PhaseLabel state={state} />
       </div>
       <div
-        class={`mt-2 mb-6 font-mono text-[72px] leading-[72px] font-normal tracking-[-0.03em] tabular-nums ${state.status === 'paused' ? 'opacity-50' : ''}`}
+        class={`mt-2 mb-4 font-mono text-[56px] leading-[56px] sm:mb-6 sm:text-[72px] sm:leading-[72px] font-normal tracking-[-0.03em] tabular-nums ${state.status === 'paused' ? 'opacity-50' : ''}`}
         aria-live="off"
       >
         {formatClock(seconds)}

@@ -24,6 +24,7 @@ export function Tomato({ kind, status, progress }: TomatoProps) {
       data-state={state}
       width="180"
       height="180"
+      class="size-24 sm:size-[180px] short:size-16"
       viewBox="0 0 32 32"
       fill="none"
       role="img"

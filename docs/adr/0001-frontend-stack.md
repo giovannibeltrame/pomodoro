@@ -2,7 +2,7 @@
 
 ## Context
 
-Quadrantic Pomodoro is a single-page, desktop-only web app with no backend. All data stays in the browser and the app must not make network requests. The UI has several interactive states: a running timer, a settings drawer, row menus with inline edit and confirm, drag-to-reorder roles, and light/dark themes. The approved design is in Stitch, which exports screens as Tailwind HTML.
+Quadrantic Pomodoro is a single-page web app with no backend. All data stays in the browser and the app must not make network requests. The UI has several interactive states: a running timer, a settings drawer, row menus with inline edit and confirm, drag-to-reorder roles, and light/dark themes. The approved design is in Stitch, which exports screens as Tailwind HTML.
 
 The timer has to be correct across reloads, hidden tabs and several open tabs, and the PRD requires unit tests for its logic.
 

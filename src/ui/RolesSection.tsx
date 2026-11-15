@@ -9,24 +9,38 @@ import {
   settingsView,
 } from '../state/signals';
 import type { Role } from '../state/storage';
-import { EditIcon, strokeIcon } from './icons';
+import { ArrowIcon, EditIcon, strokeIcon } from './icons';
+import { RowMenu } from './RowMenu';
 import { sectionLabel } from './styles';
+
+function ArchiveIcon() {
+  return (
+    <svg {...strokeIcon} class="h-3.5 w-3.5">
+      <polyline points="21 8 21 21 3 21 3 8" />
+      <rect x="1" y="3" width="22" height="5" />
+      <line x1="10" y1="12" x2="14" y2="12" />
+    </svg>
+  );
+}
 
 function ActiveRow({
   role,
   index,
+  last,
   onDragStart,
   onDropOn,
 }: {
   role: Role;
   index: number;
+  last: boolean;
   onDragStart: (id: string) => void;
   onDropOn: (index: number) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const finished = useRef(false);
-  const editRef = useRef<HTMLButtonElement>(null);
+  const rowRef = useRef<HTMLLIElement>(null);
   const refocus = useRef(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +51,7 @@ function ActiveRow({
       inputRef.current?.select();
     } else if (refocus.current) {
       refocus.current = false;
-      editRef.current?.focus();
+      rowRef.current?.querySelector<HTMLButtonElement>('[aria-haspopup="menu"]')?.focus();
     }
   }, [editing]);
 
@@ -64,6 +78,7 @@ function ActiveRow({
 
   return (
     <li
+      ref={rowRef}
       data-role-id={role.id}
       tabIndex={0}
       draggable
@@ -118,37 +133,39 @@ function ActiveRow({
                 finish();
               }
             }}
-            class="min-w-0 flex-1 border-b border-outline bg-transparent text-[13px] leading-5 text-on-surface outline-none"
+            class="min-w-0 flex-1 border-b border-outline bg-transparent pointer-coarse:min-h-11 text-[13px] leading-5 text-on-surface outline-none"
           />
         ) : (
           <span class="min-w-0 flex-1 truncate text-[13px] leading-5 text-on-surface">{role.name}</span>
         )}
-        <div class="flex items-center gap-3">
-          <button
-            ref={editRef}
-            type="button"
-            aria-label={`Edit ${role.name}`}
-            onClick={() => {
-              finished.current = false;
-              setEditing(true);
-            }}
-            class="text-outline transition-colors duration-150 hover:text-on-surface"
-          >
-            <EditIcon class="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            aria-label={`Archive ${role.name}`}
-            onClick={() => setRoleArchived(role.id, true)}
-            class="text-outline transition-colors duration-150 hover:text-on-surface"
-          >
-            <svg {...strokeIcon} class="h-3.5 w-3.5">
-              <polyline points="21 8 21 21 3 21 3 8" />
-              <rect x="1" y="3" width="22" height="5" />
-              <line x1="10" y1="12" x2="14" y2="12" />
-            </svg>
-          </button>
-        </div>
+        <RowMenu
+          label={`Actions for ${role.name}`}
+          open={menuOpen}
+          onOpenChange={setMenuOpen}
+          items={[
+            {
+              label: 'Edit',
+              icon: <EditIcon class="h-3.5 w-3.5" />,
+              onSelect: () => {
+                finished.current = false;
+                setEditing(true);
+              },
+            },
+            { label: 'Archive', icon: <ArchiveIcon />, onSelect: () => setRoleArchived(role.id, true) },
+            {
+              label: 'Move up',
+              icon: <ArrowIcon direction="up" />,
+              onSelect: () => moveRole(role.id, index - 1),
+              disabled: index === 0,
+            },
+            {
+              label: 'Move down',
+              icon: <ArrowIcon direction="down" />,
+              onSelect: () => moveRole(role.id, index + 1),
+              disabled: last,
+            },
+          ]}
+        />
       </div>
       {error ? (
         <span role="alert" class="font-mono text-xs text-on-surface-variant">
@@ -194,19 +211,19 @@ function AddRow({ onDone }: { onDone: () => void }) {
               onDone();
             }
           }}
-          class="min-w-0 flex-1 bg-transparent text-[13px] leading-5 text-on-surface outline-none placeholder:text-outline"
+          class="min-w-0 flex-1 bg-transparent text-[13px] leading-5 text-on-surface outline-none placeholder:text-outline pointer-coarse:min-h-11"
         />
         <button
           type="button"
           onClick={() => submit(ref.current?.value ?? '')}
-          class="font-mono text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
+          class="touch-target font-mono text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
         >
           Save
         </button>
         <button
           type="button"
           onClick={onDone}
-          class="font-mono text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
+          class="touch-target font-mono text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
         >
           Cancel
         </button>
@@ -261,6 +278,7 @@ export function RolesSection() {
             key={role.id}
             role={role}
             index={index}
+            last={index === active.length - 1}
             onDragStart={(id) => {
               dragId.current = id;
             }}
@@ -278,14 +296,14 @@ export function RolesSection() {
         aria-label="Add role"
         onClick={() => setAdding(true)}
         disabled={adding}
-        class="mt-1 flex h-9 w-full items-center justify-center rounded-[4px] border border-outline-variant text-xs text-on-surface-variant transition-colors duration-150 hover:border-tomato-stroke hover:text-on-surface disabled:opacity-50"
+        class="touch-target mt-1 flex h-9 w-full items-center justify-center rounded-[4px] border border-outline-variant text-xs text-on-surface-variant transition-colors duration-150 hover:border-tomato-stroke hover:text-on-surface disabled:opacity-50"
       >
         + Add role
       </button>
       {archived.length > 0 ? (
         <details class="group mt-3">
           <summary
-            class={`${sectionLabel} flex cursor-pointer list-none items-center gap-1.5 hover:text-on-surface-variant`}
+            class={`${sectionLabel} touch-target flex cursor-pointer list-none items-center gap-1.5 hover:text-on-surface-variant`}
           >
             <svg {...strokeIcon} class="h-3.5 w-3.5 -rotate-90 group-open:rotate-0">
               <polyline points="6 9 12 15 18 9" />
@@ -300,7 +318,7 @@ export function RolesSection() {
                   type="button"
                   aria-label={`Restore ${role.name}`}
                   onClick={() => setRoleArchived(role.id, false)}
-                  class="text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
+                  class="touch-target text-xs text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
                 >
                   Restore
                 </button>

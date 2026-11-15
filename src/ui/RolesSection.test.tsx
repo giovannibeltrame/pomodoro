@@ -92,9 +92,7 @@ test('Alt+arrow keys inside the rename input do not reorder', async () => {
 
 test('archive moves a role to the Archived group and restore appends it last', async () => {
   render(<RolesSection />);
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Archive Builder' }));
-  });
+  await choose('Builder', 'Archive');
   expect(names()).toEqual(['Manager', 'Learner']);
   const group = screen.getByText('Archived (1)').closest('details') as HTMLElement;
   expect(group.hasAttribute('open')).toBe(false);
@@ -105,10 +103,17 @@ test('archive moves a role to the Archived group and restore appends it last', a
   expect(screen.queryByText(/Archived/)).toBeNull();
 });
 
-async function startRename(name: string): Promise<HTMLInputElement> {
+async function choose(name: string, item: string) {
   await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: `Edit ${name}` }));
+    fireEvent.click(screen.getByRole('button', { name: `Actions for ${name}` }));
   });
+  await act(() => {
+    fireEvent.click(screen.getByRole('menuitem', { name: item }));
+  });
+}
+
+async function startRename(name: string): Promise<HTMLInputElement> {
+  await choose(name, 'Edit');
   return screen.getByRole('textbox', { name: `Rename ${name}` }) as HTMLInputElement;
 }
 
@@ -122,7 +127,7 @@ test('role rows show the plain name and an input only while renaming', async () 
     fireEvent.keyDown(input, { key: 'Escape' });
   });
   expect(screen.queryByRole('textbox', { name: /Rename/ })).toBeNull();
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Edit Builder' }));
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Actions for Builder' }));
   expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
 });
 
@@ -201,9 +206,7 @@ test('Add role appends an editable row, validates, then saves', async () => {
 
 test('an archived role name still blocks a duplicate', async () => {
   render(<RolesSection />);
-  await act(() => {
-    fireEvent.click(screen.getByRole('button', { name: 'Archive Builder' }));
-  });
+  await choose('Builder', 'Archive');
   await act(() => {
     fireEvent.click(screen.getByRole('button', { name: 'Add role' }));
   });
@@ -268,4 +271,65 @@ test('the gear opens the drawer without scrolling to Roles', async () => {
   } finally {
     (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = original;
   }
+});
+
+test('each role row has a menu with Edit, Archive, Move up and Move down', async () => {
+  render(<RolesSection />);
+  const trigger = screen.getByRole('button', { name: 'Actions for Manager' });
+  expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+  await act(() => {
+    fireEvent.click(trigger);
+  });
+  const menu = screen.getByRole('menu');
+  expect(
+    within(menu)
+      .getAllByRole('menuitem')
+      .map((item) => item.textContent),
+  ).toEqual(['Edit', 'Archive', 'Move up', 'Move down']);
+});
+
+test('Move up and Move down reorder the role, persist and are disabled at the ends', async () => {
+  render(<RolesSection />);
+  await choose('Builder', 'Move down');
+  expect(names()).toEqual(['Manager', 'Builder', 'Learner']);
+  expect(readRoles().map((r) => r.name)).toEqual(['Manager', 'Builder', 'Learner']);
+  await choose('Builder', 'Move up');
+  expect(names()).toEqual(['Builder', 'Manager', 'Learner']);
+
+  await act(() => {
+    fireEvent.click(screen.getByRole('button', { name: 'Actions for Builder' }));
+  });
+  expect((screen.getByRole('menuitem', { name: 'Move up' }) as HTMLButtonElement).disabled).toBe(true);
+  expect((screen.getByRole('menuitem', { name: 'Move down' }) as HTMLButtonElement).disabled).toBe(false);
+  await act(() => {
+    const trigger = screen.getByRole('button', { name: 'Actions for Learner' });
+    fireEvent.mouseDown(trigger);
+    fireEvent.click(trigger);
+  });
+  expect((screen.getByRole('menuitem', { name: 'Move up' }) as HTMLButtonElement).disabled).toBe(false);
+  expect((screen.getByRole('menuitem', { name: 'Move down' }) as HTMLButtonElement).disabled).toBe(true);
+});
+
+test('after a move the focus stays on the moved row menu button', async () => {
+  render(<RolesSection />);
+  await choose('Builder', 'Move down');
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Actions for Builder' }));
+});
+
+test('Escape closes the role menu without closing the drawer and returns focus to its button', async () => {
+  render(<RolesSection />);
+  const trigger = screen.getByRole('button', { name: 'Actions for Builder' });
+  await act(() => {
+    fireEvent.click(trigger);
+  });
+  let notCancelled = true;
+  await act(() => {
+    notCancelled = fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Edit' }), {
+      key: 'Escape',
+      cancelable: true,
+    });
+  });
+  expect(notCancelled).toBe(false);
+  expect(screen.queryByRole('menu')).toBeNull();
+  expect(document.activeElement).toBe(trigger);
 });

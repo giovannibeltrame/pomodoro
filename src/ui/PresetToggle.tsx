@@ -23,7 +23,7 @@ export function PresetToggle() {
             aria-pressed={selected}
             disabled={locked}
             onClick={() => selectPreset(value)}
-            class={`rounded px-3 py-1 font-mono text-xs leading-4 tracking-[0.02em] ${
+            class={`touch-target rounded px-3 py-1 font-mono text-xs leading-4 tracking-[0.02em] ${
               selected ? 'border-b-2 border-primary bg-surface-container-low font-medium text-primary' : 'text-outline'
             } ${locked ? 'cursor-not-allowed' : 'hover:text-on-surface'}`}
           >

@@ -54,3 +54,10 @@ test('breaks are static with no fill', () => {
     }
   }
 });
+
+test('shrinks to 96px on a phone and 64px on a short screen', () => {
+  const { svg } = draw({ kind: 'focus', status: 'idle', progress: 0 });
+  expect((svg.getAttribute('class') ?? '').split(/\s+/)).toEqual(
+    expect.arrayContaining(['size-24', 'sm:size-[180px]', 'short:size-16']),
+  );
+});
