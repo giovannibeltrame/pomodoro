@@ -149,11 +149,13 @@ With the timer idle and Start enabled, Space must leave it idle:
 
 The handler also skips a textarea and a `contenteditable`, which the app does not have.
 
-### Reset, Skip, End break
+### Reset, Skip, End break, extend
 
 - Reset on a running or paused Focus: an idle Focus at the same position, no record.
 - Skip on an idle Break: an idle Focus, no record.
 - End break on a running Break: an idle Focus and one `break` record whose `activeMs` is the time it ran.
+- +5 min and +10 min on a running or paused Break: the clock gains that time and `read('timer').extraMs` adds it up.
+  An idle Break and a Focus show neither.
 
 ### Preset
 

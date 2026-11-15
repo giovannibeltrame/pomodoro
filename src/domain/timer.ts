@@ -40,6 +40,7 @@ export interface TimerState {
   activeMs: number;
   segmentStart: number | null;
   classification: Classification | null;
+  extraMs?: number;
 }
 
 export type TimerEvent =
@@ -49,6 +50,7 @@ export type TimerEvent =
   | { type: 'reset' }
   | { type: 'skip' }
   | { type: 'endEarly' }
+  | { type: 'extend'; ms: number }
   | { type: 'tick' }
   | { type: 'setPreset'; preset: Preset };
 
@@ -64,8 +66,8 @@ export const PRESETS: Record<Preset, { focus: number; break: number; longBreak: 
   deep: { focus: 50 * MINUTE, break: 10 * MINUTE, longBreak: 15 * MINUTE, blocksPerCycle: 2 },
 };
 
-export function durationMs(preset: Preset, kind: PhaseKind): number {
-  return PRESETS[preset][kind];
+export function durationMs(state: TimerState): number {
+  return PRESETS[state.preset][state.kind] + (state.extraMs ?? 0);
 }
 
 export function initialState(preset: Preset): TimerState {
@@ -86,14 +88,14 @@ function idle(preset: Preset, kind: PhaseKind, position: number): TimerState {
 }
 
 export function remainingMs(state: TimerState, now: number): number {
-  const total = durationMs(state.preset, state.kind);
+  const total = durationMs(state);
   if (state.status === 'idle') return total;
   return Math.max(0, total - activeSoFar(state, now));
 }
 
 export function scheduledEnd(state: TimerState): number | null {
   if (state.status !== 'running' || state.segmentStart === null) return null;
-  return state.segmentStart + durationMs(state.preset, state.kind) - state.activeMs;
+  return state.segmentStart + durationMs(state) - state.activeMs;
 }
 
 function activeSoFar(state: TimerState, now: number): number {
@@ -138,7 +140,7 @@ export function reduce(state: TimerState, event: TimerEvent, now: number): Reduc
   if (end !== null && now >= end) {
     return {
       state: nextAfterCompletion(state),
-      records: [makeRecord(state, end, durationMs(state.preset, state.kind))],
+      records: [makeRecord(state, end, durationMs(state))],
     };
   }
 
@@ -196,6 +198,10 @@ export function reduce(state: TimerState, event: TimerEvent, now: number): Reduc
         state: nextAfterCompletion(state),
         records: [makeRecord(state, now, activeSoFar(state, now))],
       };
+    }
+    case 'extend': {
+      if (state.status === 'idle' || state.kind === 'focus') return unchanged;
+      return { state: { ...state, extraMs: (state.extraMs ?? 0) + event.ms }, records: [] };
     }
     case 'tick':
       return unchanged;
