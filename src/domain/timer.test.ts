@@ -168,6 +168,60 @@ describe('endEarly', () => {
   });
 });
 
+describe('extend', () => {
+  function runningBreak() {
+    const brk = completeFocus(initialState('classic'), T0).state;
+    return run(brk, { type: 'start' }, T0 + 30 * MIN).state;
+  }
+
+  it('adds time to a running Break, and presses add up', () => {
+    let s = runningBreak();
+    s = run(s, { type: 'extend', ms: 5 * MIN }, T0 + 31 * MIN).state;
+    expect(remainingMs(s, T0 + 31 * MIN)).toBe(9 * MIN);
+    s = run(s, { type: 'extend', ms: 10 * MIN }, T0 + 32 * MIN).state;
+    expect(remainingMs(s, T0 + 32 * MIN)).toBe(18 * MIN);
+    expect(scheduledEnd(s)).toBe(T0 + 50 * MIN);
+  });
+
+  it('adds time to a paused Break', () => {
+    const paused = run(runningBreak(), { type: 'pause' }, T0 + 32 * MIN).state;
+    const s = run(paused, { type: 'extend', ms: 10 * MIN }, T0 + 40 * MIN).state;
+    expect(s.status).toBe('paused');
+    expect(remainingMs(s, T0 + 40 * MIN)).toBe(13 * MIN);
+  });
+
+  it('adds time to a running Long break', () => {
+    const running = run(deepLongBreak(), { type: 'start' }, T0 + 120 * MIN).state;
+    const s = run(running, { type: 'extend', ms: 5 * MIN }, T0 + 120 * MIN).state;
+    expect(remainingMs(s, T0 + 120 * MIN)).toBe(20 * MIN);
+  });
+
+  it('records the extended length at the end, and the next break starts at the preset length', () => {
+    const s = run(runningBreak(), { type: 'extend', ms: 10 * MIN }, T0 + 31 * MIN).state;
+    expect(run(s, { type: 'tick' }, T0 + 44 * MIN).records).toEqual([]);
+    const done = run(s, { type: 'tick' }, T0 + 45 * MIN);
+    expect(done.records).toEqual([{ start: T0 + 30 * MIN, end: T0 + 45 * MIN, kind: 'break', activeMs: 15 * MIN }]);
+    expect(done.state.extraMs).toBeUndefined();
+    const nextBreak = completeFocus(done.state, T0 + 50 * MIN).state;
+    expect(nextBreak.kind).toBe('break');
+    expect(remainingMs(nextBreak, T0 + 80 * MIN)).toBe(5 * MIN);
+  });
+
+  it('records only the active time when an extended Break ends early', () => {
+    const s = run(runningBreak(), { type: 'extend', ms: 10 * MIN }, T0 + 31 * MIN).state;
+    const r = run(s, { type: 'endEarly' }, T0 + 38 * MIN);
+    expect(r.records[0].activeMs).toBe(8 * MIN);
+    expect(r.state.extraMs).toBeUndefined();
+  });
+
+  it('ignores an idle Break and any Focus', () => {
+    const idleBreak = completeFocus(initialState('classic'), T0).state;
+    expect(run(idleBreak, { type: 'extend', ms: 5 * MIN }, T0 + 30 * MIN).state).toBe(idleBreak);
+    const focus = startFocus(initialState('classic'));
+    expect(run(focus, { type: 'extend', ms: 5 * MIN }, T0 + MIN).state).toBe(focus);
+  });
+});
+
 describe('skip', () => {
   it('skips an idle Break without a record', () => {
     const brk = completeFocus(initialState('classic'), T0).state;

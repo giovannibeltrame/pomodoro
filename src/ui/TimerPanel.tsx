@@ -1,10 +1,11 @@
 import { computed, signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-import { durationMs, PHASE_LABEL, PRESETS, remainingMs, type TimerState } from '../domain/timer';
+import { durationMs, MINUTE, PHASE_LABEL, PRESETS, remainingMs, type TimerState } from '../domain/timer';
 import { dispatch, selection, timer } from '../state/signals';
 import { Tomato } from './Tomato';
 
 const APP_TITLE = 'Quadrantic Pomodoro';
+const EXTENSIONS = [5, 10];
 
 const now = signal(Date.now());
 const remainingSeconds = computed(() => Math.ceil(remainingMs(timer.value, now.value) / 1000));
@@ -104,7 +105,7 @@ export function TimerPanel() {
   }, [title]);
 
   const isFocus = state.kind === 'focus';
-  const total = durationMs(state.preset, state.kind);
+  const total = durationMs(state);
   const progress = state.status === 'idle' ? 0 : 1 - (seconds * 1000) / total;
 
   return (
@@ -146,9 +147,21 @@ export function TimerPanel() {
           </button>
         )}
         {!isFocus && state.status !== 'idle' && (
-          <button type="button" class={`${secondary} uppercase`} onClick={() => dispatch({ type: 'endEarly' })}>
-            End break
-          </button>
+          <>
+            {EXTENSIONS.map((minutes) => (
+              <button
+                key={minutes}
+                type="button"
+                class={`${secondary} uppercase`}
+                onClick={() => dispatch({ type: 'extend', ms: minutes * MINUTE })}
+              >
+                +{minutes} min
+              </button>
+            ))}
+            <button type="button" class={`${secondary} uppercase`} onClick={() => dispatch({ type: 'endEarly' })}>
+              End break
+            </button>
+          </>
         )}
       </div>
     </section>

@@ -161,7 +161,8 @@ function isTimerState(value: unknown): value is TimerState {
     (value.start === null || isNumber(value.start)) &&
     isNumber(value.activeMs) &&
     (value.segmentStart === null || isNumber(value.segmentStart)) &&
-    (value.classification === null || isClassification(value.classification))
+    (value.classification === null || isClassification(value.classification)) &&
+    isOptional(value.extraMs, isNumber)
   );
 }
 

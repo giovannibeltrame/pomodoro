@@ -51,9 +51,9 @@ test('controls per state', async () => {
     [running, ['Pause', 'Reset']],
     [paused, ['Resume', 'Reset']],
     [{ kind: 'break' }, ['Start', 'Skip']],
-    [{ kind: 'break', ...running }, ['Pause', 'End break']],
-    [{ kind: 'break', ...paused }, ['Resume', 'End break']],
-    [{ kind: 'longBreak', ...paused }, ['Resume', 'End break']],
+    [{ kind: 'break', ...running }, ['Pause', '+5 min', '+10 min', 'End break']],
+    [{ kind: 'break', ...paused }, ['Resume', '+5 min', '+10 min', 'End break']],
+    [{ kind: 'longBreak', ...paused }, ['Resume', '+5 min', '+10 min', 'End break']],
   ];
   for (const [patch, expected] of cases) {
     await act(() => setState(patch));
@@ -97,6 +97,28 @@ test('Skip and End break advance to Focus', async () => {
   await user.click(screen.getByRole('button', { name: 'End break' }));
   expect(timer.value.kind).toBe('focus');
   expect(timer.value.status).toBe('idle');
+});
+
+test('+5 min and +10 min extend a paused break', async () => {
+  const user = userEvent.setup();
+  render(<TimerPanel />);
+  await act(() => setState({ kind: 'break', position: 2, ...paused }));
+  expect(screen.getByText('04:59')).toBeTruthy();
+  await user.click(screen.getByRole('button', { name: '+5 min' }));
+  expect(screen.getByText('09:59')).toBeTruthy();
+  await user.click(screen.getByRole('button', { name: '+10 min' }));
+  expect(screen.getByText('19:59')).toBeTruthy();
+  expect(timer.value.extraMs).toBe(15 * 60_000);
+});
+
+test('+5 min extends a running break and keeps it running', async () => {
+  const user = userEvent.setup();
+  render(<TimerPanel />);
+  await act(() => setState({ kind: 'break', position: 2, ...running }));
+  await user.click(screen.getByRole('button', { name: '+5 min' }));
+  expect(timer.value.status).toBe('running');
+  expect(timer.value.extraMs).toBe(5 * 60_000);
+  expect(screen.getByText(/^(09:5\d|10:00)$/)).toBeTruthy();
 });
 
 test('Space starts, pauses and resumes', async () => {

@@ -255,4 +255,14 @@ describe('alarm', () => {
     expect(worker.sent.at(-1)).toEqual({ type: 'schedule', at: T0 + 120_000 + PRESETS.classic.focus - 60_000 });
     stop();
   });
+
+  it('reschedules when a running break is extended', () => {
+    const worker = fakeWorker();
+    const stop = startAlarm(worker);
+    writeTimer({ ...initialState('classic'), kind: 'break', position: 2 });
+    dispatch({ type: 'start' }, T0);
+    dispatch({ type: 'extend', ms: 10 * 60_000 }, T0 + 60_000);
+    expect(worker.sent.at(-1)).toEqual({ type: 'schedule', at: T0 + PRESETS.classic.break + 10 * 60_000 });
+    stop();
+  });
 });

@@ -64,6 +64,14 @@ describe('storage keys', () => {
     expect(readTimer('classic')).toEqual(timer);
   });
 
+  it('keeps the added break time and rejects a non-number one', () => {
+    const extended = { ...initialState('classic'), kind: 'break' as const, extraMs: 5 * 60_000 };
+    writeTimer(extended);
+    expect(readTimer('classic')).toEqual(extended);
+    localStorage.setItem(KEYS.timer, JSON.stringify({ v: 1, data: { ...extended, extraMs: '5' } }));
+    expect(readTimer('classic')).toEqual(initialState('classic'));
+  });
+
   it('leaves pomodoro:v1:* keys untouched', () => {
     localStorage.setItem('pomodoro:v1:phases', 'old');
     localStorage.setItem('pomodoro:v1:roles', 'old');
