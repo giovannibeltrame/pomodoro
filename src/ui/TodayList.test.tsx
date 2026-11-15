@@ -72,7 +72,7 @@ test('a break with no focus block before it is its own muted row', () => {
   expect(within(rows[0]!).queryByRole('button')).toBeNull();
 });
 
-test('a row without an intention omits the quoted part', () => {
+test('a row without an intention has no intention line', () => {
   phases.value = [{ ...focus, intention: undefined }];
   render(<TodayList />);
   expect(screen.getByRole('listitem').textContent).toBe('09:40Focus 50m·Builder·Q2');
@@ -99,6 +99,42 @@ test('the list scrolls on its own below the heading and totals', () => {
   render(<TodayList />);
   expect(screen.getByRole('list').className).toContain('overflow-y-auto');
   expect(screen.getByRole('list').contains(screen.getByRole('heading', { name: 'Today' }))).toBe(false);
+});
+
+test('the list fills the panel so a short list has room for the block menu', () => {
+  phases.value = [focus];
+  render(<TodayList />);
+  expect(screen.getByRole('list').className).toContain('flex-1');
+});
+
+test('opening the block menu scrolls it into view within the list', async () => {
+  const user = userEvent.setup();
+  const original = (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+  const calls: { target: Element; options: unknown }[] = [];
+  Element.prototype.scrollIntoView = function (this: Element, options?: unknown) {
+    calls.push({ target: this, options });
+  };
+  try {
+    seed(focus);
+    render(<TodayList />);
+    await user.click(screen.getByRole('button', { name: 'Block actions' }));
+    expect(calls).toEqual([{ target: screen.getByRole('menu'), options: { block: 'nearest' } }]);
+  } finally {
+    (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = original;
+  }
+});
+
+test('the folded break stays visible while its block is edited or confirmed for delete', async () => {
+  const user = userEvent.setup();
+  seed(focus, pause);
+  render(<TodayList />);
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+  expect(screen.getByText('+ Break 10m')).toBeTruthy();
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  await user.click(screen.getByRole('button', { name: 'Block actions' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+  expect(screen.getByText('+ Break 10m')).toBeTruthy();
 });
 
 test('phases from another day are not listed', () => {

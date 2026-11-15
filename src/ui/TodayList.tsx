@@ -118,10 +118,12 @@ function FocusRow({ entry }: { entry: Entry }) {
   const { record, rest } = entry;
   const [mode, setMode] = useState<Mode>('view');
   const ref = useRef<HTMLLIElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const open = mode === 'menu';
 
   useEffect(() => {
     if (!open) return;
+    menuRef.current?.scrollIntoView?.({ block: 'nearest' });
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setMode('view');
     };
@@ -153,6 +155,7 @@ function FocusRow({ entry }: { entry: Entry }) {
       </button>
       {open && (
         <div
+          ref={menuRef}
           role="menu"
           class="absolute top-full right-0 z-20 mt-1 flex w-[140px] flex-col rounded-md border border-menu-border bg-menu-bg py-1 text-[13px] shadow-menu"
         >
@@ -218,7 +221,6 @@ function FocusRow({ entry }: { entry: Entry }) {
                 {record.intention}
               </span>
             )}
-            {rest && <span class={meta}>{`+ ${phaseLength(rest)}`}</span>}
           </>
         ) : (
           <>
@@ -240,6 +242,7 @@ function FocusRow({ entry }: { entry: Entry }) {
             )}
           </>
         )}
+        {rest && <span class={meta}>{`+ ${phaseLength(rest)}`}</span>}
       </div>
     </li>
   );
@@ -255,7 +258,7 @@ export function TodayList() {
       {records.length === 0 ? (
         <p class="text-xs text-on-surface-variant">No blocks yet today. Start your first focus block.</p>
       ) : (
-        <ol class="-mx-2 flex min-h-0 flex-col divide-y divide-outline-variant/60 overflow-y-auto px-2">
+        <ol class="-mx-2 flex min-h-0 flex-1 flex-col divide-y divide-outline-variant/60 overflow-y-auto px-2">
           {entries(records).map((entry) =>
             entry.record.kind === 'focus' ? (
               <FocusRow key={entry.record.start} entry={entry} />
